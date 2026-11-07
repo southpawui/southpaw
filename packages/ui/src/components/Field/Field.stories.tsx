@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Field } from "./index";
+import { Field } from "./Field";
 
 const meta: Meta = {
   title: "Components/Field",

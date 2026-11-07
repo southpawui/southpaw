@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PreviewCard } from "./index";
+import { PreviewCard } from "./PreviewCard";
 
 const meta: Meta = {
   title: "Components/PreviewCard",

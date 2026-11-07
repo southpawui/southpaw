@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { AlertDialog } from "./index";
-import { Button } from "../Button";
+import { AlertDialog } from "./AlertDialog";
+import { Button } from "../Button/Button";
 
 const meta: Meta = {
   title: "Components/AlertDialog",

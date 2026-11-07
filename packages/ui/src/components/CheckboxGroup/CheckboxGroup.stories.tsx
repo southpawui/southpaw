@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { CheckboxGroup } from "./index";
-import { Checkbox } from "../Checkbox/index";
-import { Field } from "../Field";
+import { CheckboxGroup } from "./CheckboxGroup";
+import { Checkbox } from "../Checkbox/Checkbox";
+import { Field } from "../Field/Field";
 
 const meta: Meta = {
   title: "Components/CheckboxGroup",

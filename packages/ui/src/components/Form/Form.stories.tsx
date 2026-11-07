@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Form } from "./index";
-import { Input } from "../Input";
-import { Button } from "../Button";
+import { Form } from "./Form";
+import { Input } from "../Input/Input";
+import { Button } from "../Button/Button";
 
 const meta: Meta<typeof Form> = {
   title: "Components/Form",

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Dialog } from "./index";
-import { Button } from "../Button";
-import { Field } from "../Field";
-import { Input } from "../Input";
+import { Dialog } from "./Dialog";
+import { Button } from "../Button/Button";
+import { Field } from "../Field/Field";
+import { Input } from "../Input/Input";
 
 const meta: Meta = {
   title: "Components/Dialog",
