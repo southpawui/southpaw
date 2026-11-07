@@ -14,7 +14,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         data-slot="input"
         className={cn(
           // Base
-          "bg-surface-base text-fg-default w-full rounded-[var(--radius-DEFAULT)]",
+          "bg-surface-base text-fg-default w-full rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
           // Border
           "border-border-control border-2",
           // Placeholder
