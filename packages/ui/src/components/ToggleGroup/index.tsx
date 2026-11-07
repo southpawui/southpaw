@@ -9,7 +9,10 @@ export const ToggleGroup = React.forwardRef<
   <BaseToggleGroup
     ref={ref}
     data-slot="toggle-group"
-    className={cn("inline-flex gap-1", className)}
+    className={cn(
+      "inline-flex gap-[var(--sp-control-gap)] rounded-[var(--radius-DEFAULT)]",
+      className,
+    )}
     {...props}
   />
 ));
