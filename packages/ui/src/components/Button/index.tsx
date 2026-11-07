@@ -3,7 +3,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cn } from "../../lib/cn";
 
 export interface ButtonProps extends React.ComponentProps<typeof BaseButton> {
-  variant?: "solid" | "outline" | "ghost";
+  variant?: "solid" | "brand" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
 }
 
@@ -14,13 +14,33 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         data-slot="button"
         className={cn(
-          "inline-flex cursor-pointer items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          variant === "solid" && "bg-neutral-900 text-white hover:bg-neutral-800",
-          variant === "outline" && "border border-neutral-300 bg-transparent hover:bg-neutral-100",
-          variant === "ghost" && "bg-transparent hover:bg-neutral-100",
-          size === "sm" && "h-8 px-3 text-sm",
-          size === "md" && "h-10 px-4 text-sm",
-          size === "lg" && "h-12 px-6 text-base",
+          // Base
+          "inline-flex cursor-pointer items-center justify-center gap-2 font-medium",
+          // Shape
+          "rounded-[var(--radius-DEFAULT)]",
+          // Motion (Emil's easing)
+          "transition-[color,background-color,border-color,box-shadow,transform]",
+          "duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          // Press feedback (Emil's scale)
+          "active:scale-[var(--sp-scale-press)]",
+          // Focus — two-tone ring
+          "focus-visible:sp-focus-ring",
+          // Disabled
+          "disabled:pointer-events-none disabled:opacity-[var(--sp-state-disabled-opacity)]",
+
+          // Variants
+          variant === "solid" && "bg-accent text-fg-on-brand hover:bg-accent/90",
+          variant === "brand" && "bg-brand text-fg-on-brand hover:bg-brand/90",
+          variant === "outline" &&
+            "border-border-control text-fg-default border-2 bg-transparent hover:bg-[var(--sp-state-hover)]",
+          variant === "ghost" && "text-fg-default bg-transparent hover:bg-[var(--sp-state-hover)]",
+          variant === "danger" && "bg-danger text-fg-on-danger hover:bg-danger/90",
+
+          // Sizes (density-aware)
+          size === "sm" && "h-[var(--sp-control-height-sm)] px-3 text-sm",
+          size === "md" && "h-[var(--sp-control-height)] px-4 text-sm",
+          size === "lg" && "h-[var(--sp-control-height-lg)] px-6 text-base",
+
           className,
         )}
         {...props}
