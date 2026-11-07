@@ -1,0 +1,24 @@
+/*
+ * Southpaw Two-Tone Focus Ring
+ *
+ * A two-tone box-shadow ring visible on any background:
+ * - Inner ring (2px): contrasts with the focused element
+ * - Outer ring (3px): contrasts with the surrounding background
+ *
+ * Colors come from semantic tokens:
+ * - --sp-focus-inner (light: white, dark: dark, high-contrast: white)
+ * - --sp-focus-outer (light: dark, dark: light, high-contrast: black)
+ *
+ * Usage in components:
+ *   className="focus-visible:sp-focus-ring"
+ *
+ * Or via the Tailwind utility:
+ *   className="focus-visible:ring-sp"
+ */
+
+@utility sp-focus-ring {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--sp-focus-inner),
+    0 0 0 5px var(--sp-focus-outer);
+}
