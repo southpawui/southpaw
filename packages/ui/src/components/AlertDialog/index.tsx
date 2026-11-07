@@ -3,6 +3,7 @@ import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
 import { cn } from "../../lib/cn";
 
 const Root = BaseAlertDialog.Root;
+const Portal = BaseAlertDialog.Portal;
 
 const Trigger = React.forwardRef<
   HTMLButtonElement,
@@ -11,16 +12,11 @@ const Trigger = React.forwardRef<
   <BaseAlertDialog.Trigger
     ref={ref}
     data-slot="alert-dialog-trigger"
-    className={cn(
-      "inline-flex cursor-pointer items-center justify-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2",
-      className,
-    )}
+    className={cn(className)}
     {...props}
   />
 ));
 Trigger.displayName = "AlertDialog.Trigger";
-
-const Portal = BaseAlertDialog.Portal;
 
 const Backdrop = React.forwardRef<
   HTMLDivElement,
@@ -30,7 +26,9 @@ const Backdrop = React.forwardRef<
     ref={ref}
     data-slot="alert-dialog-backdrop"
     className={cn(
-      "fixed inset-0 bg-black/50 transition-all data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      "fixed inset-0 bg-black/50",
+      "transition-opacity duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-expressive)]",
+      "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
       className,
     )}
     {...props}
@@ -44,7 +42,11 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseA
       ref={ref}
       data-slot="alert-dialog-popup"
       className={cn(
-        "fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-lg transition-all data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2",
+        "bg-surface-overlay rounded-[var(--radius-lg)] p-6 shadow-lg",
+        "transition-[opacity,transform] duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-expressive)]",
+        "data-[ending-style]:scale-[var(--sp-scale-enter)] data-[ending-style]:opacity-0",
+        "data-[starting-style]:scale-[var(--sp-scale-enter)] data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -60,7 +62,7 @@ const Title = React.forwardRef<
   <BaseAlertDialog.Title
     ref={ref}
     data-slot="alert-dialog-title"
-    className={cn("text-lg font-semibold text-neutral-900", className)}
+    className={cn("text-fg-default text-lg font-semibold", className)}
     {...props}
   />
 ));
@@ -73,7 +75,7 @@ const Description = React.forwardRef<
   <BaseAlertDialog.Description
     ref={ref}
     data-slot="alert-dialog-description"
-    className={cn("mt-2 text-sm text-neutral-600", className)}
+    className={cn("text-fg-muted mt-2 text-sm", className)}
     {...props}
   />
 ));
@@ -86,22 +88,10 @@ const Close = React.forwardRef<
   <BaseAlertDialog.Close
     ref={ref}
     data-slot="alert-dialog-close"
-    className={cn(
-      "inline-flex cursor-pointer items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
-      className,
-    )}
+    className={cn(className)}
     {...props}
   />
 ));
 Close.displayName = "AlertDialog.Close";
 
-export const AlertDialog = {
-  Root,
-  Trigger,
-  Portal,
-  Backdrop,
-  Popup,
-  Title,
-  Description,
-  Close,
-};
+export const AlertDialog = { Root, Trigger, Portal, Backdrop, Popup, Title, Description, Close };
