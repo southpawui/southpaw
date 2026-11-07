@@ -3,8 +3,8 @@ import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { cn } from "../../lib/cn";
 
 const Provider = BaseTooltip.Provider;
-
 const Root = BaseTooltip.Root;
+const Portal = BaseTooltip.Portal;
 
 const Trigger = React.forwardRef<
   HTMLButtonElement,
@@ -13,8 +13,6 @@ const Trigger = React.forwardRef<
   <BaseTooltip.Trigger ref={ref} data-slot="tooltip-trigger" className={cn(className)} {...props} />
 ));
 Trigger.displayName = "Tooltip.Trigger";
-
-const Portal = BaseTooltip.Portal;
 
 const Positioner = React.forwardRef<
   HTMLDivElement,
@@ -35,7 +33,9 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseT
       ref={ref}
       data-slot="tooltip-popup"
       className={cn(
-        "z-50 rounded-md bg-neutral-900 px-3 py-1.5 text-xs text-white shadow-md",
+        "bg-accent text-fg-on-brand z-50 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs shadow-md",
+        "transition-opacity duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -49,19 +49,11 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseT
     <BaseTooltip.Arrow
       ref={ref}
       data-slot="tooltip-arrow"
-      className={cn("fill-neutral-900", className)}
+      className={cn("fill-accent", className)}
       {...props}
     />
   ),
 );
 Arrow.displayName = "Tooltip.Arrow";
 
-export const Tooltip = {
-  Provider,
-  Root,
-  Trigger,
-  Portal,
-  Positioner,
-  Popup,
-  Arrow,
-};
+export const Tooltip = { Provider, Root, Trigger, Portal, Positioner, Popup, Arrow };
