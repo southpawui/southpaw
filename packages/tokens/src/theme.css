@@ -48,5 +48,6 @@
   --radius-DEFAULT: 10px;
   --radius-lg: 14px;
   --font-sans: var(--sp-font-sans);
+  --font-serif: var(--sp-font-serif);
   --font-mono: var(--sp-font-mono);
 }
