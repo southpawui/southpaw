@@ -13,10 +13,28 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         data-slot="input"
         className={cn(
-          "w-full rounded-md border border-neutral-300 bg-white text-neutral-900 transition-colors placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900 disabled:cursor-not-allowed disabled:opacity-50",
-          size === "sm" && "h-8 px-2.5 text-sm",
-          size === "md" && "h-10 px-3 text-sm",
-          size === "lg" && "h-12 px-4 text-base",
+          // Base
+          "bg-surface-base text-fg-default w-full rounded-[var(--radius-DEFAULT)]",
+          // Border
+          "border-border-control border-2",
+          // Placeholder
+          "placeholder:text-fg-muted",
+          // Transition
+          "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          // Hover
+          "hover:border-fg-muted",
+          // Focus
+          "focus-visible:sp-focus-ring",
+          // Invalid (when used inside Field.Root with invalid prop)
+          "data-[invalid]:border-danger",
+          // Disabled
+          "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
+          // Read-only
+          "read-only:bg-surface-sunken read-only:border-border-default",
+          // Sizes (density-aware)
+          size === "sm" && "h-[var(--sp-control-height-sm)] px-2.5 text-sm",
+          size === "md" && "h-[var(--sp-control-height)] px-3 text-sm",
+          size === "lg" && "h-[var(--sp-control-height-lg)] px-4 text-base",
           className,
         )}
         {...props}
