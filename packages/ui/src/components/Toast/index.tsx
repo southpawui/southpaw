@@ -10,6 +10,7 @@ const Root = React.forwardRef<HTMLLIElement, React.ComponentProps<typeof BaseToa
 Root.displayName = "Toast.Root";
 
 const Provider = BaseToast.Provider;
+const Portal = BaseToast.Portal;
 
 const Viewport = React.forwardRef<
   HTMLOListElement,
@@ -33,7 +34,11 @@ const Content = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Bas
       ref={ref}
       data-slot="toast-content"
       className={cn(
-        "flex w-full items-start gap-3 rounded-md border border-neutral-200 bg-white p-4 shadow-lg",
+        "border-border-default bg-surface-overlay flex w-full items-start gap-3 rounded-[var(--radius-DEFAULT)] border p-4 shadow-lg",
+        // Productive motion (fast entrance)
+        "transition-[opacity,transform] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
+        "data-[ending-style]:translate-x-full data-[ending-style]:opacity-0",
+        "data-[starting-style]:translate-x-full data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -47,7 +52,7 @@ const Title = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseT
     <BaseToast.Title
       ref={ref}
       data-slot="toast-title"
-      className={cn("text-sm font-semibold text-neutral-900", className)}
+      className={cn("text-fg-default text-sm font-semibold", className)}
       {...props}
     />
   ),
@@ -61,7 +66,7 @@ const Description = React.forwardRef<
   <BaseToast.Description
     ref={ref}
     data-slot="toast-description"
-    className={cn("text-sm text-neutral-500", className)}
+    className={cn("text-fg-muted text-sm", className)}
     {...props}
   />
 ));
@@ -73,7 +78,9 @@ const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Ba
       ref={ref}
       data-slot="toast-close"
       className={cn(
-        "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-neutral-400 transition-colors hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-neutral-900",
+        "text-fg-muted inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)]",
+        "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        "hover:text-fg-default focus-visible:sp-focus-ring",
         className,
       )}
       {...props}
@@ -88,7 +95,9 @@ const Action = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof B
       ref={ref}
       data-slot="toast-action"
       className={cn(
-        "inline-flex h-8 items-center justify-center rounded-md border border-neutral-300 bg-transparent px-3 text-sm font-medium transition-colors hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-neutral-900",
+        "border-border-control text-fg-default inline-flex h-[var(--sp-control-height-sm)] items-center justify-center rounded-[var(--radius-DEFAULT)] border bg-transparent px-3 text-sm font-medium",
+        "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        "focus-visible:sp-focus-ring hover:bg-[var(--sp-state-hover)]",
         className,
       )}
       {...props}
@@ -96,8 +105,6 @@ const Action = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof B
   ),
 );
 Action.displayName = "Toast.Action";
-
-const Portal = BaseToast.Portal;
 
 export const Toast = {
   Root,
