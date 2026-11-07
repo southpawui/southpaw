@@ -1,0 +1,32 @@
+/*
+ * Southpaw Nested Border Radius
+ *
+ * When a rounded container holds rounded children, the inner
+ * radius should be smaller than the outer to keep curves
+ * concentric (the Apple principle).
+ *
+ * Formula: inner = outer - padding
+ *
+ * Usage:
+ *   Tight containers set --sp-nested-radius on themselves:
+ *     style="--sp-nested-radius: 6px"
+ *   or via Tailwind:
+ *     className="[--sp-nested-radius:6px]"
+ *
+ *   Children read it with a fallback:
+ *     rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]
+ *
+ *   When no container sets --sp-nested-radius, the fallback
+ *   kicks in and the child uses its own default radius.
+ *
+ * When to set it:
+ *   Only when container padding < container radius.
+ *   If padding >= radius, there's enough space — don't set it.
+ *
+ * Quick reference (Legible direction):
+ *   Container radius 14px, padding  8px → --sp-nested-radius: 6px
+ *   Container radius 14px, padding 12px → --sp-nested-radius: 2px
+ *   Container radius 14px, padding 24px → don't set (use default)
+ *   Container radius 10px, padding  8px → --sp-nested-radius: 2px
+ *   Container radius 10px, padding 16px → don't set (use default)
+ */

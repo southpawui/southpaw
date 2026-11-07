@@ -16,7 +16,7 @@ const preview: Preview = {
       toolbar: {
         title: "Theme",
         icon: "circlehollow",
-        items: ["light", "dark"],
+        items: ["light", "dark", "high-contrast"],
         dynamicTitle: true,
       },
     },
@@ -40,6 +40,9 @@ const preview: Preview = {
       const density = context.globals.density || "default";
       document.documentElement.setAttribute("data-theme", theme);
       document.documentElement.setAttribute("data-density", density);
+      // Sync canvas background with theme
+      document.body.style.backgroundColor = `var(--sp-surface-base)`;
+      document.body.style.color = `var(--sp-fg-default)`;
       return Story();
     },
   ],
