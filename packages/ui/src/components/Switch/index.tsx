@@ -8,7 +8,18 @@ const Root = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bas
       ref={ref}
       data-slot="switch"
       className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-neutral-300 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:opacity-50 data-[checked]:bg-neutral-900",
+        // Base
+        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full",
+        // Background — unchecked uses border-default area, checked uses accent
+        "bg-border-default",
+        // Transition
+        "transition-[background-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        // Focus
+        "focus-visible:sp-focus-ring",
+        // Checked — uses accent, not brand
+        "data-[checked]:bg-accent",
+        // Disabled
+        "disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
         className,
       )}
       {...props}
@@ -25,7 +36,14 @@ const Thumb = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
       ref={ref}
       data-slot="switch-thumb"
       className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-sm ring-0 transition-transform data-[checked]:translate-x-5 data-[unchecked]:translate-x-0",
+        // Base
+        "bg-surface-base pointer-events-none block h-5 w-5 rounded-full shadow-sm",
+        // Position
+        "translate-x-0.5",
+        // Transition
+        "transition-transform duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        // Checked position
+        "data-[checked]:translate-x-5",
         className,
       )}
       {...props}
@@ -34,7 +52,4 @@ const Thumb = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
 );
 Thumb.displayName = "Switch.Thumb";
 
-export const Switch = {
-  Root,
-  Thumb,
-};
+export const Switch = { Root, Thumb };
