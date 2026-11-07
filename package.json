@@ -1,0 +1,34 @@
+{
+  "name": "southpawui",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:a11y": "playwright test",
+    "verify": "turbo build lint typecheck test && pnpm test:a11y",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^9",
+    "@playwright/test": "^1.65.0",
+    "eslint": "^9",
+    "eslint-plugin-jsx-a11y": "^6",
+    "eslint-plugin-react": "^7",
+    "eslint-plugin-react-hooks": "^5",
+    "husky": "^9",
+    "lint-staged": "^15",
+    "prettier": "^3",
+    "prettier-plugin-tailwindcss": "^0.6",
+    "storybook": "^10.6.6",
+    "turbo": "^2",
+    "typescript": "^5",
+    "typescript-eslint": "^8"
+  }
+}

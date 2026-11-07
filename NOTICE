@@ -1,0 +1,44 @@
+Southpaw UI
+Copyright 2026 George Yiakoumi
+
+This project is licensed under the MIT License.
+
+---
+
+Built on:
+
+- Base UI (MIT) — https://base-ui.com
+  Copyright Meta Platforms, Inc. and affiliates
+
+- shadcn/ui (MIT) — https://ui.shadcn.com
+  Copyright shadcn
+  Southpaw uses the shadcn registry format and credits shadcn
+  as a foundational influence on the project.
+
+---
+
+Design tokens informed by:
+
+The people and projects below shaped Southpaw's design token
+system. We credit them here out of respect for their work.
+No source code was copied — these credits acknowledge the
+published research, principles, and open-source values that
+informed our own implementation.
+
+- Emil Kowalski (@emilkowalski_) — https://emilkowal.ski
+  Design Engineer at Linear. Creator of Sonner, Vaul, and
+  "Animations on the Web." Southpaw's motion tokens are based
+  on his published animation principles and easing curves.
+  https://github.com/emilkowalski/skills (MIT)
+
+- Material Design 3 (Google) — https://m3.material.io
+  Southpaw's density system uses Material's 4dp decrement
+  model and touch target guidelines as a foundation.
+
+- Nathan Curtis (EightShapes) — https://eightshapes.com
+  Component sizing and spatial models informed by his articles
+  "Size in Design Systems" and "Space in Design Systems."
+
+- Atlassian Design System — https://atlassian.design
+  Compact/default density modes and the 8px base unit
+  influenced Southpaw's density token scale.

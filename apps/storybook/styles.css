@@ -1,0 +1,47 @@
+@import "tailwindcss";
+@import "@southpawui/tokens/css";
+
+/* Tell Tailwind to scan the UI package for class names */
+@source "../../packages/ui/src/**/*.tsx";
+
+@theme inline {
+  /* ---- Surfaces ---- */
+  --color-surface-base: var(--sp-surface-base);
+  --color-surface-sunken: var(--sp-surface-sunken);
+  --color-surface-raised: var(--sp-surface-raised);
+  --color-surface-overlay: var(--sp-surface-overlay);
+  --color-surface-alternate: var(--sp-surface-alternate);
+
+  /* ---- Foreground ---- */
+  --color-fg-default: var(--sp-fg-default);
+  --color-fg-muted: var(--sp-fg-muted);
+  --color-fg-on-brand: var(--sp-fg-on-brand);
+  --color-fg-on-danger: var(--sp-fg-on-danger);
+
+  /* ---- Intent ---- */
+  --color-brand: var(--sp-brand);
+  --color-accent: var(--sp-accent);
+  --color-danger: var(--sp-danger);
+  --color-success: var(--sp-success);
+  --color-success-subtle: var(--sp-success-subtle);
+
+  /* ---- Borders ---- */
+  --color-border-default: var(--sp-border-default);
+  --color-border-control: var(--sp-border-control);
+
+  /* ---- State layers ---- */
+  --color-state-hover: var(--sp-state-hover);
+  --color-state-pressed: var(--sp-state-pressed);
+  --color-state-selected: var(--sp-state-selected);
+
+  /* ---- Focus ---- */
+  --color-focus-outer: var(--sp-focus-outer);
+  --color-focus-inner: var(--sp-focus-inner);
+
+  /* ---- Legible direction overrides ---- */
+  --radius-sm: 8px;
+  --radius-DEFAULT: 10px;
+  --radius-lg: 14px;
+  --font-sans: var(--sp-font-sans);
+  --font-mono: var(--sp-font-mono);
+}

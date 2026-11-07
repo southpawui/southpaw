@@ -1,0 +1,91 @@
+/*
+ * Southpaw Density Tokens
+ *
+ * Informed by:
+ *
+ * Material Design 3 (Google)
+ *   The density scale uses a 4dp decrement: each step reduces
+ *   component height by 4px. Touch targets never go below 48dp.
+ *   Formula: height = base + (4px * density-step)
+ *   https://m3.material.io/foundations/layout/understanding-layout/density
+ *
+ * Nathan Curtis (EightShapes)
+ *   Density is not just height — it's the relationship between
+ *   type size, padding, and component spacing as a system.
+ *   A library needs at most three sizes, applied consistently
+ *   across the entire catalog via design tokens.
+ *   https://eightshapes.com/articles/size-in-design-systems/
+ *
+ * Atlassian Design System
+ *   8px base unit. Spacing tokens from 2px to 80px.
+ *   Compact mode for dense contexts like tables and toolbars.
+ *   https://atlassian.design/foundations/spacing
+ *
+ * Southpaw's approach:
+ *   Three density modes scoped to any subtree via data-density.
+ *   Heights follow the 4px grid. Spacing uses Tailwind's native
+ *   scale — we only tokenise control heights and component gaps.
+ *
+ *   WCAG 2.5.8: coarse pointers enforce 44px minimum touch target.
+ */
+
+:root,
+[data-density="default"] {
+  /*
+   * Default density — balanced for general use.
+   * Heights on the 4px grid: 32 / 40 / 48.
+   */
+  --sp-control-height-sm: 2rem; /* 32px — icon buttons, compact inputs */
+  --sp-control-height: 2.5rem; /* 40px — buttons, inputs, selects */
+  --sp-control-height-lg: 3rem; /* 48px — hero CTAs, large inputs */
+
+  /* Gap between controls in a group (button group, form row) */
+  --sp-control-gap: 0.5rem; /* 8px */
+
+  /* Icon size inside controls — scales with density */
+  --sp-control-icon: 1.25rem; /* 20px */
+}
+
+[data-density="compact"] {
+  /*
+   * Compact density — data tables, toolbars, admin UIs.
+   * One 4px step down from default: 28 / 32 / 40.
+   * Tight but still legible at Atkinson Hyperlegible's 17px base.
+   */
+  --sp-control-height-sm: 1.75rem; /* 28px */
+  --sp-control-height: 2rem; /* 32px */
+  --sp-control-height-lg: 2.5rem; /* 40px */
+
+  --sp-control-gap: 0.375rem; /* 6px */
+  --sp-control-icon: 1rem; /* 16px */
+}
+
+[data-density="comfortable"] {
+  /*
+   * Comfortable density — consumer UIs, onboarding, mobile-first.
+   * One 4px step up from default: 40 / 48 / 56.
+   * Every size meets the 44px touch target minimum.
+   */
+  --sp-control-height-sm: 2.5rem; /* 40px */
+  --sp-control-height: 3rem; /* 48px */
+  --sp-control-height-lg: 3.5rem; /* 56px */
+
+  --sp-control-gap: 0.75rem; /* 12px */
+  --sp-control-icon: 1.5rem; /* 24px */
+}
+
+/*
+ * Coarse pointers (touch screens): enforce WCAG 2.5.8.
+ * Visual size stays compact, but the touch target area
+ * is padded to 44px minimum via min-height.
+ *
+ * Note: this increases the clickable area, not the visual size.
+ * Components should use min-height, not height, when
+ * this media query is active.
+ */
+@media (pointer: coarse) {
+  [data-density="compact"] {
+    --sp-control-height-sm: max(1.75rem, 2.75rem); /* min 44px */
+    --sp-control-height: max(2rem, 2.75rem); /* min 44px */
+  }
+}

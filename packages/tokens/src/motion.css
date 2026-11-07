@@ -1,0 +1,98 @@
+/*
+ * Southpaw Motion Tokens
+ *
+ * Informed by the work of Emil Kowalski (@emilkowalski_).
+ * Emil is a Design Engineer at Linear and creator of Sonner, Vaul,
+ * and the "Animations on the Web" course. His principles:
+ *
+ *   - UI animations stay under 300ms
+ *   - Never use ease-in for UI (it starts slow, feels sluggish)
+ *   - Built-in CSS easings are too weak — use custom cubic-beziers
+ *   - Easing amplifies perceived speed: ease-out at 200ms feels
+ *     faster than ease-in at 200ms
+ *   - Remove or reduce animation for interactions that happen
+ *     tens or hundreds of times a day
+ *
+ * References:
+ *   - https://emilkowal.ski/ui/7-practical-animation-tips
+ *   - https://github.com/emilkowalski/skills
+ *
+ * Two categories:
+ *   Productive — snappy UI feedback (hover, toggle, press, focus)
+ *   Expressive — entrances, exits, drawers, page transitions
+ *
+ * prefers-reduced-motion: durations zero out so transitions
+ * resolve instantly. Components should use opacity fades
+ * as the fallback — no spatial movement.
+ */
+
+:root {
+  /* ---- Productive (UI feedback, under 300ms) ---- */
+
+  /* Button press, toggle, checkbox — immediate feedback */
+  --sp-duration-press: 125ms;
+
+  /* Tooltips, small popovers, focus rings */
+  --sp-duration-fast: 150ms;
+
+  /* Dropdowns, selects, menus */
+  --sp-duration-normal: 200ms;
+
+  /* Larger panels, accordions */
+  --sp-duration-slow: 250ms;
+
+  /*
+   * Emil's "strong ease-out for UI" — elements entering or
+   * responding to interaction. Never ease-in for UI.
+   */
+  --sp-easing-default: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /*
+   * Emil's "strong ease-in-out" — on-screen repositioning,
+   * morphing, layout shifts.
+   */
+  --sp-easing-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ---- Expressive (entrances, exits, drawers) ---- */
+
+  /* Modals, dialogs — enter */
+  --sp-duration-entrance: 350ms;
+
+  /* Exit is always faster than enter */
+  --sp-duration-exit: 200ms;
+
+  /* Drawers, sheets — Emil recommends ~500ms */
+  --sp-duration-drawer: 500ms;
+
+  /*
+   * Emil's iOS-style drawer curve (Ionic-inspired).
+   * Use for drawers, sheets, and slide-in panels.
+   */
+  --sp-easing-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* ---- Stagger (lists, grids) ---- */
+
+  /* Delay between staggered items (Emil: 30-80ms) */
+  --sp-stagger-delay: 50ms;
+
+  /* ---- Scale (press feedback) ---- */
+
+  /* Button :active scale — Emil: 0.97 for subtle, 0.95 for bold */
+  --sp-scale-press: 0.97;
+  --sp-scale-enter: 0.95;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sp-duration-press: 0ms;
+    --sp-duration-fast: 0ms;
+    --sp-duration-normal: 0ms;
+    --sp-duration-slow: 0ms;
+    --sp-duration-entrance: 0ms;
+    --sp-duration-exit: 0ms;
+    --sp-duration-drawer: 0ms;
+    --sp-stagger-delay: 0ms;
+    --sp-scale-press: 1;
+    --sp-scale-enter: 1;
+  }
+}

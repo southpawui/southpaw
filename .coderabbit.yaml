@@ -1,0 +1,28 @@
+language: en
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  path_instructions:
+    - path: "packages/tokens/**"
+      instructions: |
+        Review token naming for consistency with the three-tier system:
+        primitive (--sp-*), semantic (--sp-color-*), component (--sp-button-*).
+        Flag any raw colour values that should be tokens.
+    - path: "packages/ui/**"
+      instructions: |
+        Ensure components use semantic tokens, not primitive values.
+        Check for proper data-slot attributes on all sub-elements.
+        Verify accessibility: ARIA attributes, keyboard handling, focus management.
+        Flag any runtime CSS-in-JS — only Tailwind classes and CSS variables are allowed.
+    - path: "apps/docs/**"
+      instructions: |
+        Check that doc pages follow the component template structure from BRIEF.md section 8.
+  auto_review:
+    enabled: true
+    drafts: false
+chat:
+  auto_reply: true

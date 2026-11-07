@@ -1,0 +1,49 @@
+/*
+ * Southpaw Primitives
+ *
+ * Raw palette values for the "Legible" visual direction.
+ * These are the building blocks — never used directly in components.
+ * Semantic tokens in semantic.css reference these.
+ *
+ * Palette designed in OKLCH for perceptual uniformity, shipped as hex.
+ * Greyscale mode: brand-led (hue 264, subtle blue tint on all neutrals).
+ *
+ * Customisation: users pick a hue (0-360) and a greyscale mode
+ * (brand-led or neutral). The theme playground regenerates this file.
+ */
+
+:root {
+  /* ---- Brand (hue 264) ---- */
+  --sp-brand-600: #0b4fd6;
+  --sp-brand-400: #5b8def;
+  --sp-brand-300: #8db4ff;
+
+  /* ---- Neutral (blue-tinted greyscale, hue 264) ---- */
+  --sp-neutral-950: #0a1220;
+  --sp-neutral-900: #0b1a33;
+  --sp-neutral-800: #111b2d;
+  --sp-neutral-700: #16223a;
+  --sp-neutral-600: #2a3854;
+  --sp-neutral-500: #3d4b63;
+  --sp-neutral-400: #5a6984;
+  --sp-neutral-300: #8494b0;
+  --sp-neutral-200: #b9c3d5;
+  --sp-neutral-100: #d5dce7;
+  --sp-neutral-50: #f1f4f9;
+  --sp-neutral-25: #f2f5fa;
+  --sp-neutral-0: #ffffff;
+
+  /* ---- Danger ---- */
+  --sp-danger-700: #b3261e;
+  --sp-danger-300: #ff8a80;
+
+  /* ---- Success ---- */
+  --sp-success-700: #146c2e;
+  --sp-success-300: #7ad68e;
+  --sp-success-50: #e4f2e8;
+  --sp-success-900: #11261a;
+
+  /* ---- Typography ---- */
+  --sp-font-sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --sp-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}

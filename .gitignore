@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.next/
+out/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Reference (private research, not published)
+reference/
+
+# Debug
+npm-debug.log*
+pnpm-debug.log*
+
+# Coverage
+coverage/
+
+# Playwright
+test-results/
+playwright-report/

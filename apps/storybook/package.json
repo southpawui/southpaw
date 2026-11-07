@@ -1,0 +1,29 @@
+{
+  "name": "@southpawui/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006",
+    "build": "STORYBOOK_DISABLE_TELEMETRY=1 storybook build -o dist",
+    "test:stories": "echo 'Story tests run via Storybook addon-vitest in the Storybook UI'"
+  },
+  "dependencies": {
+    "@southpawui/tokens": "workspace:*",
+    "@southpawui/ui": "workspace:*",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10",
+    "@storybook/addon-vitest": "^10.6.6",
+    "@storybook/react-vite": "^10",
+    "@storybook/test": "^8.6.15",
+    "@tailwindcss/vite": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "storybook": "^10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,136 @@
+/*
+ * Southpaw Semantic Tokens
+ *
+ * Purpose-driven mappings from primitives.
+ * These are what components and layouts consume.
+ *
+ * Naming: role (surface, fg, border, brand, accent, danger, success)
+ * States (hover, focus, pressed) are handled by Tailwind utilities,
+ * not token variants — keeps the token count low.
+ */
+
+/* ===== LIGHT (default) ===== */
+:root,
+[data-theme="light"] {
+  /* ---- Surfaces ---- */
+  --sp-surface-base: var(--sp-neutral-0);
+  --sp-surface-sunken: var(--sp-neutral-50);
+  --sp-surface-raised: var(--sp-neutral-0);
+  --sp-surface-overlay: var(--sp-neutral-0);
+  --sp-surface-alternate: var(--sp-neutral-50);
+
+  /* ---- Foreground (text / icons) ---- */
+  --sp-fg-default: var(--sp-neutral-900);
+  --sp-fg-muted: var(--sp-neutral-500);
+  --sp-fg-on-brand: var(--sp-neutral-0);
+  --sp-fg-on-danger: var(--sp-neutral-0);
+
+  /* ---- Borders ---- */
+  --sp-border-default: var(--sp-neutral-100); /* decorative, hairlines */
+  --sp-border-control: var(--sp-neutral-400); /* inputs, controls (>= 3:1) */
+
+  /* ---- Intent: brand (CTAs only) ---- */
+  --sp-brand: var(--sp-brand-600);
+
+  /* ---- Intent: accent (toggles, tabs, checks, selected states) ---- */
+  --sp-accent: var(--sp-neutral-900);
+
+  /* ---- Intent: feedback ---- */
+  --sp-danger: var(--sp-danger-700);
+  --sp-success: var(--sp-success-700);
+  --sp-success-subtle: var(--sp-success-50);
+
+  /* ---- Focus (two-tone ring) ---- */
+  --sp-focus-outer: var(--sp-neutral-900);
+  --sp-focus-inner: var(--sp-neutral-0);
+
+  /* ---- State layers (composable overlays) ---- */
+  --sp-state-hover: rgba(0, 0, 0, 0.04);
+  --sp-state-pressed: rgba(0, 0, 0, 0.08);
+  --sp-state-selected: rgba(0, 0, 0, 0.06);
+  --sp-state-disabled-opacity: 0.38;
+}
+
+/* ===== DARK ===== */
+[data-theme="dark"] {
+  /* ---- Surfaces ---- */
+  --sp-surface-base: var(--sp-neutral-950);
+  --sp-surface-sunken: var(--sp-neutral-800);
+  --sp-surface-raised: var(--sp-neutral-700);
+  --sp-surface-overlay: var(--sp-neutral-700);
+  --sp-surface-alternate: var(--sp-neutral-800);
+
+  /* ---- Foreground ---- */
+  --sp-fg-default: var(--sp-neutral-25);
+  --sp-fg-muted: var(--sp-neutral-200);
+  --sp-fg-on-brand: var(--sp-neutral-950);
+  --sp-fg-on-danger: var(--sp-neutral-950);
+
+  /* ---- Borders ---- */
+  --sp-border-default: var(--sp-neutral-600);
+  --sp-border-control: var(--sp-neutral-300);
+
+  /* ---- Intent ---- */
+  --sp-brand: var(--sp-brand-300);
+  --sp-accent: var(--sp-neutral-25);
+  --sp-danger: var(--sp-danger-300);
+  --sp-success: var(--sp-success-300);
+  --sp-success-subtle: var(--sp-success-900);
+
+  /* ---- Focus ---- */
+  --sp-focus-outer: var(--sp-neutral-25);
+  --sp-focus-inner: var(--sp-neutral-950);
+
+  /* ---- State layers ---- */
+  --sp-state-hover: rgba(255, 255, 255, 0.06);
+  --sp-state-pressed: rgba(255, 255, 255, 0.1);
+  --sp-state-selected: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== HIGH CONTRAST ===== */
+[data-theme="high-contrast"] {
+  /* ---- Surfaces ---- */
+  --sp-surface-base: #ffffff;
+  --sp-surface-sunken: #f0f0f0;
+  --sp-surface-raised: #ffffff;
+  --sp-surface-overlay: #ffffff;
+  --sp-surface-alternate: #f0f0f0;
+
+  /* ---- Foreground ---- */
+  --sp-fg-default: #000000;
+  --sp-fg-muted: #1a1a1a;
+  --sp-fg-on-brand: #ffffff;
+  --sp-fg-on-danger: #ffffff;
+
+  /* ---- Borders (all high contrast) ---- */
+  --sp-border-default: #000000;
+  --sp-border-control: #000000;
+
+  /* ---- Intent ---- */
+  --sp-brand: #0033aa;
+  --sp-accent: #000000;
+  --sp-danger: #aa0000;
+  --sp-success: #005500;
+  --sp-success-subtle: #d4edda;
+
+  /* ---- Focus ---- */
+  --sp-focus-outer: #000000;
+  --sp-focus-inner: #ffffff;
+
+  /* ---- State layers ---- */
+  --sp-state-hover: rgba(0, 0, 0, 0.08);
+  --sp-state-pressed: rgba(0, 0, 0, 0.16);
+  --sp-state-selected: rgba(0, 0, 0, 0.12);
+}
+
+/* ===== forced-colors (Windows High Contrast) ===== */
+@media (forced-colors: active) {
+  :root {
+    --sp-brand: LinkText;
+    --sp-accent: Highlight;
+    --sp-danger: LinkText;
+    --sp-focus-outer: Highlight;
+    --sp-focus-inner: Canvas;
+    --sp-border-control: ButtonText;
+  }
+}

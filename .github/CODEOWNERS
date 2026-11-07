@@ -1,0 +1,8 @@
+# Default owner for everything
+* @georgeyiakoumi
+
+# Token changes need explicit review
+packages/tokens/** @georgeyiakoumi
+
+# CI/CD changes need explicit review
+.github/** @georgeyiakoumi

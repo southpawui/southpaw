@@ -1,0 +1,34 @@
+/*
+ * shadcn Compatibility Layer
+ *
+ * Maps Southpaw semantic tokens to shadcn's variable names
+ * so that registry blocks from the shadcn ecosystem render
+ * correctly without modification.
+ *
+ * These are aliases only — Southpaw components don't use them.
+ */
+
+:root,
+[data-theme="light"],
+[data-theme="dark"],
+[data-theme="high-contrast"] {
+  --background: var(--sp-surface-base);
+  --foreground: var(--sp-fg-default);
+  --card: var(--sp-surface-raised);
+  --card-foreground: var(--sp-fg-default);
+  --popover: var(--sp-surface-overlay);
+  --popover-foreground: var(--sp-fg-default);
+  --primary: var(--sp-brand);
+  --primary-foreground: var(--sp-fg-on-brand);
+  --secondary: var(--sp-surface-sunken);
+  --secondary-foreground: var(--sp-fg-default);
+  --muted: var(--sp-surface-alternate);
+  --muted-foreground: var(--sp-fg-muted);
+  --accent: var(--sp-accent);
+  --accent-foreground: var(--sp-fg-on-brand);
+  --destructive: var(--sp-danger);
+  --destructive-foreground: var(--sp-fg-on-danger);
+  --border: var(--sp-border-default);
+  --input: var(--sp-border-control);
+  --ring: var(--sp-focus-outer);
+}

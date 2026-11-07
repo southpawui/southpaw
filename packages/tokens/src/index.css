@@ -1,0 +1,15 @@
+/*
+ * @southpawui/tokens
+ *
+ * Two-tier token system: primitives → semantic.
+ * Customisation model: hue (0-360) + base mode (brand-led or neutral).
+ *
+ * Import order matters — later files reference earlier ones.
+ */
+
+@import "./primitives.css";
+@import "./semantic.css";
+@import "./density.css";
+@import "./motion.css";
+@import "./compat.css";
+@import "./theme.css";
