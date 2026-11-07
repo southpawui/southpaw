@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Collapsible } from "./index";
+import { Collapsible } from "./Collapsible";
 
 const meta: Meta = {
   title: "Components/Collapsible",

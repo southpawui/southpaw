@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Fieldset } from "./index";
-import { Field } from "../Field/index";
+import { Fieldset } from "./Fieldset";
+import { Field } from "../Field/Field";
 
 const meta: Meta = {
   title: "Components/Fieldset",

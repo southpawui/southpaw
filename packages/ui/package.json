@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./*": "./src/components/*/index.tsx"
+    "./*": "./src/components/*/*.tsx"
   },
   "scripts": {
     "test": "vitest run",

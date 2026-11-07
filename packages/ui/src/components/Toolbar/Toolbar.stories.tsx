@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Toolbar } from "./index";
+import { Toolbar } from "./Toolbar";
 
 const meta: Meta = {
   title: "Components/Toolbar",

@@ -9,7 +9,7 @@ export const RadioGroup = React.forwardRef<
   <BaseRadioGroup
     ref={ref}
     data-slot="radio-group"
-    className={cn("flex flex-col gap-2", className)}
+    className={cn("flex flex-col gap-2.5", className)}
     {...props}
   />
 ));

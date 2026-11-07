@@ -8,7 +8,20 @@ const Root = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bas
       ref={ref}
       data-slot="radio"
       className={cn(
-        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-neutral-400 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 data-[disabled]:cursor-not-allowed data-[checked]:border-neutral-900 data-[disabled]:opacity-50",
+        // Base
+        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+        // Border
+        "border-border-control border-2",
+        // Transition
+        "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        // Hover
+        "hover:border-fg-muted",
+        // Focus
+        "focus-visible:sp-focus-ring",
+        // Checked — uses accent
+        "data-[checked]:border-accent",
+        // Disabled
+        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
         className,
       )}
       {...props}
@@ -26,13 +39,10 @@ const Indicator = React.forwardRef<
   <BaseRadio.Indicator
     ref={ref}
     data-slot="radio-indicator"
-    className={cn("h-2.5 w-2.5 rounded-full bg-neutral-900 data-[unchecked]:hidden", className)}
+    className={cn("bg-accent h-2.5 w-2.5 rounded-full data-[unchecked]:hidden", className)}
     {...props}
   />
 ));
 Indicator.displayName = "Radio.Indicator";
 
-export const Radio = {
-  Root,
-  Indicator,
-};
+export const Radio = { Root, Indicator };

@@ -10,7 +10,22 @@ const Trigger = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Bas
       ref={ref}
       data-slot="select-trigger"
       className={cn(
-        "inline-flex h-10 items-center justify-between gap-2 rounded-md border border-neutral-300 bg-white px-3 text-sm transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:opacity-50 data-[popup-open]:border-neutral-400",
+        // Base
+        "bg-surface-base text-fg-default inline-flex h-[var(--sp-control-height)] w-full items-center justify-between gap-2 rounded-[var(--radius-DEFAULT)] px-3 text-sm",
+        // Border
+        "border-border-control border-2",
+        // Transition
+        "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        // Hover
+        "hover:border-fg-muted",
+        // Focus
+        "focus-visible:sp-focus-ring",
+        // Open
+        "data-[popup-open]:border-accent",
+        // Invalid
+        "data-[invalid]:border-danger",
+        // Disabled
+        "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
         className,
       )}
       {...props}
@@ -36,7 +51,7 @@ const Icon = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof BaseS
     <BaseSelect.Icon
       ref={ref}
       data-slot="select-icon"
-      className={cn("text-neutral-500", className)}
+      className={cn("text-fg-muted", className)}
       {...props}
     />
   ),
@@ -44,6 +59,7 @@ const Icon = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof BaseS
 Icon.displayName = "Select.Icon";
 
 const Portal = BaseSelect.Portal;
+const Backdrop = BaseSelect.Backdrop;
 
 const Positioner = React.forwardRef<
   HTMLDivElement,
@@ -64,7 +80,10 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
       ref={ref}
       data-slot="select-popup"
       className={cn(
-        "z-50 max-h-[var(--available-height)] overflow-y-auto rounded-md border border-neutral-200 bg-white p-1 shadow-lg outline-none",
+        // Base
+        "bg-surface-overlay z-50 max-h-[var(--available-height)] overflow-y-auto rounded-[var(--radius-DEFAULT)] p-1 outline-none",
+        // Border + shadow
+        "border-border-default border shadow-lg",
         className,
       )}
       {...props}
@@ -91,7 +110,11 @@ const Item = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseSe
       ref={ref}
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 pl-8 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-neutral-100 data-[disabled]:opacity-50",
+        "text-fg-default relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 pl-8 text-sm outline-none",
+        // Highlighted
+        "data-[highlighted]:bg-[var(--sp-state-hover)]",
+        // Disabled
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
         className,
       )}
       {...props}
@@ -107,7 +130,10 @@ const ItemIndicator = React.forwardRef<
   <BaseSelect.ItemIndicator
     ref={ref}
     data-slot="select-item-indicator"
-    className={cn("absolute left-2 flex h-4 w-4 items-center justify-center", className)}
+    className={cn(
+      "text-accent absolute left-2 flex h-4 w-4 items-center justify-center",
+      className,
+    )}
     {...props}
   />
 ));
@@ -131,7 +157,7 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
     <BaseSelect.Arrow
       ref={ref}
       data-slot="select-arrow"
-      className={cn("fill-white stroke-neutral-200", className)}
+      className={cn("fill-surface-overlay stroke-border-default", className)}
       {...props}
     />
   ),
@@ -152,7 +178,7 @@ const GroupLabel = React.forwardRef<
   <BaseSelect.GroupLabel
     ref={ref}
     data-slot="select-group-label"
-    className={cn("px-2 py-1.5 text-xs font-semibold text-neutral-500", className)}
+    className={cn("text-fg-muted px-2 py-1.5 text-xs font-semibold", className)}
     {...props}
   />
 ));
@@ -165,7 +191,7 @@ const Separator = React.forwardRef<
   <BaseSelect.Separator
     ref={ref}
     data-slot="select-separator"
-    className={cn("-mx-1 my-1 h-px bg-neutral-200", className)}
+    className={cn("bg-border-default -mx-1 my-1 h-px", className)}
     {...props}
   />
 ));
@@ -178,7 +204,7 @@ const ScrollUpArrow = React.forwardRef<
   <BaseSelect.ScrollUpArrow
     ref={ref}
     data-slot="select-scroll-up-arrow"
-    className={cn("flex items-center justify-center py-1 text-neutral-500", className)}
+    className={cn("text-fg-muted flex items-center justify-center py-1", className)}
     {...props}
   />
 ));
@@ -191,7 +217,7 @@ const ScrollDownArrow = React.forwardRef<
   <BaseSelect.ScrollDownArrow
     ref={ref}
     data-slot="select-scroll-down-arrow"
-    className={cn("flex items-center justify-center py-1 text-neutral-500", className)}
+    className={cn("text-fg-muted flex items-center justify-center py-1", className)}
     {...props}
   />
 ));
@@ -203,6 +229,7 @@ export const Select = {
   Value,
   Icon,
   Portal,
+  Backdrop,
   Positioner,
   Popup,
   List,

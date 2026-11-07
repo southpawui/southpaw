@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Checkbox } from "./index";
+import { Checkbox } from "./Checkbox";
+import { Field } from "../Field/Field";
 
 const meta: Meta = {
   title: "Components/Checkbox",
@@ -8,54 +9,69 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-export const Unchecked: Story = {
+export const Default: Story = {
   render: () => (
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
-    <label className="flex items-center gap-2">
-      <Checkbox.Root defaultChecked={false}>
-        <Checkbox.Indicator />
-      </Checkbox.Root>
-      <span className="text-sm">Unchecked</span>
-    </label>
+    <Field.Root>
+      <div className="flex items-center gap-2">
+        <Checkbox.Root>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        <Field.Label className="cursor-pointer">Accept terms and conditions</Field.Label>
+      </div>
+    </Field.Root>
   ),
 };
 
 export const Checked: Story = {
   render: () => (
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
-    <label className="flex items-center gap-2">
-      <Checkbox.Root defaultChecked>
-        <Checkbox.Indicator />
-      </Checkbox.Root>
-      <span className="text-sm">Checked</span>
-    </label>
+    <Field.Root>
+      <div className="flex items-center gap-2">
+        <Checkbox.Root defaultChecked>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        <Field.Label className="cursor-pointer">Email notifications</Field.Label>
+      </div>
+    </Field.Root>
   ),
 };
 
 export const Indeterminate: Story = {
   render: () => (
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
-    <label className="flex items-center gap-2">
-      <Checkbox.Root checked="mixed">
-        <Checkbox.Indicator>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <path d="M2.5 6H9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </Checkbox.Indicator>
-      </Checkbox.Root>
-      <span className="text-sm">Indeterminate</span>
-    </label>
+    <Field.Root>
+      <div className="flex items-center gap-2">
+        <Checkbox.Root indeterminate>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        <Field.Label className="cursor-pointer">Select all</Field.Label>
+      </div>
+    </Field.Root>
   ),
 };
 
 export const Disabled: Story = {
   render: () => (
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
-    <label className="flex items-center gap-2">
-      <Checkbox.Root disabled defaultChecked>
-        <Checkbox.Indicator />
-      </Checkbox.Root>
-      <span className="text-sm text-neutral-400">Disabled</span>
-    </label>
+    <Field.Root disabled>
+      <div className="flex items-center gap-2">
+        <Checkbox.Root defaultChecked>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        <Field.Label>Mandatory agreement (cannot be changed)</Field.Label>
+      </div>
+      <Field.Description>This was agreed during onboarding.</Field.Description>
+    </Field.Root>
+  ),
+};
+
+export const WithError: Story = {
+  render: () => (
+    <Field.Root invalid>
+      <div className="flex items-center gap-2">
+        <Checkbox.Root>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        <Field.Label className="cursor-pointer">I agree to the privacy policy</Field.Label>
+      </div>
+      <Field.Error>You must agree to continue.</Field.Error>
+    </Field.Root>
   ),
 };

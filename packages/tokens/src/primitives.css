@@ -45,5 +45,6 @@
 
   /* ---- Typography ---- */
   --sp-font-sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --sp-font-serif: "Literata", Georgia, serif;
   --sp-font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }

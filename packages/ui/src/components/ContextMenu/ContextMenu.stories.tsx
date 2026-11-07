@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ContextMenu } from "./index";
+import { ContextMenu } from "./ContextMenu";
 
 const meta: Meta = {
   title: "Components/ContextMenu",
