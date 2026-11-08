@@ -19,6 +19,7 @@
  */
 
 import { chromium } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { execSync } from "child_process";
 
 const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
@@ -75,16 +76,36 @@ async function main() {
   pass(`Found ${stories.length} stories`);
 
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
+  const context = await browser.newContext();
+  const page = await context.newPage();
 
-  // Step 3: A11y audit
-  console.log("\n━━━ Step 3: A11y Audit ━━━");
+  // Page-level rules to ignore (Storybook iframe issues, not component issues)
+  const IGNORE_RULES = ["landmark-one-main", "page-has-heading-one", "region", "bypass"];
+
+  // Step 3: A11y audit (violations + inconclusives)
+  console.log("\n━━━ Step 3: A11y Audit (violations + inconclusives) ━━━");
   for (const story of stories) {
+    await page.goto(`${STORYBOOK_URL}/iframe.html?id=${story}&viewMode=story`);
+    await page.waitForTimeout(2000);
     try {
-      execSync(`pnpm a11y ${story}`, { cwd: process.cwd(), stdio: "pipe" });
-      pass(`${story} — a11y pass`);
+      const results = await new AxeBuilder({ page }).analyze();
+      const violations = results.violations.filter((v) => !IGNORE_RULES.includes(v.id));
+      const incomplete = results.incomplete.filter((v) => !IGNORE_RULES.includes(v.id));
+
+      if (violations.length > 0) {
+        violations.forEach((v) => fail(`${story} — [${v.impact}] ${v.id}: ${v.description}`));
+      } else if (incomplete.length > 0) {
+        incomplete.forEach((v) =>
+          console.log(
+            `  ⚠️  ${story} — [inconclusive] ${v.id}: ${v.nodes.length} node(s) need manual review`,
+          ),
+        );
+        pass(`${story} — a11y pass (${incomplete.length} inconclusive — manual review needed)`);
+      } else {
+        pass(`${story} — a11y pass (${results.passes.length} passes)`);
+      }
     } catch {
-      fail(`${story} — a11y violations found. Run: pnpm a11y ${story}`);
+      fail(`${story} — a11y audit error`);
     }
   }
 

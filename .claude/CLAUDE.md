@@ -71,7 +71,7 @@ These are not optional. Use them as part of every verification flow:
 - Read the screenshot images to verify with your own eyes. Do not skip this.
 - **Critically evaluate** what you see — don't just confirm it renders. Ask: does the layout make sense? Is the spacing right? Are elements aligned? Would a user find this intuitive? Compare against how the competition does it. If something looks off, fix it before presenting to the user.
 - **Screenshot EVERY story** before presenting to the user, not just one. A fix applied to one story may not have propagated to others. Check them all.
-- **Themes story must show ALL states**: default, valid, error, disabled. This is the showcase page — every visual state should be visible in every theme.
+- **Both States AND Themes stories must show ALL states**: default, valid, error, disabled. Every visual state should be visible. No exceptions.
 - Do NOT delete screenshots until the user has reviewed and confirmed they're happy. The user needs to see them. Only clean up after explicit user sign-off.
 
 ### 5. Run tests and verify
