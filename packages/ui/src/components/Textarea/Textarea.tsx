@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Field as BaseField } from "@base-ui/react/field";
 import { CheckIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
 
@@ -34,15 +35,15 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           className,
         )}
       >
-        <textarea
+        <BaseField.Control
           ref={ref}
+          render={<textarea />}
           data-slot="textarea"
           rows={rows ?? (autosize ? 1 : 3)}
           className={cn(
             "text-fg-default placeholder:text-fg-muted w-full bg-transparent px-3 py-2 text-sm outline-none",
             "disabled:cursor-not-allowed",
             autosize ? "resize-none [field-sizing:content]" : `resize-${resize}`,
-            // When not autosize, ensure a sensible min height
             !autosize && "min-h-20",
           )}
           {...props}
