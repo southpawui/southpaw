@@ -57,6 +57,8 @@ main
 - Identify gaps between our implementation and the best-in-class.
 - Present findings and get approval before implementing.
 - For simple components (Separator, Badge, Avatar), a quick check of 2–3 libraries is sufficient — use judgement on scope.
+- **Do not defer features that multiple competitors offer.** If 2+ libraries have a feature (clear button, read-only state, virtual scroll, etc.), it should be in scope — not "added later." The goal is best-in-class, not minimum viable.
+- **Document the research.** Save the competitive analysis as a `.md` file in the component's directory (e.g. `packages/ui/src/components/Select/RESEARCH.md`). Also add a summary to the Linear issue. This is a permanent record, not throwaway context.
 
 ### 4. Verify visually — use the E2E tools
 
@@ -66,6 +68,7 @@ These are not optional. Use them as part of every verification flow:
 - `pnpm interact <actions...>` — test hover, focus, active, disabled states by interacting with the actual rendered component.
 - `pnpm a11y <component-name>` — run axe-core audit on all stories for the component.
 - Read the screenshot images to verify with your own eyes. Do not skip this.
+- **Critically evaluate** what you see — don't just confirm it renders. Ask: does the layout make sense? Is the spacing right? Would a user find this intuitive? Compare against how the competition does it. If something looks off, fix it before presenting to the user.
 - Delete screenshots from `e2e/__screenshots__/` after verification — don't leave them accumulating. Only keep them if the user needs to review.
 
 ### 5. Run tests
