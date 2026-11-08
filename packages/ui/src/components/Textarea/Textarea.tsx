@@ -1,68 +1,58 @@
 import * as React from "react";
+import { CheckIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
 
+/* ============================================================
+ * Textarea
+ * ============================================================ */
+
 export interface TextareaProps extends React.ComponentPropsWithRef<"textarea"> {
-  /** Show a character count. Pass the max length. */
-  maxLength?: number;
+  /** Auto-resize to fit content. Uses CSS field-sizing: content. */
+  autosize?: boolean;
+  /** CSS resize behavior. Default: "vertical". Set to "none" when using autosize. */
+  resize?: "none" | "vertical" | "horizontal" | "both";
+  /** Show valid/success state — green border + checkmark */
+  valid?: boolean;
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, maxLength, onChange, ...props }, ref) => {
-    const [length, setLength] = React.useState(() =>
-      typeof props.defaultValue === "string" ? props.defaultValue.length : 0,
-    );
-
-    const handleChange = React.useCallback(
-      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setLength(e.target.value.length);
-        onChange?.(e);
-      },
-      [onChange],
-    );
-
+  ({ className, autosize, resize = "vertical", valid, rows, ...props }, ref) => {
     return (
-      <div data-slot="textarea-wrapper" className="relative">
+      <div
+        data-slot="textarea-group"
+        className={cn(
+          "relative flex",
+          "bg-surface-base w-full rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+          "border-border-control border-2",
+          "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          "hover:has-[:not(:disabled,:read-only)]:border-fg-muted",
+          "has-[:focus-visible]:sp-focus-ring",
+          "has-[[data-invalid]]:border-danger",
+          valid && "border-success",
+          "has-[:disabled]:bg-surface-sunken has-[:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+          "has-[:read-only]:bg-surface-sunken has-[:read-only]:border-border-default",
+          className,
+        )}
+      >
         <textarea
           ref={ref}
           data-slot="textarea"
-          maxLength={maxLength}
-          onChange={handleChange}
+          rows={rows ?? (autosize ? 1 : 3)}
           className={cn(
-            // Base
-            "bg-surface-base text-fg-default w-full rounded-[var(--radius-DEFAULT)]",
-            "min-h-20 resize-y px-3 py-2 text-sm",
-            // Border
-            "border-border-control border-2",
-            // Placeholder
-            "placeholder:text-fg-muted",
-            // Transition
-            "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-            // Hover
-            "hover:border-fg-muted",
-            // Focus
-            "focus-visible:sp-focus-ring",
-            // Invalid
-            "data-[invalid]:border-danger",
-            // Disabled
-            "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
-            // Read-only
-            "read-only:bg-surface-sunken read-only:border-border-default",
-            // If character count shown, add bottom padding
-            maxLength && "pb-7",
-            className,
+            "text-fg-default placeholder:text-fg-muted w-full bg-transparent px-3 py-2 text-sm outline-none",
+            "disabled:cursor-not-allowed",
+            autosize ? "resize-none [field-sizing:content]" : `resize-${resize}`,
+            // When not autosize, ensure a sensible min height
+            !autosize && "min-h-20",
           )}
           {...props}
         />
-        {maxLength && (
+        {valid && (
           <span
-            data-slot="textarea-count"
-            className={cn(
-              "text-fg-muted pointer-events-none absolute bottom-2 right-3 text-xs",
-              length > maxLength && "text-danger",
-            )}
-            aria-live="polite"
+            data-slot="textarea-valid"
+            className="text-success pointer-events-none absolute right-3 top-2.5"
           >
-            {length}/{maxLength}
+            <CheckIcon className="h-4 w-4" />
           </span>
         )}
       </div>
