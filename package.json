@@ -13,7 +13,8 @@
     "a11y": "node --experimental-strip-types --no-warnings e2e/a11y-audit.ts",
     "interact": "node --experimental-strip-types --no-warnings e2e/interact.ts",
     "dom": "node --experimental-strip-types --no-warnings e2e/dom.ts",
-    "verify": "turbo build lint typecheck test && pnpm test:a11y",
+    "verify": "node --experimental-strip-types --no-warnings e2e/verify.ts",
+    "verify:ci": "turbo build lint typecheck test && pnpm test:a11y",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"

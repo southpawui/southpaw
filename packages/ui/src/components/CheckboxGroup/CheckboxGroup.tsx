@@ -9,7 +9,7 @@ export const CheckboxGroup = React.forwardRef<
   <BaseCheckboxGroup
     ref={ref}
     data-slot="checkbox-group"
-    className={cn("flex flex-col gap-3", className)}
+    className={cn("flex flex-col gap-[var(--sp-control-gap)]", className)}
     {...props}
   />
 ));

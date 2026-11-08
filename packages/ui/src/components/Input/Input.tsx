@@ -233,6 +233,10 @@ function PhoneCodeSelect({
   countries: CountryCode[];
   disabled?: boolean;
 }) {
+  // Note: Base UI Field context propagates IDs to nested controls, causing
+  // duplicate IDs when a Select is inside a Field. This is a known Base UI
+  // limitation — the Select trigger inherits the Field's control ID.
+  // TODO: Report to Base UI or find a context-breaking workaround.
   if (countries.length === 1) {
     return (
       <span
