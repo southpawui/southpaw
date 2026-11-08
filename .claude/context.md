@@ -84,6 +84,7 @@ e2e/               — Playwright tests, screenshot tool, a11y audit, interact t
 - `pnpm screenshot <story-id>` — visual pixel comparison against baseline
 - `pnpm a11y <story-id|component>` — axe-core a11y audit (JSON results)
 - `pnpm interact <actions...>` — navigate, hover, click, type, tab, screenshot
+- `pnpm dom <story-id>` — dump rendered DOM structure, slot/role tree, flag redundant wrappers
 
 ## References & Influences
 

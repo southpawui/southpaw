@@ -70,6 +70,7 @@ function ClearButton({ onClear }: { onClear: () => void }) {
       data-slot="select-clear"
       className="text-fg-muted hover:text-fg-default !h-5 !min-h-0 !w-5 !min-w-0 !rounded-full"
       tabIndex={-1}
+      nativeButton={false}
       render={<span role="button" />}
       onClick={(e) => {
         e.preventDefault();
