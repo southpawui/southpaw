@@ -11,11 +11,12 @@
  *
  * Runs:
  *   1. Unit tests (Vitest)
- *   2. A11y audit (axe-core on all stories)
- *   3. Duplicate ID check (all stories)
- *   4. Accessible name check (all interactive elements)
- *   5. DOM redundancy check (redundant wrapper divs)
- *   6. Screenshots of all stories (saved for user review)
+ *   2. Per-story checks (single navigation per story):
+ *      - A11y audit (axe-core, violations + inconclusives)
+ *      - Duplicate ID check
+ *      - Accessible name check (all interactive elements)
+ *      - DOM redundancy check (redundant wrapper divs)
+ *   3. Screenshots of all stories (saved for user review)
  */
 
 import { chromium } from "@playwright/test";
@@ -43,6 +44,9 @@ function pass(msg: string) {
   console.log(`  ✅ ${msg}`);
 }
 
+// Page-level rules to ignore (Storybook iframe issues, not component issues)
+const IGNORE_RULES = ["landmark-one-main", "page-has-heading-one", "region", "bypass"];
+
 async function main() {
   console.log(`\n🔍 Verifying component: ${component}\n`);
 
@@ -55,7 +59,7 @@ async function main() {
     fail("Unit tests failed — run `pnpm test` to see errors");
   }
 
-  // Step 2-5: Browser-based checks
+  // Step 2: Fetch stories
   console.log("\n━━━ Step 2: Fetching stories ━━━");
   let stories: string[] = [];
   try {
@@ -79,14 +83,13 @@ async function main() {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Page-level rules to ignore (Storybook iframe issues, not component issues)
-  const IGNORE_RULES = ["landmark-one-main", "page-has-heading-one", "region", "bypass"];
-
-  // Step 3: A11y audit (violations + inconclusives)
-  console.log("\n━━━ Step 3: A11y Audit (violations + inconclusives) ━━━");
+  // Step 3: Per-story checks (single navigation per story)
+  console.log("\n━━━ Step 3: Per-story checks ━━━");
   for (const story of stories) {
     await page.goto(`${STORYBOOK_URL}/iframe.html?id=${story}&viewMode=story`);
     await page.waitForTimeout(2000);
+
+    // 3a: A11y audit (violations + inconclusives)
     try {
       const results = await new AxeBuilder({ page }).analyze();
       const violations = results.violations.filter((v) => !IGNORE_RULES.includes(v.id));
@@ -107,14 +110,8 @@ async function main() {
     } catch {
       fail(`${story} — a11y audit error`);
     }
-  }
 
-  // Step 4: Duplicate ID check
-  console.log("\n━━━ Step 4: Duplicate ID Check ━━━");
-  for (const story of stories) {
-    await page.goto(`${STORYBOOK_URL}/iframe.html?id=${story}&viewMode=story`);
-    await page.waitForTimeout(2000);
-
+    // 3b: Duplicate ID check
     const dupes = await page.evaluate(() => {
       const idMap = new Map<string, string[]>();
       document.querySelectorAll("[id]").forEach((el) => {
@@ -138,14 +135,8 @@ async function main() {
     } else {
       pass(`${story} — no duplicate IDs`);
     }
-  }
 
-  // Step 5: Accessible name check
-  console.log("\n━━━ Step 5: Accessible Name Check ━━━");
-  for (const story of stories) {
-    await page.goto(`${STORYBOOK_URL}/iframe.html?id=${story}&viewMode=story`);
-    await page.waitForTimeout(1500);
-
+    // 3c: Accessible name check
     const missing = await page.evaluate(() => {
       const interactiveRoles = ["checkbox", "radio", "switch", "button", "combobox", "slider"];
       const elements = document.querySelectorAll(
@@ -159,13 +150,11 @@ async function main() {
         const textContent = el.textContent?.trim();
         const title = el.getAttribute("title");
 
-        // Check if element has any accessible name source
         if (!ariaLabel && !ariaLabelledby && !textContent && !title) {
           const slot = el.getAttribute("data-slot") || el.tagName.toLowerCase();
           issues.push(`${role} (${slot}) has no accessible name`);
         }
 
-        // If aria-labelledby references an element, check it exists
         if (ariaLabelledby) {
           const referenced = document.getElementById(ariaLabelledby);
           if (!referenced) {
@@ -183,14 +172,8 @@ async function main() {
     } else {
       pass(`${story} — all interactive elements have accessible names`);
     }
-  }
 
-  // Step 6: DOM redundancy check
-  console.log("\n━━━ Step 6: DOM Redundancy Check ━━━");
-  for (const story of stories) {
-    await page.goto(`${STORYBOOK_URL}/iframe.html?id=${story}&viewMode=story`);
-    await page.waitForTimeout(1500);
-
+    // 3d: DOM redundancy check
     const warnings = await page.evaluate(() => {
       function findRedundant(el: Element, path: string): string[] {
         const w: string[] = [];
@@ -225,8 +208,8 @@ async function main() {
     }
   }
 
-  // Step 7: Screenshots
-  console.log("\n━━━ Step 7: Screenshots ━━━");
+  // Step 4: Screenshots
+  console.log("\n━━━ Step 4: Screenshots ━━━");
   for (const story of stories) {
     try {
       execSync(`pnpm screenshot ${story} --update`, { cwd: process.cwd(), stdio: "pipe" });
