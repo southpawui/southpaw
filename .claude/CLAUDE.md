@@ -37,7 +37,8 @@ main
 - Saying "this works" or "looks good" → Did you screenshot and visually verify? (Step 4)
 - Saying "tests pass" → Did you actually run them and see the output? (Step 5)
 - Typing `git commit` or `git push` → Did the user explicitly approve? (Step 6)
-- Finishing a task → Did you update Linear and Notion? (Step 7)
+- Finishing a task → Did you update the component LOG.md? (Step 7)
+- Finishing a task → Did you update Linear and Notion? (Step 8)
 
 ### 1. Read before speaking
 
@@ -71,7 +72,7 @@ These are not optional. Use them as part of every verification flow:
 - Read the screenshot images to verify with your own eyes. Do not skip this.
 - **Critically evaluate** what you see — don't just confirm it renders. Ask: does the layout make sense? Is the spacing right? Are elements aligned? Would a user find this intuitive? Compare against how the competition does it. If something looks off, fix it before presenting to the user.
 - **Screenshot EVERY story** before presenting to the user, not just one. A fix applied to one story may not have propagated to others. Check them all.
-- **Themes story must show ALL states**: default, valid, error, disabled. This is the showcase page — every visual state should be visible in every theme.
+- **Both States AND Themes stories must show ALL states**: default, valid, error, disabled. Every visual state should be visible. No exceptions.
 - Do NOT delete screenshots until the user has reviewed and confirmed they're happy. The user needs to see them. Only clean up after explicit user sign-off.
 
 ### 5. Run tests and verify
@@ -89,21 +90,27 @@ These are not optional. Use them as part of every verification flow:
 - Never batch up "commit and push" — they are separate decisions.
 - Commit messages follow conventional commits: `feat(scope):`, `fix(scope):`, `perf(scope):`, `test(scope):`, `refactor(scope):`. Scope is the component name in lowercase (e.g. `feat(textarea): add autosize prop`).
 
-### 7. Keep Linear and Notion in sync
+### 7. Update the component LOG.md
+
+- Every component has a `LOG.md` in its directory. After every change — enhancement, bug fix, refactor, decision — add an entry with the date, what changed, and why.
+- Include "Considered and rejected" entries for decisions that were reversed or features that were built and then removed, with reasoning.
+- This is a permanent record that survives context compaction. Future `/improve` runs should read it before suggesting changes that contradict past decisions.
+
+### 8. Keep Linear and Notion in sync
 
 - Update Linear issue status when work starts, progresses, or completes.
 - Add notes to Linear issues when scope changes or decisions are made.
 - Update Notion project page to reflect current state.
 - Do this as you go, not as an afterthought.
 
-### 8. Assess whether /improve is warranted
+### 9. Assess whether /improve is warranted
 
 - After completing a task, consider whether the scale and complexity warrants running `/improve` on the changed files.
 - Small, isolated changes (a bug fix, a story tweak) — skip it.
 - Substantial component work (new component, major refactor, compound sub-components) — run it.
 - When in doubt, ask the user.
 
-### 9. Releases
+### 10. Releases
 
 - **After every feature PR is merged**: create a patch/pre-release tag (e.g. `v0.1.0-alpha.1`, `v0.1.0-alpha.2`) with a GitHub Release summarising what changed. Skip for trivial fix-only PRs.
 - **After a phase completes**: create a minor version release (e.g. `v0.1.0`, `v0.2.0`) with a full changelog covering everything in the phase.
