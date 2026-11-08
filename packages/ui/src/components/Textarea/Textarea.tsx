@@ -31,7 +31,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           "has-[[data-invalid]]:!border-danger",
           valid && "!border-success",
           "has-[:disabled]:bg-surface-sunken has-[:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
-          "has-[:read-only]:bg-surface-sunken has-[:read-only]:border-border-default",
+          "has-[textarea:read-only]:bg-surface-sunken has-[textarea:read-only]:border-border-default",
           className,
         )}
       >
