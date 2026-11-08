@@ -205,21 +205,25 @@ CharacterCount.displayName = "Field.CharacterCount";
 
 /* ----- Group ----- */
 interface FieldGroupProps extends React.ComponentPropsWithRef<"div"> {
-  /** Spacing between fields. Default uses standard field gap. */
+  /** Layout direction. "row" for inline checkbox/radio + label. "column" for stacking fields. */
+  direction?: "row" | "column";
+  /** Spacing between items (column direction only). */
   spacing?: "tight" | "default" | "loose";
 }
 
 const Group = React.forwardRef<HTMLDivElement, FieldGroupProps>(
-  ({ className, spacing = "default", ...props }, ref) => (
+  ({ className, direction = "column", spacing = "default", ...props }, ref) => (
     <div
       ref={ref}
       data-slot="field-group"
       role="group"
       className={cn(
-        "flex flex-col",
-        spacing === "tight" && "gap-3",
-        spacing === "default" && "gap-4",
-        spacing === "loose" && "gap-6",
+        "flex",
+        direction === "column" && "flex-col",
+        direction === "column" && spacing === "tight" && "gap-3",
+        direction === "column" && spacing === "default" && "gap-4",
+        direction === "column" && spacing === "loose" && "gap-6",
+        direction === "row" && "items-start gap-2",
         className,
       )}
       {...props}
