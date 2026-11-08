@@ -85,6 +85,7 @@ e2e/               — Playwright tests, screenshot tool, a11y audit, interact t
 - `pnpm a11y <story-id|component>` — axe-core a11y audit (JSON results)
 - `pnpm interact <actions...>` — navigate, hover, click, type, tab, screenshot
 - `pnpm dom <story-id>` — dump rendered DOM structure, slot/role tree, flag redundant wrappers
+- `pnpm verify <component>` — run ALL checks: tests, a11y, duplicate IDs, accessible names, DOM redundancy, screenshots. **Must pass before presenting work to user.**
 
 ## References & Influences
 

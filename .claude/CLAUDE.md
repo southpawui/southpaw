@@ -24,7 +24,7 @@ main
 
 ## Before actioning anything, follow these steps:
 
-**MANDATORY: Before every task, re-read BOTH of these files and confirm you have done so. Do not skip this. Do not rely on memory. Open them, read them, then proceed.**
+**MANDATORY: Before every task, re-read BOTH of these files and confirm you have done so. Do not skip this. Do not rely on memory. Open them, read them, then proceed. "Every task" means every new component, every new prompt from the user, every time you resume after a break or context compaction. If in doubt, re-read.**
 
 1. This file: `CLAUDE.md` (process instructions)
 2. Context file: `context.md` (stack, conventions, references, influences)
@@ -66,18 +66,20 @@ These are not optional. Use them as part of every verification flow:
 
 - `pnpm screenshot <story-id>` — take screenshots and visually confirm changes look correct.
 - `pnpm interact <actions...>` — test hover, focus, active, disabled states by interacting with the actual rendered component.
-- `pnpm a11y <component-name>` — run axe-core audit on all stories for the component.
+- `pnpm a11y <component-name>` — run axe-core audit on all stories for the component. After EVERY story change, also run: (1) duplicate ID check across all stories, (2) check that every interactive element has an accessible name (`aria-label` or `aria-labelledby`). The CLI tool may not catch everything the Storybook addon does. Never present work to the user without having checked for both violations AND inconclusives.
 - `pnpm dom <story-id>` — inspect the rendered DOM structure. Check for redundant wrapper divs, unnecessary nesting, and correct data-slot/role attributes. If a `<div>` wraps a single `<div>` with no semantic purpose, remove it.
 - Read the screenshot images to verify with your own eyes. Do not skip this.
 - **Critically evaluate** what you see — don't just confirm it renders. Ask: does the layout make sense? Is the spacing right? Are elements aligned? Would a user find this intuitive? Compare against how the competition does it. If something looks off, fix it before presenting to the user.
 - **Screenshot EVERY story** before presenting to the user, not just one. A fix applied to one story may not have propagated to others. Check them all.
-- Delete screenshots from `e2e/__screenshots__/` after verification — don't leave them accumulating. Only keep them if the user needs to review.
+- **Themes story must show ALL states**: default, valid, error, disabled. This is the showcase page — every visual state should be visible in every theme.
+- Do NOT delete screenshots until the user has reviewed and confirmed they're happy. The user needs to see them. Only clean up after explicit user sign-off.
 
-### 5. Run tests
+### 5. Run tests and verify
 
 - Run `pnpm test` (Vitest) after every code change.
 - Never claim something works without seeing the test output.
 - If tests fail, fix them before moving on.
+- **Before presenting ANY component to the user, run `pnpm verify <component>`.** This runs tests, a11y, duplicate IDs, accessible names, DOM redundancy, and screenshots in one command. If it fails, fix the issues before presenting. Do NOT skip this.
 
 ### 6. Never commit or push without user sign-off
 

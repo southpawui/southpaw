@@ -2,14 +2,23 @@ import * as React from "react";
 import { Radio as BaseRadio } from "@base-ui/react/radio";
 import { cn } from "../../lib/cn";
 
-const Root = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BaseRadio.Root>>(
-  ({ className, children, ...props }, ref) => (
+/* ============================================================
+ * Root
+ * ============================================================ */
+
+export interface RadioProps extends React.ComponentProps<typeof BaseRadio.Root> {
+  /** Show valid/success state — green border when checked */
+  valid?: boolean;
+}
+
+const Root = React.forwardRef<HTMLButtonElement, RadioProps>(
+  ({ className, valid, children, ...props }, ref) => (
     <BaseRadio.Root
       ref={ref}
       data-slot="radio"
       className={cn(
-        // Base
-        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+        // Base — fixed size, circular
+        "inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full",
         // Border
         "border-border-control border-2",
         // Transition
@@ -20,17 +29,25 @@ const Root = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bas
         "focus-visible:sp-focus-ring",
         // Checked — uses accent
         "data-[checked]:border-accent",
+        // Invalid (from Field context)
+        "data-[invalid]:!border-danger",
+        // Valid
+        valid && "data-[checked]:!border-success",
         // Disabled
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
         className,
       )}
       {...props}
     >
-      {children}
+      {children ?? <Indicator />}
     </BaseRadio.Root>
   ),
 );
 Root.displayName = "Radio.Root";
+
+/* ============================================================
+ * Indicator
+ * ============================================================ */
 
 const Indicator = React.forwardRef<
   HTMLSpanElement,
@@ -39,10 +56,14 @@ const Indicator = React.forwardRef<
   <BaseRadio.Indicator
     ref={ref}
     data-slot="radio-indicator"
-    className={cn("bg-accent h-2.5 w-2.5 rounded-full data-[unchecked]:hidden", className)}
+    className={cn("h-2.5 w-2.5 rounded-full data-[unchecked]:hidden", "bg-accent", className)}
     {...props}
   />
 ));
 Indicator.displayName = "Radio.Indicator";
+
+/* ============================================================
+ * Compound export
+ * ============================================================ */
 
 export const Radio = { Root, Indicator };
