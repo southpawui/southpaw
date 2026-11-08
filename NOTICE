@@ -15,6 +15,28 @@ Built on:
   Southpaw uses the shadcn registry format and credits shadcn
   as a foundational influence on the project.
 
+- libphonenumber-js (MIT) — https://github.com/catamphetamine/libphonenumber-js
+  Copyright catamphetamine
+  A lighter rewrite of Google's libphonenumber. Used by
+  Southpaw's phone input for as-you-type formatting and
+  country code detection across all international formats.
+
+- react-phone-number-input (MIT) — https://github.com/catamphetamine/react-phone-number-input
+  Copyright catamphetamine
+  Battle-tested phone number formatting for React. Used by
+  Southpaw's Input component (purpose="phone") for reliable
+  international number formatting across 250+ countries.
+
+- imask (MIT) — https://imask.js.org
+  Copyright Alexey Kryazhev
+  Input masking library. Used by Southpaw's Input component
+  for credit card number, expiry, and CVV formatting.
+
+- country-codes-list (MIT) — https://github.com/nicosommi/country-codes-list
+  Complete list of 250 countries with ISO codes, calling
+  codes, and flag emojis. Used by Southpaw's phone input
+  country selector.
+
 ---
 
 Design tokens informed by:
