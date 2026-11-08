@@ -216,6 +216,7 @@ export const States: Story = {
  * ============================================================ */
 
 export const Density: Story = {
+  parameters: { density: { disable: true } },
   render: () => (
     <div className="flex flex-col gap-10">
       {(["compact", "default", "comfortable"] as const).map((density) => (

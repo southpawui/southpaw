@@ -150,7 +150,7 @@ export const States: Story = {
 
 export const Resize: Story = {
   render: () => (
-    <div className="flex flex-col gap-8 sm:max-w-lg">
+    <div className="flex flex-col gap-8">
       {(["vertical", "horizontal", "both", "none"] as const).map((r) => (
         <Field.Root key={r}>
           <Field.Label>resize=&quot;{r}&quot;</Field.Label>
@@ -166,6 +166,7 @@ export const Resize: Story = {
  * ============================================================ */
 
 export const Density: Story = {
+  parameters: { density: { disable: true } },
   render: () => (
     <div className="flex flex-col gap-10">
       {(["compact", "default", "comfortable"] as const).map((density) => (

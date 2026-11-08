@@ -32,9 +32,9 @@ describe("Textarea", () => {
     expect(screen.getByRole("textbox")).toHaveAttribute("rows", "3");
   });
 
-  it("defaults to 1 row when autosize", () => {
+  it("defaults to 3 rows when autosize", () => {
     render(<Textarea autosize aria-label="Message" />);
-    expect(screen.getByRole("textbox")).toHaveAttribute("rows", "1");
+    expect(screen.getByRole("textbox")).toHaveAttribute("rows", "3");
   });
 
   it("respects explicit rows prop", () => {
@@ -47,18 +47,29 @@ describe("Textarea", () => {
     expect(screen.getByRole("textbox").className).toContain("[field-sizing:content]");
   });
 
-  it("applies resize-none class when autosize", () => {
-    render(<Textarea autosize aria-label="Message" />);
-    expect(screen.getByRole("textbox").className).toContain("resize-none");
+  it("applies resize-y on wrapper by default", () => {
+    const { container } = render(<Textarea aria-label="Message" />);
+    expect(container.querySelector("[data-slot='textarea-group']")!.className).toContain(
+      "resize-y",
+    );
   });
 
-  it("applies resize-vertical by default", () => {
-    render(<Textarea aria-label="Message" />);
-    expect(screen.getByRole("textbox").className).toContain("resize-vertical");
+  it("applies correct resize class on wrapper for each option", () => {
+    const { container: c1, unmount: u1 } = render(<Textarea resize="none" aria-label="None" />);
+    expect(c1.querySelector("[data-slot='textarea-group']")!.className).not.toMatch(/resize-[xyb]/);
+    u1();
+
+    const { container: c2, unmount: u2 } = render(<Textarea resize="horizontal" aria-label="H" />);
+    expect(c2.querySelector("[data-slot='textarea-group']")!.className).toContain("resize-x");
+    u2();
+
+    const { container: c3, unmount: u3 } = render(<Textarea resize="both" aria-label="B" />);
+    expect(c3.querySelector("[data-slot='textarea-group']")!.className).toMatch(/\bresize\b/);
+    u3();
   });
 
-  it("applies custom resize prop", () => {
-    render(<Textarea resize="none" aria-label="Message" />);
+  it("textarea itself is always resize-none", () => {
+    render(<Textarea resize="both" aria-label="Message" />);
     expect(screen.getByRole("textbox").className).toContain("resize-none");
   });
 
@@ -98,5 +109,21 @@ describe("Textarea", () => {
   it("passes maxLength to the native textarea", () => {
     render(<Textarea maxLength={200} aria-label="Limited" />);
     expect(screen.getByRole("textbox")).toHaveAttribute("maxlength", "200");
+  });
+
+  it("wrapper has no resize class when autosize is true", () => {
+    const { container } = render(<Textarea autosize aria-label="Auto" />);
+    const wrapper = container.querySelector("[data-slot='textarea-group']")!;
+    expect(wrapper.className).not.toMatch(/resize-[xy]/);
+    expect(wrapper.className).not.toMatch(/\bresize\b(?!-none)/);
+  });
+
+  it("applies density padding classes on textarea", () => {
+    render(<Textarea aria-label="Message" />);
+    const textarea = screen.getByRole("textbox");
+    expect(textarea.className).toContain("px-3");
+    expect(textarea.className).toContain("py-2");
+    expect(textarea.className).toContain("[[data-density=compact]_&]:px-2");
+    expect(textarea.className).toContain("[[data-density=comfortable]_&]:px-4");
   });
 });

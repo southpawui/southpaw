@@ -1,74 +1,113 @@
-# Southpaw UI — Project Instructions
+# Southpaw UI — Agent Instructions
 
-## What is this?
+For project context (stack, conventions, repo layout, tooling), see [context.md](context.md).
 
-Open-source React component library: Base UI + Tailwind v4.
-Positioning: "GOV.UK-level rigour with shadcn's ergonomics, on Base UI."
+## Starting a new phase
 
-## Stack
+When beginning a new phase of work (e.g. "Phase 2: v0.2 Components"):
 
-- **Monorepo**: pnpm 11.9 workspaces + Turborepo
-- **Runtime**: Node 24, React 19, TypeScript strict
-- **Primitives**: `@base-ui/react` v1.9
-- **Styling**: Tailwind v4 (`@tailwindcss/postcss` for docs, `@tailwindcss/vite` for storybook)
-- **Variants**: CVA + clsx + tailwind-merge (use `cn()` from `packages/ui/src/lib/cn.ts`)
-- **Docs**: Next.js 15 (App Router) in `apps/docs`
-- **Storybook**: Storybook 10 in `apps/storybook` (reads stories from `packages/ui`)
-- **Tokens**: CSS variables in `packages/tokens`, exported as `@southpawui/tokens/css`
-- **Registry**: shadcn-compatible JSON builder in `packages/registry`
-
-## Repo Layout
+1. **Create a Linear parent issue** for the phase (e.g. "Phase 2: v0.2 Components") in project "Southpaw UI", team GEO.
+2. **Create sub-issues** in Linear for each task/component in the phase.
+3. **Create the phase trunk branch** off `main` (e.g. `phase-2`) and push it immediately.
+4. **Create the first sub-issue branch** off the trunk (e.g. `geo-900-enhance-select` off `phase-2`).
+5. **Chain subsequent branches**: each new sub-issue branch is created off the previous sub-issue branch, NOT off the trunk. This creates a stacked PR chain.
+6. **Each sub-PR targets the previous branch**. The trunk PR targets `main`.
+7. When the phase is complete, squash and merge the trunk into `main`.
 
 ```
-apps/docs          — Next.js docs site
-apps/storybook     — Storybook 10
-packages/tokens    — CSS variables (three-tier: primitive, semantic, component)
-packages/ui        — Component source (Base UI + Tailwind)
-packages/registry  — Build script for shadcn-compatible JSON
-reference/         — BRIEF.md + benchmarks (gitignored, private research)
+main
+ └── phase-2 (trunk PR → main)
+      └── geo-900-enhance-select (PR → phase-2)
+           └── geo-901-enhance-checkbox (PR → geo-900)
+                └── geo-902-enhance-dialog (PR → geo-901)
 ```
 
-## Conventions
+## Before actioning anything, follow these steps:
 
-### Naming
+**MANDATORY: Before every task, re-read BOTH of these files and confirm you have done so. Do not skip this. Do not rely on memory. Open them, read them, then proceed.**
 
-- CSS variable prefix: `--sp-*` for all library-owned vars
-- Package scope: `@southpawui/*`
-- Components export from `packages/ui/src/components/<Name>/index.tsx`
+1. This file: `CLAUDE.md` (process instructions)
+2. Context file: `context.md` (stack, conventions, references, influences)
 
-### Theming
+**STOP AND CHECK: If you are about to do any of the following, pause and verify you have followed the steps above:**
 
-- Theme switching: `data-theme="light|dark|high-contrast"` on `<html>`
-- Density: `data-density="compact|default|comfortable"` scoped to any subtree
+- Making a claim about what code does → Did you read it? (Step 1)
+- Writing new component code → Did you check existing patterns? (Step 2)
+- Building/enhancing a component → Did you research the competition? (Step 3)
+- Saying "this works" or "looks good" → Did you screenshot and visually verify? (Step 4)
+- Saying "tests pass" → Did you actually run them and see the output? (Step 5)
+- Typing `git commit` or `git push` → Did the user explicitly approve? (Step 6)
+- Finishing a task → Did you update Linear and Notion? (Step 7)
 
-### Component Patterns
+### 1. Read before speaking
 
-- Every component wraps a Base UI primitive
-- All sub-elements get `data-slot="<name>"` attributes
-- Use semantic tokens, never raw colour values in components
-- No runtime CSS-in-JS — only Tailwind classes and CSS variables
+- **NEVER** make claims about what code does without reading it first.
+- If asked about a file, component, or behaviour — read the source. No guessing, no assumptions.
+- If you're unsure about something, check it. Open the file. Run the command. Look at the output.
 
-### Code Quality
+### 2. Understand existing patterns first
 
-- ESLint 9 flat config with `jsx-a11y` strict mode
-- Prettier with `prettier-plugin-tailwindcss`
-- Husky + lint-staged on pre-commit
-- Never skip hooks (`--no-verify`) or bypass signing
+- Before writing new code, read at least one existing component that's already been enhanced (Button, Input, Field, Textarea) to understand the established patterns.
+- Match naming conventions, prop patterns, styling approach, and test structure.
+- Check how similar components handle density, theming, states, and accessibility.
 
-### CI (GitHub Actions)
+### 3. Research the competition
 
-- Jobs: lint, typecheck, build, test, a11y (axe + Playwright)
-- CodeRabbit reviews on PRs (`.coderabbit.yaml`)
+- Before enhancing a substantial component (forms, overlays, navigation), research how leading UI libraries implement it (shadcn, Mantine, Chakra, MUI, Ant Design, GOV.UK, Carbon, Spectrum, Primer).
+- Identify gaps between our implementation and the best-in-class.
+- Present findings and get approval before implementing.
+- For simple components (Separator, Badge, Avatar), a quick check of 2–3 libraries is sufficient — use judgement on scope.
 
-## Project Management
+### 4. Verify visually — use the E2E tools
 
-- **Linear project**: [Southpaw UI](https://linear.app/georgeyiakoumiwebsite/project/southpaw-ui-22559aa66e7a) (team: GEO)
-- **Notion project**: [Southpaw UI](https://app.notion.com/p/411feeb2a07881078efed614b5c4fe57)
-- Branch from Linear issues when possible
+These are not optional. Use them as part of every verification flow:
 
-## Workflow
+- `pnpm screenshot <story-id>` — take screenshots and visually confirm changes look correct.
+- `pnpm interact <actions...>` — test hover, focus, active, disabled states by interacting with the actual rendered component.
+- `pnpm a11y <component-name>` — run axe-core audit on all stories for the component.
+- Read the screenshot images to verify with your own eyes. Do not skip this.
+- Delete screenshots from `e2e/__screenshots__/` after verification — don't leave them accumulating. Only keep them if the user needs to review.
 
-- When creating Linear issues, assign to project "Southpaw UI" and team "GEO"
-- Use Linear issue branches for feature work
-- PRs trigger CodeRabbit review automatically
-- CI must pass before merge
+### 5. Run tests
+
+- Run `pnpm test` (Vitest) after every code change.
+- Never claim something works without seeing the test output.
+- If tests fail, fix them before moving on.
+
+### 6. Never commit or push without user sign-off
+
+- After making changes, ask the user to review in Storybook first.
+- Wait for their explicit confirmation that it looks right.
+- Only THEN ask if they're ready to commit.
+- Never batch up "commit and push" — they are separate decisions.
+- Commit messages follow conventional commits: `feat(scope):`, `fix(scope):`, `perf(scope):`, `test(scope):`, `refactor(scope):`. Scope is the component name in lowercase (e.g. `feat(textarea): add autosize prop`).
+
+### 7. Keep Linear and Notion in sync
+
+- Update Linear issue status when work starts, progresses, or completes.
+- Add notes to Linear issues when scope changes or decisions are made.
+- Update Notion project page to reflect current state.
+- Do this as you go, not as an afterthought.
+
+### 8. Assess whether /improve is warranted
+
+- After completing a task, consider whether the scale and complexity warrants running `/improve` on the changed files.
+- Small, isolated changes (a bug fix, a story tweak) — skip it.
+- Substantial component work (new component, major refactor, compound sub-components) — run it.
+- When in doubt, ask the user.
+
+### 9. Releases
+
+- **After every feature PR is merged**: create a patch/pre-release tag (e.g. `v0.1.0-alpha.1`, `v0.1.0-alpha.2`) with a GitHub Release summarising what changed. Skip for trivial fix-only PRs.
+- **After a phase completes**: create a minor version release (e.g. `v0.1.0`, `v0.2.0`) with a full changelog covering everything in the phase.
+- Use `gh release create` for GitHub Releases.
+- Keep release notes concise — group changes by component, list breaking changes first.
+
+## Rules
+
+- **NEVER use raw HTML elements for interactive or semantic elements.** Use Base UI primitives (`@base-ui/react`) — not `<button>`, `<input>`, `<select>`, `<dialog>`, etc. If Base UI doesn't have a primitive, use an existing Southpaw component (e.g. `<Button>` not `<button>`). For layout and structure, prefer semantic HTML (`<section>`, `<nav>`, `<article>`, `<aside>`, `<header>`, `<footer>`, `<main>`, `<ul>`, `<ol>`, `<li>`) over generic `<div>` and `<span>`. Check how shadcn/ui and other leading libraries structure their markup before defaulting to divs.
+- NEVER skip pre-commit hooks (`--no-verify`)
+- For complex domain problems (phone, dates, currency), use battle-tested libraries
+- Brand colour is reserved for CTAs, accent for UI controls
+- Components should be full-width by default, responsive by default. In Storybook stories, wrap examples in a container with `sm:max-w-md` or `sm:max-w-lg` so they're presentable
+- Only tokenise what Tailwind doesn't already handle well
