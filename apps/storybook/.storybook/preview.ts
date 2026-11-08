@@ -39,7 +39,12 @@ const preview: Preview = {
       const theme = context.globals.theme || "light";
       const density = context.globals.density || "default";
       document.documentElement.setAttribute("data-theme", theme);
-      document.documentElement.setAttribute("data-density", density);
+      // Skip global density when the story manages its own (e.g. Density comparison stories)
+      if (context.parameters.density?.disable) {
+        document.documentElement.removeAttribute("data-density");
+      } else {
+        document.documentElement.setAttribute("data-density", density);
+      }
       // Sync canvas background with theme
       document.body.style.backgroundColor = `var(--sp-surface-base)`;
       document.body.style.color = `var(--sp-fg-default)`;
