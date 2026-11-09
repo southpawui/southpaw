@@ -42,7 +42,7 @@ import { chromium, type Browser, type BrowserContext, type Page } from "@playwri
 import fs from "node:fs";
 import path from "node:path";
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
 const SCREENSHOTS_DIR = path.join(import.meta.dirname, "__screenshots__");
 
 export class InteractiveSession {

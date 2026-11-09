@@ -16,7 +16,7 @@
 
 import { chromium } from "@playwright/test";
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
 
 const storyId = process.argv[2];
 if (!storyId) {

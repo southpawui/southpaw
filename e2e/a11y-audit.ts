@@ -18,7 +18,7 @@
 import { chromium } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
 
 // Page-level rules that don't apply to isolated story iframes
 const DISABLED_RULES = ["landmark-one-main", "page-has-heading-one", "region"];

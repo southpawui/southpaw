@@ -223,7 +223,7 @@ const Group = React.forwardRef<HTMLDivElement, FieldGroupProps>(
         direction === "column" && spacing === "tight" && "gap-3",
         direction === "column" && spacing === "default" && "gap-4",
         direction === "column" && spacing === "loose" && "gap-6",
-        direction === "row" && "items-start gap-2",
+        direction === "row" && "items-center gap-[var(--sp-control-gap)]",
         className,
       )}
       {...props}
