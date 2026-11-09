@@ -24,7 +24,7 @@ import pixelmatch from "pixelmatch";
 
 /* ---- Config ---- */
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
 const SCREENSHOTS_DIR = path.join(import.meta.dirname, "__screenshots__");
 const DEFAULT_VIEWPORT = { width: 1280, height: 900 };
 const PIXEL_THRESHOLD = 0.1; // per-pixel color threshold (0-1)

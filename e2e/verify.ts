@@ -23,7 +23,7 @@ import { chromium } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { execSync } from "child_process";
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
 
 const component = process.argv[2];
 if (!component) {
@@ -91,7 +91,10 @@ async function main() {
 
     // 3a: A11y audit (violations + inconclusives)
     try {
-      const results = await new AxeBuilder({ page }).analyze();
+      const results = await new AxeBuilder({ page })
+        .include("#storybook-root")
+        .exclude("p[style*='color: red']") // Storybook error messages
+        .analyze();
       const violations = results.violations.filter((v) => !IGNORE_RULES.includes(v.id));
       const incomplete = results.incomplete.filter((v) => !IGNORE_RULES.includes(v.id));
 
