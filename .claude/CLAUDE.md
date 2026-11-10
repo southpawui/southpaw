@@ -73,6 +73,7 @@ These are not optional. Use them as part of every verification flow:
 - **Critically evaluate** what you see — don't just confirm it renders. Ask: does the layout make sense? Is the spacing right? Are elements aligned? Would a user find this intuitive? Compare against how the competition does it. If something looks off, fix it before presenting to the user.
 - **Screenshot EVERY story** before presenting to the user, not just one. A fix applied to one story may not have propagated to others. Check them all.
 - **Both States AND Themes stories must show ALL states**: default, valid, error, disabled. Every visual state should be visible. No exceptions.
+- **Themes stories must show ALL variants and colour options**: if the component has variants (solid/outline/ghost), sizes, or colour options (brand/danger/success/muted), show them all in each theme. The point of the Themes story is comprehensive visual coverage — not a minimal example.
 - Do NOT delete screenshots until the user has reviewed and confirmed they're happy. The user needs to see them. Only clean up after explicit user sign-off.
 
 ### 5. Run tests and verify
