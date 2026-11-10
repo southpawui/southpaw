@@ -6,66 +6,129 @@ const meta: Meta = {
 };
 
 export default meta;
+type Story = StoryObj;
 
-export const Default: StoryObj = {
-  render: () => (
-    <Progress.Root value={60} className="w-80">
+/* ---- Helper ---- */
+function ProgressDemo({
+  label,
+  value,
+  ...props
+}: { label: string; value: number | null } & Omit<
+  React.ComponentProps<typeof Progress.Root>,
+  "value"
+>) {
+  return (
+    <Progress.Root value={value} {...props}>
       <div className="flex justify-between">
-        <Progress.Label>Loading...</Progress.Label>
-        <Progress.Value />
+        <Progress.Label>{label}</Progress.Label>
+        {value !== null && <Progress.Value />}
       </div>
       <Progress.Track>
         <Progress.Indicator />
       </Progress.Track>
     </Progress.Root>
+  );
+}
+
+/* ============================================================
+ * DEFAULT
+ * ============================================================ */
+
+export const Default: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6 sm:max-w-md">
+      <ProgressDemo label="Loading..." value={60} />
+      <ProgressDemo label="Uploading" value={25} />
+      <ProgressDemo label="Complete" value={100} />
+      <ProgressDemo label="Empty" value={0} />
+    </div>
   ),
 };
 
-export const Empty: StoryObj = {
+/* ============================================================
+ * SIZES
+ * ============================================================ */
+
+export const Sizes: Story = {
   render: () => (
-    <Progress.Root value={0} aria-label="Progress" className="w-80">
-      <Progress.Track>
-        <Progress.Indicator />
-      </Progress.Track>
-    </Progress.Root>
+    <div className="flex flex-col gap-6 sm:max-w-md">
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <Progress.Root key={size} value={65}>
+          <div className="flex justify-between">
+            <Progress.Label>{size}</Progress.Label>
+            <Progress.Value />
+          </div>
+          <Progress.Track size={size}>
+            <Progress.Indicator />
+          </Progress.Track>
+        </Progress.Root>
+      ))}
+    </div>
   ),
 };
 
-export const Half: StoryObj = {
+/* ============================================================
+ * COLOURS
+ * ============================================================ */
+
+export const Colours: Story = {
   render: () => (
-    <Progress.Root value={50} className="w-80">
-      <div className="flex justify-between">
-        <Progress.Label>Uploading</Progress.Label>
-        <Progress.Value />
-      </div>
-      <Progress.Track>
-        <Progress.Indicator />
-      </Progress.Track>
-    </Progress.Root>
+    <div className="flex flex-col gap-6 sm:max-w-md">
+      {(["default", "brand", "success", "danger", "warning"] as const).map((color) => (
+        <ProgressDemo
+          key={color}
+          label={color.charAt(0).toUpperCase() + color.slice(1)}
+          value={70}
+          color={color}
+        />
+      ))}
+    </div>
   ),
 };
 
-export const Complete: StoryObj = {
+/* ============================================================
+ * INDETERMINATE
+ * ============================================================ */
+
+export const Indeterminate: Story = {
   render: () => (
-    <Progress.Root value={100} className="w-80">
-      <div className="flex justify-between">
-        <Progress.Label>Complete</Progress.Label>
-        <Progress.Value />
-      </div>
-      <Progress.Track>
-        <Progress.Indicator />
-      </Progress.Track>
-    </Progress.Root>
+    <div className="flex flex-col gap-6 sm:max-w-md">
+      <ProgressDemo label="Processing..." value={null} />
+      <ProgressDemo label="Uploading..." value={null} color="brand" />
+      <ProgressDemo label="Validating..." value={null} color="success" />
+    </div>
   ),
 };
 
-export const Indeterminate: StoryObj = {
+/* ============================================================
+ * THEMES
+ * ============================================================ */
+
+export const Themes: Story = {
   render: () => (
-    <Progress.Root value={null} className="w-80">
-      <Progress.Label>Processing...</Progress.Label>
-      <Progress.Track>
-        <Progress.Indicator className="w-1/3 animate-[indeterminate_1.5s_ease-in-out_infinite]" />
-      </Progress.Track>
-    </Progress.Root>
+    <div className="flex flex-col gap-8">
+      {(["light", "dark", "high-contrast"] as const).map((theme) => (
+        <div
+          key={theme}
+          data-theme={theme}
+          className="bg-surface-base text-fg-default rounded-lg p-6"
+        >
+          <p className="text-fg-muted mb-4 text-xs font-semibold uppercase tracking-wide">
+            {theme}
+          </p>
+          <div className="flex flex-col gap-4 sm:max-w-md">
+            {(["default", "brand", "success", "danger", "warning"] as const).map((color) => (
+              <ProgressDemo
+                key={color}
+                label={color.charAt(0).toUpperCase() + color.slice(1)}
+                value={65}
+                color={color}
+              />
+            ))}
+            <ProgressDemo label="Indeterminate" value={null} color="brand" />
+          </div>
+        </div>
+      ))}
+    </div>
   ),
 };

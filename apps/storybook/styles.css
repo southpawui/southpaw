@@ -6,6 +6,16 @@
 /* Tell Tailwind to scan the UI package for class names */
 @source "../../packages/ui/src/**/*.tsx";
 
+/* ---- Component keyframes ---- */
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
 @theme inline {
   /* ---- Surfaces ---- */
   --color-surface-base: var(--sp-surface-base);
