@@ -54,11 +54,10 @@ main
 
 ### 3. Research the competition
 
-- Before enhancing a substantial component (forms, overlays, navigation), research how leading UI libraries implement it (shadcn, Mantine, Chakra, MUI, Ant Design, GOV.UK, Carbon, Spectrum, Primer).
+- Before enhancing ANY component, research ALL of these: shadcn, Mantine, Chakra, MUI, Ant Design, GOV.UK, Carbon, Spectrum, Primer. No shortcuts — check every library regardless of component complexity.
 - Identify gaps between our implementation and the best-in-class.
 - Present findings and get approval before implementing.
-- For simple components (Separator, Badge, Avatar), a quick check of 2–3 libraries is sufficient — use judgement on scope.
-- **Do not defer features that multiple competitors offer.** If 2+ libraries have a feature (clear button, read-only state, virtual scroll, etc.), it should be in scope — not "added later." The goal is best-in-class, not minimum viable.
+- **If even 1 library has a feature, it is in scope — do not defer it.** The goal is best-in-class, not minimum viable.
 - **Document the research.** Save the competitive analysis as a `.md` file in the component's directory (e.g. `packages/ui/src/components/Select/RESEARCH.md`). Also add a summary to the Linear issue. This is a permanent record, not throwaway context.
 
 ### 4. Verify visually — use the E2E tools
@@ -71,6 +70,7 @@ These are not optional. Use them as part of every verification flow:
 - `pnpm dom <story-id>` — inspect the rendered DOM structure. Check for redundant wrapper divs, unnecessary nesting, and correct data-slot/role attributes. If a `<div>` wraps a single `<div>` with no semantic purpose, remove it.
 - Read the screenshot images to verify with your own eyes. Do not skip this.
 - **Critically evaluate** what you see — don't just confirm it renders. Ask: does the layout make sense? Is the spacing right? Are elements aligned? Would a user find this intuitive? Compare against how the competition does it. If something looks off, fix it before presenting to the user.
+- **After every visual change, verify the actual rendered output matches expectations.** Use Playwright to check computed styles (width, height, opacity, colour, cursor, animation) on key elements. Do not rely on screenshots alone — screenshots can look "close enough" while hiding broken CSS. Check the DOM, check computed values, confirm they match what you intended.
 - **Screenshot EVERY story** before presenting to the user, not just one. A fix applied to one story may not have propagated to others. Check them all.
 - **Both States AND Themes stories must show ALL states**: default, valid, error, disabled. Every visual state should be visible. No exceptions.
 - **Themes stories must show ALL variants and colour options**: if the component has variants (solid/outline/ghost), sizes, or colour options (brand/danger/success/muted), show them all in each theme. The point of the Themes story is comprehensive visual coverage — not a minimal example.
