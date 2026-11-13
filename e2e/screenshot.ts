@@ -10,7 +10,7 @@
  *   npx tsx e2e/screenshot.ts components-button--solid --theme dark
  *   npx tsx e2e/screenshot.ts components-input--purpose --width 800
  *
- * Requires Storybook running on localhost:6006 (or set STORYBOOK_URL).
+ * Requires Storybook running on localhost:$STORYBOOK_PORT (default 6006; or set STORYBOOK_URL).
  *
  * Baselines are stored in e2e/__screenshots__/<story-id>.png
  * Diffs are written to    e2e/__screenshots__/<story-id>.diff.png
@@ -24,7 +24,8 @@ import pixelmatch from "pixelmatch";
 
 /* ---- Config ---- */
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
+const STORYBOOK_URL =
+  process.env.STORYBOOK_URL ?? `http://localhost:${process.env.STORYBOOK_PORT ?? "6006"}`;
 const SCREENSHOTS_DIR = path.join(import.meta.dirname, "__screenshots__");
 const DEFAULT_VIEWPORT = { width: 1280, height: 900 };
 const PIXEL_THRESHOLD = 0.1; // per-pixel color threshold (0-1)

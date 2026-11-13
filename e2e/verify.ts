@@ -23,7 +23,8 @@ import { chromium } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { execSync } from "child_process";
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
+const STORYBOOK_URL =
+  process.env.STORYBOOK_URL ?? `http://localhost:${process.env.STORYBOOK_PORT ?? "6006"}`;
 
 const component = process.argv[2];
 if (!component) {

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006",
+    "dev": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p ${STORYBOOK_PORT:-6006}",
     "build": "STORYBOOK_DISABLE_TELEMETRY=1 storybook build -o dist",
     "test:stories": "echo 'Story tests run via Storybook addon-vitest in the Storybook UI'"
   },
