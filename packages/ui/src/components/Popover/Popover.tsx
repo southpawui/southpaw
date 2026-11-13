@@ -2,30 +2,34 @@ import * as React from "react";
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import { cn } from "../../lib/cn";
 
-/* ----- Root ----- */
+/* ============================================================
+ * Root (pass-through)
+ * ============================================================ */
+
 const Root = BasePopover.Root;
 
-/* ----- Trigger ----- */
+/* ============================================================
+ * Trigger (unstyled — consumer wraps with Button)
+ * ============================================================ */
+
 const Trigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof BasePopover.Trigger>
 >(({ className, ...props }, ref) => (
-  <BasePopover.Trigger
-    ref={ref}
-    data-slot="popover-trigger"
-    className={cn(
-      "inline-flex cursor-pointer items-center justify-center rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2",
-      className,
-    )}
-    {...props}
-  />
+  <BasePopover.Trigger ref={ref} data-slot="popover-trigger" className={cn(className)} {...props} />
 ));
-Trigger.displayName = "PopoverTrigger";
+Trigger.displayName = "Popover.Trigger";
 
-/* ----- Portal ----- */
+/* ============================================================
+ * Portal (pass-through)
+ * ============================================================ */
+
 const Portal = BasePopover.Portal;
 
-/* ----- Positioner ----- */
+/* ============================================================
+ * Positioner
+ * ============================================================ */
+
 const Positioner = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof BasePopover.Positioner>
@@ -37,54 +41,82 @@ const Positioner = React.forwardRef<
     {...props}
   />
 ));
-Positioner.displayName = "PopoverPositioner";
+Positioner.displayName = "Popover.Positioner";
 
-/* ----- Popup ----- */
+/* ============================================================
+ * Popup
+ * ============================================================ */
+
 const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BasePopover.Popup>>(
   ({ className, ...props }, ref) => (
     <BasePopover.Popup
       ref={ref}
       data-slot="popover-popup"
       className={cn(
-        "w-72 origin-[var(--transform-origin)] rounded-md border border-neutral-200 bg-white p-4 shadow-lg outline-none transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "bg-surface-overlay border-border-default w-72 rounded-[var(--radius-DEFAULT)] border p-4 shadow-lg outline-none",
+        // Animation — scale from transform origin (set by Base UI positioner)
+        "origin-[var(--transform-origin)]",
+        "transition-[transform,scale,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
+        "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+        "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
     />
   ),
 );
-Popup.displayName = "PopoverPopup";
+Popup.displayName = "Popover.Popup";
 
-/* ----- Arrow ----- */
+/* ============================================================
+ * Arrow
+ * ============================================================ */
+
 const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BasePopover.Arrow>>(
   ({ className, ...props }, ref) => (
     <BasePopover.Arrow
       ref={ref}
       data-slot="popover-arrow"
       className={cn(
-        "data-[side=bottom]:top-[-6px] data-[side=left]:right-[-6px] data-[side=right]:left-[-6px] data-[side=top]:bottom-[-6px]",
+        "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
         className,
       )}
       {...props}
-    />
+    >
+      <div
+        className={cn(
+          "bg-surface-overlay border-border-default h-2.5 w-2.5 rotate-45 border",
+          // Hide the edges that overlap the popup — use parent data-side
+          "[[data-side=bottom]>&]:border-b-0 [[data-side=bottom]>&]:border-r-0",
+          "[[data-side=top]>&]:border-l-0 [[data-side=top]>&]:border-t-0",
+          "[[data-side=left]>&]:border-b-0 [[data-side=left]>&]:border-l-0",
+          "[[data-side=right]>&]:border-r-0 [[data-side=right]>&]:border-t-0",
+        )}
+      />
+    </BasePopover.Arrow>
   ),
 );
-Arrow.displayName = "PopoverArrow";
+Arrow.displayName = "Popover.Arrow";
 
-/* ----- Title ----- */
+/* ============================================================
+ * Title
+ * ============================================================ */
+
 const Title = React.forwardRef<HTMLHeadingElement, React.ComponentProps<typeof BasePopover.Title>>(
   ({ className, ...props }, ref) => (
     <BasePopover.Title
       ref={ref}
       data-slot="popover-title"
-      className={cn("text-base font-semibold text-neutral-900", className)}
+      className={cn("text-fg-default text-base font-semibold", className)}
       {...props}
     />
   ),
 );
-Title.displayName = "PopoverTitle";
+Title.displayName = "Popover.Title";
 
-/* ----- Description ----- */
+/* ============================================================
+ * Description
+ * ============================================================ */
+
 const Description = React.forwardRef<
   HTMLParagraphElement,
   React.ComponentProps<typeof BasePopover.Description>
@@ -92,27 +124,26 @@ const Description = React.forwardRef<
   <BasePopover.Description
     ref={ref}
     data-slot="popover-description"
-    className={cn("mt-1 text-sm text-neutral-500", className)}
+    className={cn("text-fg-muted mt-1 text-sm", className)}
     {...props}
   />
 ));
-Description.displayName = "PopoverDescription";
+Description.displayName = "Popover.Description";
 
-/* ----- Close ----- */
+/* ============================================================
+ * Close (unstyled)
+ * ============================================================ */
+
 const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BasePopover.Close>>(
   ({ className, ...props }, ref) => (
-    <BasePopover.Close
-      ref={ref}
-      data-slot="popover-close"
-      className={cn(
-        "inline-flex cursor-pointer items-center justify-center rounded-md px-2 py-1 text-sm text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900",
-        className,
-      )}
-      {...props}
-    />
+    <BasePopover.Close ref={ref} data-slot="popover-close" className={cn(className)} {...props} />
   ),
 );
-Close.displayName = "PopoverClose";
+Close.displayName = "Popover.Close";
+
+/* ============================================================
+ * Compound export
+ * ============================================================ */
 
 export const Popover = {
   Root,
