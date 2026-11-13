@@ -1,5 +1,43 @@
 # Tooltip — Change Log
 
+## 2026-11-13 — /improve fixes (GEO-919)
+
+George asked for all six findings to be fixed.
+
+### What changed
+
+1. **Shortcut kept out of the accessible name.**
+   - `Tooltip.Shortcut` is now `aria-hidden`. Before, `type="label"` + Shortcut named an icon button "Save ⌘S".
+   - New optional `keys` prop (aria-keyshortcuts syntax, e.g. `"Meta+S"`), which Root sets as `aria-keyshortcuts` on the trigger.
+   - The children API is unchanged, so the planned swap to Kbd (GEO-940) is still drop-in.
+2. **Detached triggers** (outside Root, linked by `handle`) now get ARIA wiring and touch long-press.
+   - Root publishes its context against its handle in a `WeakMap` registry, which detached triggers read with `useSyncExternalStore`.
+   - Because a shared popup's text changes per trigger, a detached trigger references the popup (`aria-describedby`) only while it is the trigger that opened it.
+   - Detached triggers never take their name from the popup (`type="label"` is ignored for them), so they must keep their own `aria-label`.
+   - Detached triggers outside any Provider now apply Southpaw's 300ms / 0ms delays themselves. Before this, they fell back to Base UI's 600ms.
+3. **Stable trigger ref.** The merged ref is memoised, so Base UI no longer unregisters and re-registers the trigger on every re-render.
+4. **ARIA merging.**
+   - A consumer's `aria-describedby` / `aria-labelledby` is merged with the tooltip id instead of replacing it.
+   - A custom `id` on `Popup` is registered back to Root so the trigger references it.
+5. **Generic Root.** `Tooltip.Root<Payload>` is typed through the handle, so render-function `payload` is typed. The SharedTooltip story no longer casts.
+6. **Tests: 18 → 28.** Added coverage for:
+   - `onOpenChange` forwarding
+   - controlled `open`
+   - ref forwarding and stability
+   - aria-describedby merge
+   - custom popup id
+   - shortcut name + `aria-keyshortcuts`
+   - detached ARIA scoping
+   - detached touch
+   - detached hover delay (mutation-checked: it fails without the fix)
+   - consumer handle + touch
+
+### Considered and rejected
+
+- **Rejected: static ARIA references on detached triggers.** With handle + payload, one popup serves several triggers. Permanently pointing every trigger at it would give the inactive triggers the wrong description, or the wrong name.
+- **Not fixed (by design): touch long-press while Root is `disabled`.** Base UI forces the tooltip closed, so nothing shows.
+- **Not fixed (by design): keepMounted cost.** Base UI runs no positioning listeners for a closed keepMounted positioner, so the cost is DOM nodes only.
+
 ## 2026-11-13 — Full enhancement (GEO-919)
 
 Research: see RESEARCH.md (all 9 libraries + Base UI source + Emil Kowalski's motion guidance).

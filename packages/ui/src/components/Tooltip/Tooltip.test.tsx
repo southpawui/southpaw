@@ -1,3 +1,4 @@
+import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -189,5 +190,173 @@ describe("Tooltip", () => {
     await user.tab();
     expect(screen.getByText("Raw tooltip")).toBeVisible();
     expect(screen.getByText("Raw")).toHaveAccessibleDescription("Raw tooltip");
+  });
+
+  /* ---------------- /improve follow-ups ---------------- */
+
+  it("forwards onOpenChange to the consumer", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <Tooltip.Root onOpenChange={onOpenChange}>
+        <Tooltip.Trigger>Save</Tooltip.Trigger>
+        <Tooltip.Content>Save your changes</Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    await user.tab();
+    expect(onOpenChange).toHaveBeenCalledWith(true, expect.anything());
+  });
+
+  it("supports controlled open", () => {
+    const { rerender } = render(
+      <Tooltip.Root open={false}>
+        <Tooltip.Trigger>Save</Tooltip.Trigger>
+        <Tooltip.Content>Controlled</Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    expect(popup()).not.toHaveAttribute("data-open");
+    rerender(
+      <Tooltip.Root open>
+        <Tooltip.Trigger>Save</Tooltip.Trigger>
+        <Tooltip.Content>Controlled</Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    expect(popup()).toHaveAttribute("data-open");
+  });
+
+  it("forwards the trigger ref and keeps it stable across re-renders", () => {
+    const calls: Array<HTMLButtonElement | null> = [];
+    const ref = (node: HTMLButtonElement | null) => calls.push(node);
+    function Harness({ n }: { n: number }) {
+      return (
+        <Tooltip.Root>
+          <Tooltip.Trigger ref={ref}>Save {n}</Tooltip.Trigger>
+          <Tooltip.Content>Tip</Tooltip.Content>
+        </Tooltip.Root>
+      );
+    }
+    const { rerender } = render(<Harness n={1} />);
+    expect(calls[0]).toBeInstanceOf(HTMLButtonElement);
+    const before = calls.length;
+    rerender(<Harness n={2} />);
+    rerender(<Harness n={3} />);
+    expect(calls.length).toBe(before);
+  });
+
+  it("merges the consumer's aria-describedby with the tooltip's", () => {
+    render(
+      <>
+        <span id="hint">Extra hint</span>
+        <Tooltip.Root>
+          <Tooltip.Trigger aria-describedby="hint">Save</Tooltip.Trigger>
+          <Tooltip.Content>Save your changes</Tooltip.Content>
+        </Tooltip.Root>
+      </>,
+    );
+    const trigger = screen.getByText("Save");
+    expect(trigger.getAttribute("aria-describedby")).toBe(`hint ${popup().id}`);
+    expect(trigger).toHaveAccessibleDescription("Extra hint Save your changes");
+  });
+
+  it("keeps the ARIA reference correct when Popup has a custom id", () => {
+    render(
+      <Tooltip.Root>
+        <Tooltip.Trigger>Save</Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Positioner>
+            <Tooltip.Popup id="my-tip">Custom id</Tooltip.Popup>
+          </Tooltip.Positioner>
+        </Tooltip.Portal>
+      </Tooltip.Root>,
+    );
+    expect(popup().id).toBe("my-tip");
+    expect(screen.getByText("Save")).toHaveAttribute("aria-describedby", "my-tip");
+  });
+
+  it("keeps the shortcut out of the accessible name and exposes aria-keyshortcuts", () => {
+    render(
+      <Tooltip.Root type="label">
+        <Tooltip.Trigger>
+          <svg aria-hidden="true" />
+        </Tooltip.Trigger>
+        <Tooltip.Content>
+          Save<Tooltip.Shortcut keys="Meta+S">⌘S</Tooltip.Shortcut>
+        </Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Save" });
+    expect(trigger).toHaveAttribute("aria-keyshortcuts", "Meta+S");
+    expect(screen.getByText("⌘S")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  describe("detached triggers (handle)", () => {
+    function Shared() {
+      const [handle] = React.useState(() => Tooltip.createHandle<string>());
+      return (
+        <>
+          <Tooltip.Trigger handle={handle} payload="Settings" aria-label="Settings">
+            S
+          </Tooltip.Trigger>
+          <Tooltip.Trigger handle={handle} payload="Delete" aria-label="Delete">
+            D
+          </Tooltip.Trigger>
+          <Tooltip.Root handle={handle}>
+            {({ payload }) => <Tooltip.Content>{payload}</Tooltip.Content>}
+          </Tooltip.Root>
+        </>
+      );
+    }
+
+    it("references the popup only from the trigger that opened it", async () => {
+      const user = userEvent.setup();
+      render(<Shared />);
+      const settings = screen.getByRole("button", { name: "Settings" });
+      const del = screen.getByRole("button", { name: "Delete" });
+      expect(settings).not.toHaveAttribute("aria-describedby");
+      await user.tab();
+      expect(settings).toHaveAttribute("aria-describedby", popup().id);
+      expect(settings).toHaveAccessibleDescription("Settings");
+      expect(del).not.toHaveAttribute("aria-describedby");
+      expect(settings).not.toHaveAttribute("aria-labelledby");
+    });
+
+    it("uses Southpaw's 300ms hover delay outside a Provider", () => {
+      vi.useFakeTimers();
+      render(<Shared />);
+      const trigger = screen.getByRole("button", { name: "Settings" });
+      fireEvent.mouseEnter(trigger);
+      fireEvent.mouseMove(trigger);
+      act(() => vi.advanceTimersByTime(250));
+      expect(popup()).not.toHaveAttribute("data-open");
+      act(() => vi.advanceTimersByTime(100));
+      expect(popup()).toHaveAttribute("data-open");
+    });
+
+    it("supports touch long-press", () => {
+      vi.useFakeTimers();
+      render(<Shared />);
+      const del = screen.getByRole("button", { name: "Delete" });
+      fireEvent.touchStart(del, { touches: [{ clientX: 0, clientY: 0 }] });
+      act(() => vi.advanceTimersByTime(700));
+      expect(popup()).toHaveAttribute("data-open");
+      expect(popup()).toHaveTextContent("Delete");
+    });
+  });
+
+  it("supports touch with a consumer-supplied handle on Root", () => {
+    vi.useFakeTimers();
+    function WithHandle() {
+      const [handle] = React.useState(() => Tooltip.createHandle());
+      return (
+        <Tooltip.Root handle={handle}>
+          <Tooltip.Trigger>Save</Tooltip.Trigger>
+          <Tooltip.Content>Saved</Tooltip.Content>
+        </Tooltip.Root>
+      );
+    }
+    render(<WithHandle />);
+    fireEvent.touchStart(screen.getByText("Save"), { touches: [{ clientX: 0, clientY: 0 }] });
+    act(() => vi.advanceTimersByTime(700));
+    expect(popup()).toHaveAttribute("data-open");
   });
 });

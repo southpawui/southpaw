@@ -29,6 +29,8 @@ type TooltipType = "description" | "label";
 
 interface RootContextValue {
   popupId: string;
+  /** Popup registers a consumer-supplied `id` here so the trigger's ARIA reference stays correct. */
+  setPopupIdOverride: (id: string | undefined) => void;
   type: TooltipType;
   triggerRef: React.RefObject<HTMLElement | null>;
   touch: boolean;
@@ -36,12 +38,63 @@ interface RootContextValue {
   touchCloseDelay: number;
   handle: BaseTooltip.Handle<unknown>;
   density: string | undefined;
+  /** id of the trigger that opened the tooltip (null when closed). */
+  activeTriggerId: string | null;
+  /** `aria-keyshortcuts` value registered by Tooltip.Shortcut. */
+  shortcutKeys: string | undefined;
+  setShortcutKeys: (keys: string | undefined) => void;
 }
 
 const RootContext = React.createContext<RootContextValue | null>(null);
 
 function useRootContext() {
   return React.useContext(RootContext);
+}
+
+/*
+ * Detached triggers (rendered outside Root, linked by `handle`) can't read
+ * RootContext, so Root also publishes its context against its handle.
+ */
+type RegistryEntry = { ctx: RootContextValue | null; listeners: Set<() => void> };
+const handleRegistry = new WeakMap<object, RegistryEntry>();
+
+function getRegistryEntry(handle: object): RegistryEntry {
+  let entry = handleRegistry.get(handle);
+  if (!entry) {
+    entry = { ctx: null, listeners: new Set() };
+    handleRegistry.set(handle, entry);
+  }
+  return entry;
+}
+
+function publishHandleContext(handle: object, ctx: RootContextValue | null) {
+  const entry = getRegistryEntry(handle);
+  entry.ctx = ctx;
+  entry.listeners.forEach((listener) => listener());
+}
+
+const noopSubscribe = () => () => {};
+
+function useHandleContext(handle: object | undefined) {
+  const subscribe = React.useCallback(
+    (listener: () => void) => {
+      if (!handle) return () => {};
+      const entry = getRegistryEntry(handle);
+      entry.listeners.add(listener);
+      return () => entry.listeners.delete(listener);
+    },
+    [handle],
+  );
+  return React.useSyncExternalStore(
+    handle ? subscribe : noopSubscribe,
+    () => (handle ? getRegistryEntry(handle).ctx : null),
+    () => null,
+  );
+}
+
+function mergeIds(...ids: Array<string | undefined>) {
+  const merged = ids.filter(Boolean).join(" ");
+  return merged || undefined;
 }
 
 /* ============================================================
@@ -68,9 +121,9 @@ Provider.displayName = "Tooltip.Provider";
  * Root
  * ============================================================ */
 
-type BaseRootProps = React.ComponentProps<typeof BaseTooltip.Root>;
+type BaseRootProps<Payload = unknown> = BaseTooltip.Root.Props<Payload>;
 
-interface RootProps extends BaseRootProps {
+interface RootProps<Payload = unknown> extends BaseRootProps<Payload> {
   /**
    * How the tooltip text relates to the trigger for assistive tech.
    * - `description` (default): `aria-describedby`, supplementary info.
@@ -91,7 +144,7 @@ interface RootProps extends BaseRootProps {
   touchCloseDelay?: number;
 }
 
-function Root({
+function Root<Payload = unknown>({
   type = "description",
   touch = true,
   touchDelay = DEFAULT_TOUCH_DELAY,
@@ -99,42 +152,72 @@ function Root({
   handle: handleProp,
   onOpenChange,
   ...props
-}: RootProps) {
-  const popupId = React.useId();
+}: RootProps<Payload>) {
+  const generatedPopupId = React.useId();
+  const [popupIdOverride, setPopupIdOverride] = React.useState<string | undefined>(undefined);
+  const popupId = popupIdOverride ?? generatedPopupId;
+  const [shortcutKeys, setShortcutKeys] = React.useState<string | undefined>(undefined);
   const triggerRef = React.useRef<HTMLElement | null>(null);
-  const [ownHandle] = React.useState(() => BaseTooltip.createHandle());
-  const handle = (handleProp ?? ownHandle) as BaseTooltip.Handle<unknown>;
+  const [ownHandle] = React.useState(() => BaseTooltip.createHandle<Payload>());
+  const typedHandle = handleProp ?? ownHandle;
+  const handle = typedHandle as unknown as BaseTooltip.Handle<unknown>;
   const hasProvider = React.useContext(ProviderPresenceContext);
 
   // Portalled content can't inherit data-density from the trigger's subtree,
   // so read it from the trigger (or the active trigger) and forward it.
   const [density, setDensity] = React.useState<string | undefined>(undefined);
+  const [activeTriggerId, setActiveTriggerId] = React.useState<string | null>(null);
   const readDensity = React.useCallback((el?: Element | null) => {
     const source = el ?? triggerRef.current;
     setDensity(source?.closest("[data-density]")?.getAttribute("data-density") ?? undefined);
   }, []);
   React.useLayoutEffect(() => readDensity(), [readDensity]);
 
-  const handleOpenChange = React.useCallback<NonNullable<BaseRootProps["onOpenChange"]>>(
+  const handleOpenChange = React.useCallback<NonNullable<BaseRootProps<Payload>["onOpenChange"]>>(
     (open, details) => {
       if (open) readDensity(details.trigger);
+      setActiveTriggerId(open ? (details.trigger?.id ?? null) : null);
       onOpenChange?.(open, details);
     },
     [onOpenChange, readDensity],
   );
 
   const ctx = React.useMemo<RootContextValue>(
-    () => ({ popupId, type, triggerRef, touch, touchDelay, touchCloseDelay, handle, density }),
-    [popupId, type, touch, touchDelay, touchCloseDelay, handle, density],
+    () => ({
+      popupId,
+      setPopupIdOverride,
+      type,
+      triggerRef,
+      touch,
+      touchDelay,
+      touchCloseDelay,
+      handle,
+      density,
+      activeTriggerId,
+      shortcutKeys,
+      setShortcutKeys,
+    }),
+    [
+      popupId,
+      type,
+      touch,
+      touchDelay,
+      touchCloseDelay,
+      handle,
+      density,
+      activeTriggerId,
+      shortcutKeys,
+    ],
   );
+
+  React.useLayoutEffect(() => {
+    publishHandleContext(handle, ctx);
+  }, [handle, ctx]);
+  React.useLayoutEffect(() => () => publishHandleContext(handle, null), [handle]);
 
   const root = (
     <RootContext.Provider value={ctx}>
-      <BaseTooltip.Root
-        handle={handle as BaseRootProps["handle"]}
-        onOpenChange={handleOpenChange}
-        {...props}
-      />
+      <BaseTooltip.Root<Payload> handle={typedHandle} onOpenChange={handleOpenChange} {...props} />
     </RootContext.Provider>
   );
 
@@ -171,11 +254,23 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(
       onTouchEnd,
       onTouchCancel,
       onContextMenu,
+      "aria-describedby": ariaDescribedByProp,
+      "aria-labelledby": ariaLabelledByProp,
+      "aria-keyshortcuts": ariaKeyShortcutsProp,
+      delay: delayProp,
+      closeDelay: closeDelayProp,
       ...props
     },
     ref,
   ) => {
-    const ctx = useRootContext();
+    // Detached triggers can sit outside any Provider; keep Southpaw's delays there too.
+    const hasProvider = React.useContext(ProviderPresenceContext);
+    const delay = delayProp ?? (hasProvider ? undefined : DEFAULT_DELAY);
+    const closeDelay = closeDelayProp ?? (hasProvider ? undefined : DEFAULT_CLOSE_DELAY);
+    // Inside Root → RootContext; detached (handle) → the Root published against that handle.
+    const rootCtx = useRootContext();
+    const handleCtx = useHandleContext(props.handle as object | undefined);
+    const ctx = rootCtx ?? handleCtx;
     const generatedId = React.useId();
     const triggerId = idProp ?? generatedId;
 
@@ -243,16 +338,36 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(
         }
       : { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, onContextMenu };
 
-    const ariaProps = ctx
-      ? ctx.type === "label"
-        ? { "aria-labelledby": ctx.popupId }
-        : { "aria-describedby": ctx.popupId }
-      : {};
+    // Merge with the consumer's own references rather than replacing them.
+    //
+    // Inside Root the popup belongs to this trigger, so the reference is static.
+    // Detached triggers usually share one popup whose text changes per trigger
+    // (handle + payload), so they reference it only while they opened it, and
+    // never take their accessible name from it — give them an aria-label.
+    const isDetached = !rootCtx && !!handleCtx;
+    const isLabel = ctx?.type === "label" && !isDetached;
+    const linked = !!ctx && (!isDetached || ctx.activeTriggerId === triggerId);
+    const ariaProps = {
+      "aria-describedby": mergeIds(
+        ariaDescribedByProp,
+        linked && !isLabel ? ctx?.popupId : undefined,
+      ),
+      "aria-labelledby": mergeIds(ariaLabelledByProp, linked && isLabel ? ctx?.popupId : undefined),
+      "aria-keyshortcuts": ariaKeyShortcutsProp ?? (isDetached ? undefined : ctx?.shortcutKeys),
+    };
+
+    const triggerRef = ctx?.triggerRef;
+    const mergedRef = React.useMemo(
+      () => mergeRefs(ref, triggerRef as React.Ref<HTMLButtonElement> | undefined),
+      [ref, triggerRef],
+    );
 
     return (
       <BaseTooltip.Trigger
-        ref={mergeRefs(ref, ctx?.triggerRef as React.Ref<HTMLButtonElement>)}
+        ref={mergedRef}
         id={triggerId}
+        delay={delay}
+        closeDelay={closeDelay}
         data-slot="tooltip-trigger"
         className={cn(touchEnabled && "select-none [-webkit-touch-callout:none]", className)}
         {...ariaProps}
@@ -327,15 +442,21 @@ interface PopupProps extends React.ComponentProps<typeof BaseTooltip.Popup> {
 }
 
 const Popup = React.forwardRef<HTMLDivElement, PopupProps>(
-  ({ className, variant = "neutral", showIcon, children, ...props }, ref) => {
+  ({ className, variant = "neutral", showIcon, children, id: idProp, ...props }, ref) => {
     const ctx = useRootContext();
     const density = ctx?.density;
+    const setPopupIdOverride = ctx?.setPopupIdOverride;
+    React.useLayoutEffect(() => {
+      if (!setPopupIdOverride || !idProp) return;
+      setPopupIdOverride(idProp);
+      return () => setPopupIdOverride(undefined);
+    }, [idProp, setPopupIdOverride]);
     const Icon = showIcon ? variantIcons[variant] : null;
 
     return (
       <BaseTooltip.Popup
         ref={ref}
-        id={ctx?.popupId}
+        id={idProp ?? ctx?.popupId}
         role="tooltip"
         data-slot="tooltip-popup"
         data-variant={variant}
@@ -401,22 +522,41 @@ Arrow.displayName = "Tooltip.Arrow";
 
 /* ============================================================
  * Shortcut — keyboard hint (Primer keybindingHint, shadcn).
- * Will switch to the Kbd component once GEO-940 lands.
+ * Will switch to the Kbd component once GEO-940 lands (keep this API).
+ *
+ * Visual only: hidden from assistive tech so "⌘S" never leaks into the
+ * trigger's accessible name/description. Pass `keys` in aria-keyshortcuts
+ * syntax (e.g. "Meta+S") to expose it on the trigger instead.
  * ============================================================ */
 
-const Shortcut = React.forwardRef<HTMLElement, React.ComponentProps<"kbd">>(
-  ({ className, ...props }, ref) => (
-    <kbd
-      ref={ref}
-      data-slot="tooltip-shortcut"
-      className={cn(
-        "ms-1 inline-flex items-center rounded-[calc(var(--radius-sm)-2px)] px-1",
-        "border-current/30 border font-sans text-[0.85em] leading-tight opacity-80",
-        className,
-      )}
-      {...props}
-    />
-  ),
+interface ShortcutProps extends React.ComponentProps<"kbd"> {
+  /** Shortcut in `aria-keyshortcuts` syntax, e.g. "Meta+S" or "Control+Shift+Z". Set on the trigger. */
+  keys?: string;
+}
+
+const Shortcut = React.forwardRef<HTMLElement, ShortcutProps>(
+  ({ className, keys, ...props }, ref) => {
+    const setShortcutKeys = useRootContext()?.setShortcutKeys;
+    React.useLayoutEffect(() => {
+      if (!setShortcutKeys || !keys) return;
+      setShortcutKeys(keys);
+      return () => setShortcutKeys(undefined);
+    }, [keys, setShortcutKeys]);
+
+    return (
+      <kbd
+        ref={ref}
+        aria-hidden="true"
+        data-slot="tooltip-shortcut"
+        className={cn(
+          "ms-1 inline-flex items-center rounded-[calc(var(--radius-sm)-2px)] px-1",
+          "border-current/30 border font-sans text-[0.85em] leading-tight opacity-80",
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
 );
 Shortcut.displayName = "Tooltip.Shortcut";
 
@@ -504,6 +644,7 @@ export const Tooltip = {
 
 export type {
   RootProps as TooltipRootProps,
+  ShortcutProps as TooltipShortcutProps,
   PopupProps as TooltipPopupProps,
   ContentProps as TooltipContentProps,
 };

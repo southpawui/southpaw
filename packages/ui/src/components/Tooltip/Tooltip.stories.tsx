@@ -167,15 +167,15 @@ export const KeyboardShortcut: Story = {
   render: () => (
     <div className="flex flex-wrap justify-center gap-x-16 gap-y-20 pt-16">
       {[
-        { label: "Save", icon: <FloppyDiskIcon />, shortcut: "⌘S" },
-        { label: "Copy", icon: <CopyIcon />, shortcut: "⌘C" },
-        { label: "Cut", icon: <ScissorsIcon />, shortcut: "⌘X" },
-      ].map(({ label, icon, shortcut }) => (
+        { label: "Save", icon: <FloppyDiskIcon />, shortcut: "⌘S", keys: "Meta+S" },
+        { label: "Copy", icon: <CopyIcon />, shortcut: "⌘C", keys: "Meta+C" },
+        { label: "Cut", icon: <ScissorsIcon />, shortcut: "⌘X", keys: "Meta+X" },
+      ].map(({ label, icon, shortcut, keys }) => (
         <Tooltip.Root key={label} type="label" defaultOpen>
           <Tooltip.Trigger render={<Button variant="outline" size="icon" icon={icon} />} />
           <Tooltip.Content>
             {label}
-            <Tooltip.Shortcut>{shortcut}</Tooltip.Shortcut>
+            <Tooltip.Shortcut keys={keys}>{shortcut}</Tooltip.Shortcut>
           </Tooltip.Content>
         </Tooltip.Root>
       ))}
@@ -290,7 +290,7 @@ export const SharedTooltip: Story = {
         />
       ))}
       <Tooltip.Root handle={sharedHandle}>
-        {({ payload }) => <Tooltip.Content>{payload as string}</Tooltip.Content>}
+        {({ payload }) => <Tooltip.Content>{payload}</Tooltip.Content>}
       </Tooltip.Root>
     </div>
   ),
@@ -345,7 +345,7 @@ export const Density: Story = {
                 render={<Button variant="outline" size="icon" icon={<FloppyDiskIcon />} />}
               />
               <Tooltip.Content>
-                Save<Tooltip.Shortcut>⌘S</Tooltip.Shortcut>
+                Save<Tooltip.Shortcut keys="Meta+S">⌘S</Tooltip.Shortcut>
               </Tooltip.Content>
             </Tooltip.Root>
           </div>
@@ -387,7 +387,7 @@ function ThemePanel({ theme }: { theme: "light" | "dark" | "high-contrast" }) {
                 <Tooltip.Content variant={variant} showIcon container={container}>
                   {variant === "neutral" ? (
                     <>
-                      Save<Tooltip.Shortcut>⌘S</Tooltip.Shortcut>
+                      Save<Tooltip.Shortcut keys="Meta+S">⌘S</Tooltip.Shortcut>
                     </>
                   ) : (
                     `With ${variant} icon`
