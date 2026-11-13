@@ -22,6 +22,8 @@
   --color-fg-muted: var(--sp-fg-muted);
   --color-fg-on-brand: var(--sp-fg-on-brand);
   --color-fg-on-danger: var(--sp-fg-on-danger);
+  --color-fg-on-success: var(--sp-fg-on-success);
+  --color-fg-on-info: var(--sp-fg-on-info);
 
   /* ---- Intent ---- */
   --color-brand: var(--sp-brand);
@@ -29,6 +31,7 @@
   --color-danger: var(--sp-danger);
   --color-success: var(--sp-success);
   --color-success-subtle: var(--sp-success-subtle);
+  --color-info: var(--sp-info);
 
   /* ---- Borders ---- */
   --color-border-default: var(--sp-border-default);

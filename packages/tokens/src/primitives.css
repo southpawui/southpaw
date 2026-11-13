@@ -43,6 +43,10 @@
   --sp-success-50: #e4f2e8;
   --sp-success-900: #11261a;
 
+  /* ---- Info ---- */
+  --sp-info-700: #0b57d0;
+  --sp-info-300: #a8c7fa;
+
   /* ---- Typography ---- */
   --sp-font-sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
   --sp-font-serif: "Literata", Georgia, serif;
