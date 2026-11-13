@@ -24,6 +24,8 @@
   --sp-fg-muted: var(--sp-neutral-500);
   --sp-fg-on-brand: var(--sp-neutral-0);
   --sp-fg-on-danger: var(--sp-neutral-0);
+  --sp-fg-on-success: var(--sp-neutral-0);
+  --sp-fg-on-info: var(--sp-neutral-0);
 
   /* ---- Borders ---- */
   --sp-border-default: var(--sp-neutral-100); /* decorative, hairlines */
@@ -39,6 +41,7 @@
   --sp-danger: var(--sp-danger-700);
   --sp-success: var(--sp-success-700);
   --sp-success-subtle: var(--sp-success-50);
+  --sp-info: var(--sp-info-700);
 
   /* ---- Focus (two-tone ring) ---- */
   --sp-focus-outer: var(--sp-neutral-900);
@@ -65,6 +68,8 @@
   --sp-fg-muted: var(--sp-neutral-200);
   --sp-fg-on-brand: var(--sp-neutral-950);
   --sp-fg-on-danger: var(--sp-neutral-950);
+  --sp-fg-on-success: var(--sp-neutral-950);
+  --sp-fg-on-info: var(--sp-neutral-950);
 
   /* ---- Borders ---- */
   --sp-border-default: var(--sp-neutral-600);
@@ -76,6 +81,7 @@
   --sp-danger: var(--sp-danger-300);
   --sp-success: var(--sp-success-300);
   --sp-success-subtle: var(--sp-success-900);
+  --sp-info: var(--sp-info-300);
 
   /* ---- Focus ---- */
   --sp-focus-outer: var(--sp-neutral-25);
@@ -101,6 +107,8 @@
   --sp-fg-muted: #1a1a1a;
   --sp-fg-on-brand: #ffffff;
   --sp-fg-on-danger: #ffffff;
+  --sp-fg-on-success: #ffffff;
+  --sp-fg-on-info: #ffffff;
 
   /* ---- Borders (all high contrast) ---- */
   --sp-border-default: #000000;
@@ -112,6 +120,7 @@
   --sp-danger: #aa0000;
   --sp-success: #005500;
   --sp-success-subtle: #d4edda;
+  --sp-info: #00449e;
 
   /* ---- Focus ---- */
   --sp-focus-outer: #000000;
