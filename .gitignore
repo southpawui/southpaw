@@ -25,6 +25,10 @@ reference/
 # Debug
 npm-debug.log*
 pnpm-debug.log*
+debug-storybook.log
+
+# TypeScript incremental build info
+*.tsbuildinfo
 
 # Coverage
 coverage/
