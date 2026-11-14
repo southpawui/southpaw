@@ -17,7 +17,8 @@ function DemoAvatar({
 }: { initials?: string; src?: string } & React.ComponentProps<typeof Avatar.Root>) {
   return (
     <Avatar.Root {...props}>
-      <Avatar.Image src={src ?? ""} alt={initials} />
+      {/* Named avatars use alt="" so the name isn't announced twice */}
+      <Avatar.Image src={src ?? ""} alt={props.name ? "" : initials} />
       <Avatar.Fallback>{initials}</Avatar.Fallback>
       {children}
     </Avatar.Root>
@@ -25,6 +26,14 @@ function DemoAvatar({
 }
 
 const avatarSrc = "https://i.pravatar.cc/150?u=southpaw";
+
+const team: Array<[initials: string, name: string]> = [
+  ["GY", "George Yiakoumi"],
+  ["AB", "Ada Byron"],
+  ["CD", "Chris Doe"],
+  ["EF", "Eve Foster"],
+  ["GH", "Gus Hale"],
+];
 
 /* ============================================================
  * DEFAULT
@@ -109,6 +118,27 @@ export const WithStatus: Story = {
 };
 
 /* ============================================================
+ * WITH NAME — accessible name + Tooltip on hover / long-press.
+ * Static avatars aren't focusable (no library makes them a tab stop),
+ * so keyboard/screen-reader users get the name from the accessible name.
+ * ============================================================ */
+
+export const WithName: Story = {
+  render: () => (
+    <div className="flex items-center gap-4 pt-12">
+      <Avatar.Root name="George Yiakoumi">
+        <Avatar.Image src={avatarSrc} alt="" />
+        <Avatar.Fallback>GY</Avatar.Fallback>
+      </Avatar.Root>
+      <DemoAvatar initials="AB" name="Ada Byron">
+        <Avatar.Status status="online" />
+      </DemoAvatar>
+      <DemoAvatar initials="CD" name="Chris Doe (no tooltip)" tooltip={false} />
+    </div>
+  ),
+};
+
+/* ============================================================
  * GROUP
  * ============================================================ */
 
@@ -131,11 +161,9 @@ export const GroupStory: Story = {
           With overflow (max=3)
         </p>
         <Avatar.Group max={3}>
-          <DemoAvatar initials="GY" />
-          <DemoAvatar initials="AB" />
-          <DemoAvatar initials="CD" />
-          <DemoAvatar initials="EF" />
-          <DemoAvatar initials="GH" />
+          {team.map(([initials, name]) => (
+            <DemoAvatar key={initials} initials={initials} name={name} />
+          ))}
         </Avatar.Group>
       </div>
       <div>
@@ -144,8 +172,8 @@ export const GroupStory: Story = {
         </p>
         <Avatar.Group max={4}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Avatar.Root key={i}>
-              <Avatar.Image src={`https://i.pravatar.cc/150?u=user${i}`} alt={`User ${i}`} />
+            <Avatar.Root key={i} name={`User ${i}`}>
+              <Avatar.Image src={`https://i.pravatar.cc/150?u=user${i}`} alt="" />
               <Avatar.Fallback>U{i}</Avatar.Fallback>
             </Avatar.Root>
           ))}
@@ -182,10 +210,9 @@ export const Themes: Story = {
               ))}
             </div>
             <Avatar.Group max={3}>
-              <DemoAvatar initials="GY" />
-              <DemoAvatar initials="AB" />
-              <DemoAvatar initials="CD" />
-              <DemoAvatar initials="EF" />
+              {team.slice(0, 4).map(([initials, name]) => (
+                <DemoAvatar key={initials} initials={initials} name={name} />
+              ))}
             </Avatar.Group>
           </div>
         </div>
