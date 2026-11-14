@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
 import { cn } from "../../lib/cn";
+import { Tooltip } from "../Tooltip/Tooltip";
 
 /* ============================================================
  * Root
@@ -11,8 +12,20 @@ export interface AvatarRootProps extends React.ComponentProps<typeof BaseAvatar.
   size?: "sm" | "md" | "lg";
   /** Shape variant */
   shape?: "circle" | "square";
-  /** User's name — shown as native tooltip on hover. Will upgrade to Tooltip component in Wave 4. */
+  /**
+   * The person's name. Becomes the avatar's accessible name and, by default,
+   * a Tooltip on hover / touch long-press. Static avatars aren't focusable, so
+   * keyboard users get the name from assistive tech, not the tooltip; render the
+   * avatar as a link or button (`render`) to make the tooltip keyboard-reachable.
+   *
+   * When `name` is set, give `Avatar.Image` an empty `alt=""` — otherwise the
+   * name is announced twice ("Ada Byron, group, image Ada Byron").
+   * A consumer `aria-label` takes precedence as the name; the tooltip then
+   * becomes the description.
+   */
   name?: string;
+  /** Show `name` in a Tooltip. Set `false` to keep only the accessible name. @default true */
+  tooltip?: boolean;
 }
 
 const sizeClasses: Record<string, string> = {
@@ -22,24 +35,74 @@ const sizeClasses: Record<string, string> = {
 };
 
 const Root = React.forwardRef<HTMLSpanElement, AvatarRootProps>(
-  ({ className, size = "md", shape = "circle", name, ...props }, ref) => (
-    <BaseAvatar.Root
-      ref={ref}
-      data-slot="avatar"
-      data-size={size}
-      data-shape={shape}
-      title={name}
-      className={cn(
+  (
+    {
+      className,
+      size = "md",
+      shape = "circle",
+      name,
+      tooltip = true,
+      children,
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabelledBy,
+      "aria-describedby": ariaDescribedBy,
+      ...props
+    },
+    ref,
+  ) => {
+    // A named static avatar is a labelled group: the name is announced and the
+    // image/status inside stay reachable (role="img" would hide the status dot).
+    // A custom `render` (link/button) keeps its own role.
+    const namedRole = name && !props.render && !props.role ? "group" : undefined;
+    const showTooltip = !!name && tooltip;
+
+    const rootProps = {
+      "data-slot": "avatar",
+      "data-size": size,
+      "data-shape": shape,
+      role: namedRole,
+      // Without a tooltip the name goes straight onto the element.
+      "aria-label": ariaLabel ?? (name && !showTooltip ? name : undefined),
+      className: cn(
         "relative inline-flex shrink-0 items-center justify-center",
         "bg-surface-alternate",
         shape === "circle" && "rounded-full",
         shape === "square" && "rounded-lg",
         sizeClasses[size],
         className,
-      )}
-      {...props}
-    />
-  ),
+      ),
+      ...props,
+    };
+
+    if (!showTooltip) {
+      return (
+        <BaseAvatar.Root
+          ref={ref}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+          {...rootProps}
+        >
+          {children}
+        </BaseAvatar.Root>
+      );
+    }
+
+    return (
+      // A consumer aria-label stays the name; the tooltip then describes.
+      <Tooltip.Root type={ariaLabel ? "description" : "label"}>
+        <Tooltip.Trigger
+          ref={ref as React.Ref<HTMLButtonElement>}
+          // ARIA references go on the trigger so they merge with the tooltip's.
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+          render={<BaseAvatar.Root {...rootProps} />}
+        >
+          {children}
+        </Tooltip.Trigger>
+        <Tooltip.Content>{name}</Tooltip.Content>
+      </Tooltip.Root>
+    );
+  },
 );
 Root.displayName = "Avatar.Root";
 
@@ -135,41 +198,89 @@ const Group = React.forwardRef<HTMLDivElement, AvatarGroupProps>(
   ({ className, max, children, ...props }, ref) => {
     const childArray = React.Children.toArray(children);
     const visible = max ? childArray.slice(0, max) : childArray;
-    const overflow = max ? childArray.length - max : 0;
+    const hidden = max ? childArray.slice(max) : [];
+    const overflow = hidden.length;
+    // Names of the avatars folded into "+N" (Mantine lists them in a tooltip).
+    const hiddenNames = hidden
+      .map((child) =>
+        React.isValidElement<{ name?: unknown }>(child) && typeof child.props.name === "string"
+          ? child.props.name
+          : null,
+      )
+      .filter((n): n is string => !!n);
+    const unnamedCount = overflow - hiddenNames.length;
+
+    const overflowClassName = cn(
+      "ring-surface-base bg-surface-alternate text-fg-muted relative inline-flex cursor-default select-none items-center justify-center rounded-full ring-2",
+      "h-10 w-10 text-xs font-medium",
+      "transition-[transform,z-index] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
+      "origin-center hover:z-20 hover:scale-110",
+    );
 
     return (
-      <div
-        ref={ref}
-        data-slot="avatar-group"
-        className={cn("flex -space-x-2", className)}
-        {...props}
-      >
-        {visible.map((child, i) => (
-          <div
-            key={i}
-            className={cn(
-              "ring-surface-base relative rounded-full ring-2",
-              "transition-[transform,z-index] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
-              "origin-center hover:z-20 hover:scale-110",
-            )}
-          >
-            {child}
-          </div>
-        ))}
-        {overflow > 0 && (
-          <span
-            data-slot="avatar-overflow"
-            className={cn(
-              "ring-surface-base bg-surface-alternate text-fg-muted relative inline-flex cursor-default select-none items-center justify-center rounded-full ring-2",
-              "h-10 w-10 text-xs font-medium",
-              "transition-[transform,z-index] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
-              "origin-center hover:z-20 hover:scale-110",
-            )}
-          >
-            +{overflow}
-          </span>
-        )}
-      </div>
+      // Shared provider: once one name shows, neighbours open instantly.
+      <Tooltip.Provider>
+        <div
+          ref={ref}
+          data-slot="avatar-group"
+          className={cn("flex -space-x-2", className)}
+          {...props}
+        >
+          {visible.map((child, i) => (
+            <div
+              key={i}
+              className={cn(
+                "ring-surface-base relative rounded-full ring-2",
+                "transition-[transform,z-index] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
+                "origin-center hover:z-20 hover:scale-110",
+              )}
+            >
+              {child}
+            </div>
+          ))}
+          {/*
+           * "+N" is named (role="img"), not merely described: screen readers in
+           * browse mode don't announce descriptions on static text. With names,
+           * the tooltip IS the name ("2 more: Cy, Di") via a visually hidden prefix.
+           */}
+          {overflow > 0 &&
+            (hiddenNames.length > 0 ? (
+              <Tooltip.Root type="label">
+                <Tooltip.Trigger
+                  render={
+                    <span role="img" data-slot="avatar-overflow" className={overflowClassName} />
+                  }
+                >
+                  +{overflow}
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                  <span className="sr-only">{overflow} more: </span>
+                  <ul data-slot="avatar-overflow-names" className="flex flex-col">
+                    {hiddenNames.map((n, i) => (
+                      <li key={i}>
+                        {n}
+                        {/* Comma for the accessible name only ("2 more: Cy, Di") */}
+                        {(i < hiddenNames.length - 1 || unnamedCount > 0) && (
+                          <span className="sr-only">,</span>
+                        )}
+                      </li>
+                    ))}
+                    {unnamedCount > 0 && <li>{`and ${unnamedCount} more`}</li>}
+                  </ul>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            ) : (
+              <span
+                role="img"
+                aria-label={`${overflow} more`}
+                data-slot="avatar-overflow"
+                className={overflowClassName}
+              >
+                +{overflow}
+              </span>
+            ))}
+        </div>
+      </Tooltip.Provider>
     );
   },
 );
