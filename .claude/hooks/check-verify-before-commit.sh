@@ -9,6 +9,13 @@ command=$(echo "$input" | jq -r '.tool_input.command // ""')
 
 # Only check git commit commands
 if echo "$command" | grep -q "git commit"; then
+  # Only enforce when component source has changed (staged, unstaged or untracked).
+  # Checking the whole working tree, not just the index, closes the `git add X && git commit`
+  # loophole where this hook runs before the add. Infra/config-only commits are exempt.
+  if [ -z "$(git -C "${CLAUDE_PROJECT_DIR}" status --porcelain -- packages/ui/src/components)" ]; then
+    exit 0
+  fi
+
   # Check if verify was run by looking for recent screenshots
   # (pnpm verify always generates screenshots as its last step)
   screenshot_dir="${CLAUDE_PROJECT_DIR}/e2e/__screenshots__"

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const STORYBOOK_PORT = process.env.STORYBOOK_PORT ?? "6006";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -8,7 +10,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://127.0.0.1:6006",
+    baseURL: `http://127.0.0.1:${STORYBOOK_PORT}`,
     trace: "on-first-retry",
   },
   projects: [
@@ -19,7 +21,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "pnpm --filter @southpawui/storybook dev",
-    url: "http://127.0.0.1:6006",
+    url: `http://127.0.0.1:${STORYBOOK_PORT}`,
     reuseExistingServer: !process.env.CI,
   },
 });

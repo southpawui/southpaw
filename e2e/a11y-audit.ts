@@ -12,13 +12,14 @@
  *   pnpm a11y input
  *   pnpm a11y --all
  *
- * Requires Storybook running on localhost:6006 (or set STORYBOOK_URL).
+ * Requires Storybook running on localhost:$STORYBOOK_PORT (default 6006; or set STORYBOOK_URL).
  */
 
 import { chromium } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? "http://localhost:6006";
+const STORYBOOK_URL =
+  process.env.STORYBOOK_URL ?? `http://localhost:${process.env.STORYBOOK_PORT ?? "6006"}`;
 
 // Page-level rules that don't apply to isolated story iframes
 const DISABLED_RULES = ["landmark-one-main", "page-has-heading-one", "region"];
