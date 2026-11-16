@@ -36,6 +36,8 @@
   /* ---- Danger ---- */
   --sp-danger-700: #b3261e;
   --sp-danger-300: #ff8a80;
+  --sp-danger-50: #fce8e6;
+  --sp-danger-950: #3a1513;
 
   /* ---- Success ---- */
   --sp-success-700: #146c2e;
@@ -46,6 +48,14 @@
   /* ---- Info ---- */
   --sp-info-700: #0b57d0;
   --sp-info-300: #a8c7fa;
+  --sp-info-50: #e8f0fe;
+  --sp-info-950: #0f2547;
+
+  /* ---- Warning (amber) ---- */
+  --sp-warning-700: #b45309; /* 5.0:1 on white */
+  --sp-warning-300: #fcd34d; /* 13:1 on neutral-950 */
+  --sp-warning-50: #fef3c7;
+  --sp-warning-950: #2e2208;
 
   /* ---- Typography ---- */
   --sp-font-sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
