@@ -1,5 +1,14 @@
 # Collapsible — Change Log
 
+## 2026-11-16 — Unnamed show-more region warns (follow-up)
+
+George approved this on 2026-11-16 (relayed by the coordinator). It resolves the question flagged at sign-off.
+
+- A show-more panel with `role="region"` and no Trigger has nothing to label it. Since fix 3 below, the ShowMore button no longer names it (that announced "Show more region"). So the panel needs its own `aria-label` or `aria-labelledby`.
+- It now logs a one-time development `console.warn` when that name is missing, using the same pattern as ScrollArea and the icon-only Trigger. A consumer's `aria-label` passes straight through.
+- `role` prop docs updated. 1 new test (warns without a name; silent and correctly named with `aria-label`).
+- Considered and rejected: making `aria-label` required in the types when `role="region"`. The rule depends on whether a Trigger is mounted, which the types can't see.
+
 ## 2026-11-14 — Signed off; /improve fixes before commit
 
 George signed off on 2026-11-14 (relayed by the coordinator) and asked for /improve, fixes, a re-check, then commit and push.

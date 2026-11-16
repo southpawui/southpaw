@@ -439,7 +439,8 @@ export interface CollapsiblePanelProps extends React.ComponentProps<typeof BaseC
   fade?: boolean;
   /**
    * `group` (default when set) or `region` for landmark-worthy sections.
-   * Either way the panel is labelled by the trigger.
+   * Either way the panel is labelled by the trigger. A show-more panel with
+   * `region` and no Trigger needs an `aria-label` (warns in development).
    */
   role?: "group" | "region";
   /** Props for the inner content element (padding lives here so height animates cleanly). */
@@ -640,6 +641,20 @@ const ShowMorePanel = React.forwardRef<HTMLDivElement, ShowMorePanelProps>((prop
     el.addEventListener("focusin", onFocusIn);
     return () => el.removeEventListener("focusin", onFocusIn);
   }, []);
+
+  // A region needs a name. Without a Trigger to label it, the consumer must pass one.
+  const unnamedRegion =
+    role === "region" && !ctx.labelTriggerId && !rest["aria-label"] && !rest["aria-labelledby"];
+  const warned = React.useRef(false);
+  React.useEffect(() => {
+    if (isDev && unnamedRegion && !warned.current) {
+      warned.current = true;
+      console.warn(
+        '[Southpaw] Collapsible.Panel: a show-more panel with role="region" and no Trigger needs ' +
+          "an accessible name. Pass `aria-label` or `aria-labelledby`.",
+      );
+    }
+  }, [unnamedRegion]);
 
   const faded = fade && !fits && !ctx.open;
   const { className: contentClassName, ...contentRest } = contentProps ?? {};

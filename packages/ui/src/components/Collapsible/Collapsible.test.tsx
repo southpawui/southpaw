@@ -371,6 +371,32 @@ describe("Collapsible", () => {
       expect(new Set(ids).size).toBe(ids.length);
     });
 
+    it("warns when a region show-more panel has no Trigger and no name", () => {
+      mockSizes(500, 100);
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const { unmount } = render(
+        <Collapsible.Root>
+          <Collapsible.Panel collapsedHeight={100} role="region">
+            Text
+          </Collapsible.Panel>
+          <Collapsible.ShowMore />
+        </Collapsible.Root>,
+      );
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('role="region" and no Trigger'));
+      unmount();
+      warn.mockClear();
+      render(
+        <Collapsible.Root>
+          <Collapsible.Panel collapsedHeight={100} role="region" aria-label="Customer review">
+            Text
+          </Collapsible.Panel>
+          <Collapsible.ShowMore />
+        </Collapsible.Root>,
+      );
+      expect(warn).not.toHaveBeenCalled();
+      expect(screen.getByRole("region", { name: "Customer review" })).toBeInTheDocument();
+    });
+
     it("uses custom labels", async () => {
       mockSizes(500, 100);
       render(
