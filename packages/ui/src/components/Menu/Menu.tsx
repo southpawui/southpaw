@@ -441,19 +441,98 @@ const textLabel = (children: React.ReactNode, label?: string) =>
  * Root, Portal, SubmenuRoot, FilterProvider (pass-through)
  * ============================================================ */
 
-const Root = BaseMenu.Root;
+/*
+ * Keyboard opens skip the open animation (Emil Kowalski: never animate
+ * keyboard-initiated actions). Base UI reports why a menu opened through the
+ * public `onOpenChange(open, eventDetails)`: arrow keys give
+ * `list-navigation`; Enter and Space give `trigger-press` with a click whose
+ * `detail` is 0 (no pointer). Roots record it and Popup reads it.
+ */
+
+/** True while the nearest menu was opened from the keyboard. */
+export const KeyboardOpenContext = React.createContext(false);
+
+interface OpenChangeDetails {
+  reason?: string;
+  event?: Event;
+}
+
+/** Whether Base UI's open-change details describe a keyboard open. */
+export function isKeyboardOpenChange({ reason, event }: OpenChangeDetails) {
+  if (reason === "list-navigation") return true;
+  return reason === "trigger-press" && event instanceof MouseEvent && event.detail === 0;
+}
+
+/**
+ * Wraps a root's `onOpenChange` to record whether each open came from the
+ * keyboard. Shared with ContextMenu and Menubar, which pass their own test.
+ */
+export function useKeyboardOpenTracking(
+  onOpenChange: unknown,
+  isKeyboard: (details: OpenChangeDetails) => boolean = isKeyboardOpenChange,
+) {
+  const [keyboardOpen, setKeyboardOpen] = React.useState(false);
+  const handleOpenChange = (open: boolean, details: OpenChangeDetails) => {
+    if (open) setKeyboardOpen(isKeyboard(details));
+    (onOpenChange as ((open: boolean, details: OpenChangeDetails) => void) | undefined)?.(
+      open,
+      details,
+    );
+  };
+  return [keyboardOpen, handleOpenChange] as const;
+}
+
+function Root<Payload>(props: BaseMenu.Root.Props<Payload>) {
+  const [keyboardOpen, onOpenChange] = useKeyboardOpenTracking(props.onOpenChange);
+  return (
+    <KeyboardOpenContext.Provider value={keyboardOpen}>
+      <BaseMenu.Root {...props} onOpenChange={onOpenChange} />
+    </KeyboardOpenContext.Provider>
+  );
+}
+
+function SubmenuRoot(props: React.ComponentProps<typeof BaseMenu.SubmenuRoot>) {
+  const [keyboardOpen, onOpenChange] = useKeyboardOpenTracking(props.onOpenChange);
+  return (
+    <KeyboardOpenContext.Provider value={keyboardOpen}>
+      <BaseMenu.SubmenuRoot {...props} onOpenChange={onOpenChange} />
+    </KeyboardOpenContext.Provider>
+  );
+}
+
 const Portal = BaseMenu.Portal;
-const SubmenuRoot = BaseMenu.SubmenuRoot;
 const FilterProvider = BaseMenu.FilterProvider;
 const Viewport = BaseMenu.Viewport;
 
 /* ============================================================
- * Trigger (unstyled — render a Button)
+ * Trigger (render a Button). Only its open state is styled.
  * ============================================================ */
+
+/**
+ * Open state of a menu trigger, shared by every Menu trigger. Keyed to
+ * `data-popup-open`, which Base UI sets together with `aria-expanded="true"`,
+ * so the trigger only looks pressed when the accessibility tree says it is
+ * expanded.
+ * - A pressed overlay as a background-image layer, so it darkens any Button
+ *   variant (ghost, outline, solid) without replacing its colour.
+ * - An inset ring in the trigger's own text colour: a non-colour cue that
+ *   contrasts with its fill as much as the label does (WCAG 1.4.11).
+ * - Forced colours drop backgrounds and box-shadows: a Highlight outline.
+ */
+export const menuTriggerOpenClasses = cn(
+  "data-[popup-open]:bg-[linear-gradient(var(--sp-state-pressed),var(--sp-state-pressed))]",
+  "data-[popup-open]:shadow-[inset_0_0_0_1.5px_currentColor]",
+  "forced-colors:data-[popup-open]:outline-2 forced-colors:data-[popup-open]:-outline-offset-2 forced-colors:data-[popup-open]:outline-solid forced-colors:data-[popup-open]:outline-[Highlight]",
+);
 
 const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BaseMenu.Trigger>>(
   ({ className, ...props }, ref) => (
-    <BaseMenu.Trigger ref={ref} data-slot="menu-trigger" className={cn(className)} {...props} />
+    <BaseMenu.Trigger
+      ref={ref}
+      data-slot="menu-trigger"
+      className={cn(menuTriggerOpenClasses, className)}
+      {...props}
+    />
   ),
 );
 Trigger.displayName = "Menu.Trigger";
@@ -515,6 +594,7 @@ const Popup = React.forwardRef<HTMLDivElement, MenuPopupProps>(
     ref,
   ) => {
     const parent = useMenuStyle();
+    const keyboardOpen = React.useContext(KeyboardOpenContext);
     const value = React.useMemo<MenuStyleContextValue>(
       () => ({
         size: size ?? parent.size,
@@ -530,6 +610,7 @@ const Popup = React.forwardRef<HTMLDivElement, MenuPopupProps>(
           data-slot="menu-popup"
           data-size={value.size}
           data-highlight={value.highlight}
+          data-keyboard-open={keyboardOpen ? "" : undefined}
           style={
             {
               ...(maxHeight ? { "--sp-menu-max-height": maxHeight } : null),
@@ -549,6 +630,9 @@ const Popup = React.forwardRef<HTMLDivElement, MenuPopupProps>(
             "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
             "motion-reduce:transition-none",
+            // Opened from the keyboard: appear at once. Only while open, so the
+            // close animation is unchanged.
+            "data-[keyboard-open]:data-[open]:transition-none",
             className,
           )}
           {...props}

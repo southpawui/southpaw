@@ -1,5 +1,58 @@
 # Menu — Change Log
 
+## 2026-11-16 — Menu.Trigger shows its open state (George, ContextMenu review)
+
+Lands in the ContextMenu PR (GEO-926).
+
+### What changed
+
+- **`Menu.Trigger` styles its open state** with the exported `menuTriggerOpenClasses`. Before, it was fully unstyled. Its resting look still comes from the Button passed as `render`.
+- **The look follows the semantics.** The styling keys off `data-popup-open`, which Base UI sets together with `aria-expanded="true"`. So a trigger only looks pressed when the accessibility tree says it is expanded.
+- **Pressed fill:** a `--sp-state-pressed` overlay drawn as a `background-image` layer. It darkens any Button variant (ghost, outline, solid) without replacing a solid button's colour.
+- **Non-colour cue:** a 1.5px inset ring in `currentColor`. The fill alone measures only 1.30–1.69:1 against a tinted row, below WCAG 1.4.11's 3:1, so the ring carries the state. Because it uses the trigger's text colour, it contrasts as much as the label does.
+- **Forced colours:** backgrounds and box-shadows are dropped there, so the trigger gets a 2px `Highlight` outline instead.
+- **Tests:**
+  - the trigger has open styling only after it opens (`data-popup-open` and `aria-expanded="true"`);
+  - a consumer `className` is kept;
+  - the "unstyled" test now checks that there are no resting styles.
+
+### Measured (Chromium, ghost "…" button on a tinted ListRows row)
+
+| Theme         | Ring vs tinted row | Ring vs button fill | Fill vs row (colour only) |
+| ------------- | ------------------ | ------------------- | ------------------------- |
+| light         | 14.51:1            | 11.16:1             | 1.30:1                    |
+| dark          | 13.25:1            | 8.09:1              | 1.64:1                    |
+| high contrast | 14.48:1            | 8.58:1              | 1.69:1                    |
+
+- **Forced colours (emulated):** the button outline is `Highlight` (Chromium's emulated palette gives dark navy), inside the row's black outline. They are also told apart by position: the button's outline is its own inner box.
+- **Other variants:**
+  - outline Button ("Edit"): the ring sits inside its 2px border;
+  - solid split-button caret: a white inner ring;
+  - all screenshotted.
+
+## 2026-11-16 — Keyboard opens skip the open animation (George, ContextMenu review)
+
+Lands in the ContextMenu PR (GEO-926), because ContextMenu shares this Popup.
+
+### What changed
+
+- **`Menu.Root` and `Menu.SubmenuRoot` are thin wrappers** around Base UI's. They pass every prop through and wrap `onOpenChange` to record whether each open came from the keyboard. The consumer's `onOpenChange` is still called.
+- **The keyboard test uses only Base UI's public `eventDetails`:**
+  - `reason === "list-navigation"` (arrow keys);
+  - or `reason === "trigger-press"` with a click whose `detail` is 0 (Enter and Space dispatch a click with no pointer).
+  - It's exported as `isKeyboardOpenChange`. ContextMenu and Menubar use `useKeyboardOpenTracking` and `KeyboardOpenContext`.
+- **`Menu.Popup` gets `data-keyboard-open`** and `data-[keyboard-open]:data-[open]:transition-none`. A keyboard open appears at once. The close transition is unchanged, because it only applies while `data-open` is set.
+- **Why not Base UI's `data-instant`:**
+  - Base UI only sets `instant="click"` for Enter/Space keyboard clicks, not for ArrowDown (`list-navigation`).
+  - It would also apply to keyboard-activated item closes, which would change the close animation.
+- **Tests:** 6 more (49). Click is animated; Enter, Space and ArrowDown are not. `isKeyboardOpenChange` cases. The consumer's `onOpenChange` is still called.
+
+### Checks (Chromium, computed `transition-property` on the popup)
+
+- click: `transform, scale, opacity`;
+- Enter, Space, ArrowDown: `none`;
+- closing after a keyboard open: `transform, scale, opacity`.
+
 ## 2026-11-16 — Signed off by George (GEO-925)
 
 ### Focus guards (George chose option 1)
