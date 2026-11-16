@@ -48,6 +48,25 @@ function pass(msg: string) {
 // Page-level rules to ignore (Storybook iframe issues, not component issues)
 const IGNORE_RULES = ["landmark-one-main", "page-has-heading-one", "region", "bypass"];
 
+/*
+ * Base UI focus guards: `span[data-base-ui-focus-guard]` are the focus-trap
+ * sentinels Base UI renders around an open popup (aria-hidden, tabindex=0).
+ * axe flags them under `aria-hidden-focus` when a story renders a popup that
+ * is already open and non-modal (e.g. Menu showcase stories). A menu opened by
+ * the user passes. Only these nodes, and only for this rule, are dropped; any
+ * other aria-hidden-focus node, and every other rule, still fails as before.
+ */
+type AxeRuleResult = { id: string; nodes: { html: string }[] };
+function dropFocusGuards<T extends AxeRuleResult>(results: T[]): T[] {
+  return results
+    .map((r) =>
+      r.id === "aria-hidden-focus"
+        ? { ...r, nodes: r.nodes.filter((n) => !n.html.includes("data-base-ui-focus-guard")) }
+        : r,
+    )
+    .filter((r) => r.id !== "aria-hidden-focus" || r.nodes.length > 0);
+}
+
 async function main() {
   console.log(`\n🔍 Verifying component: ${component}\n`);
 
@@ -96,8 +115,12 @@ async function main() {
         .include("#storybook-root")
         .exclude("p[style*='color: red']") // Storybook error messages
         .analyze();
-      const violations = results.violations.filter((v) => !IGNORE_RULES.includes(v.id));
-      const incomplete = results.incomplete.filter((v) => !IGNORE_RULES.includes(v.id));
+      const violations = dropFocusGuards(
+        results.violations.filter((v) => !IGNORE_RULES.includes(v.id)),
+      );
+      const incomplete = dropFocusGuards(
+        results.incomplete.filter((v) => !IGNORE_RULES.includes(v.id)),
+      );
 
       if (violations.length > 0) {
         violations.forEach((v) => fail(`${story} — [${v.impact}] ${v.id}: ${v.description}`));
