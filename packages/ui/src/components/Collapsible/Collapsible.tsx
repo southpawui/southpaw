@@ -755,3 +755,4 @@ export const collapsibleStyles = {
   contentPadding,
   motion,
 };
+export const useCollapsibleOpenChangeComplete = useOpenChangeComplete;
