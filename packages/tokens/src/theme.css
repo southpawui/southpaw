@@ -24,6 +24,7 @@
   --color-fg-on-danger: var(--sp-fg-on-danger);
   --color-fg-on-success: var(--sp-fg-on-success);
   --color-fg-on-info: var(--sp-fg-on-info);
+  --color-fg-on-warning: var(--sp-fg-on-warning);
 
   /* ---- Intent ---- */
   --color-brand: var(--sp-brand);
@@ -31,7 +32,11 @@
   --color-danger: var(--sp-danger);
   --color-success: var(--sp-success);
   --color-success-subtle: var(--sp-success-subtle);
+  --color-info-subtle: var(--sp-info-subtle);
+  --color-warning-subtle: var(--sp-warning-subtle);
+  --color-danger-subtle: var(--sp-danger-subtle);
   --color-info: var(--sp-info);
+  --color-warning: var(--sp-warning);
 
   /* ---- Borders ---- */
   --color-border-default: var(--sp-border-default);
