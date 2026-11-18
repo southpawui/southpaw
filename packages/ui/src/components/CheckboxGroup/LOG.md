@@ -21,3 +21,12 @@
 
 - **Built-in Legend/Description/Error sub-components** — would duplicate what Field already provides. shadcn doesn't have a CheckboxGroup component at all — they compose with Field. We follow the same principle.
 - **Horizontal orientation** — only 1/8 competitors offer it. If needed, consumer can override with `className="flex-row"` on Root.
+
+## 2026-11-18 — Expose aria-disabled (approved shared change, GEO-896 follow-up)
+
+- **Bug:** Base UI's CheckboxGroup, unlike its RadioGroup, doesn't set `aria-disabled` on its `role="group"`, so screen readers weren't told a disabled group is disabled. That applies whether it's disabled directly, through `Field.Root`, or through an ancestor Fieldset or ButtonGroup.
+- **Found by:** dimming `Field.Label` when disabled (Field change, same day). axe then flagged the disabled group's label ("Preferences") for colour contrast, because nothing marked the labelled group as inactive. WCAG 1.4.3 exempts inactive components, but only if they're exposed as inactive.
+- **Fix:** a default `render` adds `aria-disabled={state.disabled || undefined}` from Base UI's state. A consumer's own `render` still wins.
+- **Tests:** `aria-disabled` is set when the group is disabled directly and when it's disabled through Field. There's none when enabled, and a consumer's `render` is respected.
+- **Checks:** `pnpm verify checkboxgroup` passes all checks, including the States and Themes stories that failed before.
+- **Approved** by George (2026-11-18).
