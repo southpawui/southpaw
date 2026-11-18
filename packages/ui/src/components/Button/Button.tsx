@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Spinner } from "../Spinner/Spinner";
 import { cn } from "../../lib/cn";
+import { ButtonGroupContext } from "../ButtonGroup/context";
 
 export interface ButtonProps extends Omit<React.ComponentProps<typeof BaseButton>, "color"> {
   /** Visible text label. Use this or children — label takes precedence. */
@@ -53,18 +54,26 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       className,
       label,
-      variant = "solid",
-      color = "default",
-      size = "md",
+      variant: variantProp,
+      color: colorProp,
+      size: sizeProp,
       icon,
       iconPosition = "start",
       srOnly,
       loading = false,
+      disabled: disabledProp,
       children,
       ...props
     },
     ref,
   ) => {
+    // Inside a ButtonGroup, the group's size/variant/color are defaults; the Button's own
+    // props win. `disabled` from the group disables every Button (GEO-896).
+    const group = React.useContext(ButtonGroupContext);
+    const variant = variantProp ?? group?.variant ?? "solid";
+    const color = colorProp ?? group?.color ?? "default";
+    const size = sizeProp ?? group?.size ?? "md";
+    const disabled = Boolean(group?.disabled) || disabledProp;
     const isIconOnly = size === "icon";
     // When loading, show spinner in place of icon
     const displayIcon = loading ? <Spinner /> : icon;
@@ -80,9 +89,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <BaseButton
         ref={ref}
         data-slot="button"
+        data-variant={variant}
         aria-label={ariaLabel}
         aria-busy={loading || undefined}
-        disabled={loading || props.disabled}
+        disabled={loading || disabled}
         className={cn(
           // Base
           "inline-flex cursor-pointer items-center justify-center font-medium",
@@ -106,7 +116,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           colorVariantClasses[color]?.[variant],
 
           // Sizes (density-aware) — tighten padding on icon side
-          isIconOnly && "h-[var(--sp-control-height)] w-[var(--sp-control-height)]",
+          // Icon-only buttons are square; inside a sized ButtonGroup they match its height.
+          isIconOnly &&
+            group?.size === "sm" &&
+            "h-[var(--sp-control-height-sm)] w-[var(--sp-control-height-sm)]",
+          isIconOnly &&
+            group?.size === "lg" &&
+            "h-[var(--sp-control-height-lg)] w-[var(--sp-control-height-lg)]",
+          isIconOnly &&
+            (group?.size ?? "md") === "md" &&
+            "h-[var(--sp-control-height)] w-[var(--sp-control-height)]",
           size === "sm" && !hasIcon && "h-[var(--sp-control-height-sm)] px-3 text-sm",
           size === "sm" && iconStart && "h-[var(--sp-control-height-sm)] pl-2 pr-3 text-sm",
           size === "sm" && iconEnd && "h-[var(--sp-control-height-sm)] pl-3 pr-2 text-sm",
