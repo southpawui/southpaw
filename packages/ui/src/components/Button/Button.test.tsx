@@ -109,4 +109,45 @@ describe("Button", () => {
     render(<Button ref={ref} label="Ref" />);
     expect(ref).toHaveBeenCalledWith(expect.any(HTMLButtonElement));
   });
+
+  describe("inactive (GEO-932, Primer)", () => {
+    it("stays focusable, is aria-disabled and ignores activation", async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(<Button inactive label="Publish" onClick={onClick} />);
+      const btn = screen.getByRole("button", { name: "Publish" });
+      expect(btn).toHaveAttribute("aria-disabled", "true");
+      expect(btn).not.toHaveAttribute("disabled");
+      expect(btn).toHaveAttribute("data-inactive");
+      await user.tab();
+      expect(btn).toHaveFocus();
+      await user.click(btn);
+      await user.keyboard("{Enter}");
+      await user.keyboard(" ");
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it("has the disabled look without pointer-events-none, hover or press scale", () => {
+      render(<Button inactive label="Publish" />);
+      const cls = screen.getByRole("button", { name: "Publish" }).className;
+      expect(cls).toContain("opacity-[var(--sp-state-disabled-opacity)]");
+      expect(cls).toContain("cursor-not-allowed");
+      expect(cls).not.toContain("hover:bg-accent/90");
+      expect(cls).not.toContain("active:scale-");
+    });
+
+    it("disabled wins over inactive (not focusable)", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <Button inactive disabled label="Both" />
+          <Button label="Next" />
+        </>,
+      );
+      expect(screen.getByRole("button", { name: "Both" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Both" })).not.toHaveAttribute("data-inactive");
+      await user.tab();
+      expect(screen.getByRole("button", { name: "Next" })).toHaveFocus();
+    });
+  });
 });

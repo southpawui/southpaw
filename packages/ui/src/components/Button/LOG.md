@@ -30,3 +30,25 @@ Styled with token system. Basic unstyled Base UI wrapper.
 - **Bug fix:** `disabled` is destructured out of the rest props. Before, `{...props}` came after `disabled={loading || props.disabled}`, so an explicit `disabled={false}` re-enabled a loading Button. A regression test is in ButtonGroup.test.tsx.
 - **Pre-existing, not changed:** a loading Button is also `disabled`, so the disabled opacity stacks on top of `opacity-80`, which contradicts the "Loading keeps full opacity" comment. Flagged for its own ticket.
 - `pnpm verify button`: all checks pass. The existing Button tests are unchanged and pass.
+
+## 2026-11-18 — `inactive` (GEO-932, approved shared change)
+
+- **George's decision:** build Primer's focusable "inactive" for **both** Button and Toggle, with the Button change in its own commit.
+- **What it does:** `inactive` looks disabled but **stays focusable and hoverable**, so a Tooltip can explain why it's unavailable.
+- **How:** Base UI Button's `disabled` + `focusableWhenDisabled`. Base UI keeps the tab stop, sets `aria-disabled="true"` (no native `disabled`), and swallows click, Enter and Space.
+- **Styling:**
+  - the disabled opacity and `cursor-not-allowed`;
+  - pointer events stay **on** (unlike `disabled:pointer-events-none`) so a Tooltip can open;
+  - hover classes are filtered out of the colour × variant map at runtime (the literals stay in the source for Tailwind);
+  - no press scale;
+  - `data-inactive`.
+- **Precedence:** `disabled` and `loading` win over `inactive`. A ButtonGroup's `disabled` still makes it really disabled.
+- **Story:** Inactive (variants, colours, icon, icon-only, and an enabled/disabled/inactive row to Tab through).
+- **Tests:**
+  - it's focusable and `aria-disabled`, and a click, Enter or Space doesn't call `onClick`;
+  - its classes have no hover and no scale;
+  - `disabled` wins.
+- **Checks:** `pnpm verify button` passes all checks.
+- **GEO-959:** the icon-only inactive "Settings" button in the story needs a Tooltip once Tooltip lands.
+
+**Signed off** by George, 2026-11-18 (with Toggle). /improve was a quick self-review with no new findings.
