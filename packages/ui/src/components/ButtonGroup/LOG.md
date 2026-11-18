@@ -102,6 +102,59 @@ States story: valid/error don't apply to a group of actions (each Button carries
 - `STORYBOOK_PORT=6009 pnpm verify buttongroup` and `pnpm verify button`: all checks pass.
 - eslint is clean, and the scratch-tsconfig type-check of the changed files is clean (GEO-951).
 
+## 2026-11-18 — Disabled cascades to every control (George's decision, follow-up to sign-off)
+
+**Decision (George, via the coordinator):** a disabled ButtonGroup disables **everything** inside it, as native `<fieldset disabled>` does. That includes Input, Select, NumberField, Toggle and any other control, not only Buttons. This answers the open question from the sign-off entry.
+
+**How (reused, not a new API):** `ButtonGroup.Root` now renders Base UI **`Fieldset.Root`**, which is a native `<fieldset>`, still with `role="group"`.
+
+- **Native cascade.** Every native control inside is actually disabled: it can't be clicked or focused, and it matches `:disabled`. That covers Button, Toggle, Input, Textarea, the Select trigger, OTPField, and NumberField's input and steppers.
+- **Base UI context.** `Fieldset.Root` passes `disabled` to any `Field.Root` inside. So Field-wrapped controls that aren't native (Checkbox and Switch are `<span role=…>`) get `data-disabled` and are blocked too.
+- **Button context.** `ButtonGroupContext.disabled` still reaches Buttons, so `render={<nav />}` keeps disabling them. The native cascade needs the default `<fieldset>`, and the `render` prop docs say so.
+- **Fieldset reset:** `m-0 min-w-0 border-0 p-0`. `min-w-0` overrides the fieldset's `min-inline-size: min-content`, which would stop wrapping and stacking.
+- **Ref and props:** the ref type is now `HTMLFieldSetElement`; the props extend `fieldset`.
+
+**Checked in Playwright (DisabledCascade story):**
+
+- Every control reports `:disabled` or `data-disabled`.
+- Tab skips everything inside the disabled groups.
+- Clicking the Checkbox and Switch doesn't change them.
+- The other stories' layouts are unchanged (Orientation, GrowAndAlign, GroupProps at 375px).
+
+**Gaps that need shared changes (sent to George for approval, not done here):**
+
+1. **NumberField** looks enabled (full opacity) when disabled by a parent fieldset, though it is disabled. Its group and stepper styles key off Base UI's `data-disabled`/`aria-disabled`, which aren't set by an ancestor fieldset. Fix: also style from native `:disabled` (`has-[input:disabled]` on the group, `disabled:` on the steppers).
+2. **Field.Label** isn't dimmed when its field is disabled, anywhere in the library. This predates the cascade (the deferred "Field: disabled propagation" note).
+3. **Bare Checkbox, Switch, Radio and Slider** (not wrapped in `Field.Root`) aren't native controls, so a fieldset can't disable them. Inside `Field.Root`, which is the library convention, they are. Recommendation: document this rather than change it.
+
+**Tests:** 6 new, 383 in total:
+
+- the group renders a fieldset;
+- Input, Toggle, NumberField and Button are disabled;
+- a Checkbox in a Field gets `data-disabled` and ignores clicks;
+- Tab skips the disabled group;
+- an enabled group leaves its controls enabled;
+- `render={<nav />}` still disables Buttons.
+
+**Checks:**
+
+- `STORYBOOK_PORT=6009 pnpm verify buttongroup`: all checks pass (14 stories).
+- Lint is clean.
+
+## 2026-11-18 — Disabled cascade signed off (George: "signed off")
+
+- **/improve (quick, this follow-up diff only):** one test gap, nesting. A nested ButtonGroup inside a disabled group wasn't covered, so I added a test: the inner fieldset, its Toggle and its Button are all disabled.
+- **Considered and rejected:**
+  - Dropping `aria-disabled` now that the native fieldset is `disabled`: keeping it is harmless, axe is clean, and it's the only signal when `render={<nav />}` is used.
+  - Base UI's `aria-labelledby={legendId}`: there's no Legend, so it's undefined, and the consumer's `aria-label`/`aria-labelledby` wins (covered by the existing label test).
+- **Shared changes (approved by George, separate commits before this one):**
+  - NumberField styles its disabled look from native `:disabled`.
+  - CheckboxGroup exposes `aria-disabled`.
+  - Field.Label dims when its field is disabled.
+- **Docs:** bare Checkbox, Switch, Radio and Slider need `Field.Root` to be disabled by the group. This is documented on `ButtonGroupContextValue.disabled` (docs only, as George chose).
+- **Fieldset double-dimming** (labels and controls inside a disabled Fieldset at about 0.14) is flagged for its own ticket.
+- **Checks:** `pnpm test` 387 passed, `STORYBOOK_PORT=6009 pnpm verify buttongroup` all checks pass, eslint clean.
+
 ### Notes for other tickets
 
 - **GEO-959** (Tooltip on icon-only buttons): ButtonGroup itself renders no buttons. The **stories** use icon-only Buttons that need tooltips once GEO-959 lands: Pagination (Previous/Next page), Nested (Undo/Redo) and SplitButton ("More save options"). Not cherry-picked here.

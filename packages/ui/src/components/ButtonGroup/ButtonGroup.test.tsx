@@ -4,6 +4,10 @@ import { ButtonGroup } from "./ButtonGroup";
 import { Button } from "../Button/Button";
 import { Input } from "../Input/Input";
 import { connectedClasses } from "../../lib/connected";
+import { Toggle } from "../Toggle/Toggle";
+import { NumberField } from "../NumberField/NumberField";
+import { Checkbox } from "../Checkbox/Checkbox";
+import { Field } from "../Field/Field";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -256,6 +260,103 @@ describe("ButtonGroup", () => {
       );
       // The spinner contributes "Loading" to the name ("LoadingSaving").
       expect(screen.getByRole("button", { name: /Saving/ })).toBeDisabled();
+    });
+  });
+
+  describe("disabled cascades to every control (like <fieldset disabled>)", () => {
+    it("renders a native fieldset", () => {
+      render(
+        <ButtonGroup.Root aria-label="A">
+          <Button>One</Button>
+        </ButtonGroup.Root>,
+      );
+      expect(group().tagName).toBe("FIELDSET");
+    });
+
+    it("disables Input, Toggle, NumberField and Button inside a disabled group", () => {
+      render(
+        <ButtonGroup.Root aria-label="A" disabled>
+          <Input aria-label="Email" />
+          <Toggle aria-label="Bold">B</Toggle>
+          <NumberField.Root defaultValue={1}>
+            <NumberField.Group inputProps={{ "aria-label": "Qty" }} />
+          </NumberField.Root>
+          <Button>Go</Button>
+        </ButtonGroup.Root>,
+      );
+      // NumberField.Group is also role="group", so query ours by name.
+      expect(screen.getByRole("group", { name: "A" })).toBeDisabled();
+      expect(screen.getByRole("textbox", { name: "Email" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Bold" })).toBeDisabled();
+      expect(screen.getByRole("textbox", { name: "Qty" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Increase" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Go" })).toBeDisabled();
+    });
+
+    it("reaches Field-wrapped controls through Base UI's Fieldset context (Checkbox)", async () => {
+      const user = userEvent.setup();
+      render(
+        <ButtonGroup.Root aria-label="A" disabled>
+          <Field.Root>
+            <Checkbox.Root aria-label="Gift wrap" />
+          </Field.Root>
+        </ButtonGroup.Root>,
+      );
+      const box = screen.getByRole("checkbox", { name: "Gift wrap" });
+      expect(box).toHaveAttribute("data-disabled");
+      await user.click(box);
+      expect(box).toHaveAttribute("aria-checked", "false");
+    });
+
+    it("nothing inside a disabled group is reachable with Tab", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <ButtonGroup.Root aria-label="A" disabled>
+            <Input aria-label="Email" />
+            <Toggle aria-label="Bold">B</Toggle>
+            <Button>Go</Button>
+          </ButtonGroup.Root>
+          <Button>After</Button>
+        </>,
+      );
+      await user.tab();
+      expect(screen.getByRole("button", { name: "After" })).toHaveFocus();
+    });
+
+    it("an enabled group leaves its controls enabled", () => {
+      render(
+        <ButtonGroup.Root aria-label="A">
+          <Input aria-label="Email" />
+          <Toggle aria-label="Bold">B</Toggle>
+        </ButtonGroup.Root>,
+      );
+      expect(group()).not.toBeDisabled();
+      expect(screen.getByRole("textbox", { name: "Email" })).toBeEnabled();
+      expect(screen.getByRole("button", { name: "Bold" })).toBeEnabled();
+    });
+
+    it("a nested group inside a disabled group is disabled too", () => {
+      render(
+        <ButtonGroup.Root aria-label="Outer" disabled>
+          <ButtonGroup.Root aria-label="Inner" attached>
+            <Toggle aria-label="Bold">B</Toggle>
+            <Button>Inner button</Button>
+          </ButtonGroup.Root>
+        </ButtonGroup.Root>,
+      );
+      expect(screen.getByRole("group", { name: "Inner" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Bold" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Inner button" })).toBeDisabled();
+    });
+
+    it("with render={<nav />} Buttons are still disabled via context", () => {
+      render(
+        <ButtonGroup.Root aria-label="A" disabled render={<nav />}>
+          <Button>Go</Button>
+        </ButtonGroup.Root>,
+      );
+      expect(screen.getByRole("button", { name: "Go" })).toBeDisabled();
     });
   });
 

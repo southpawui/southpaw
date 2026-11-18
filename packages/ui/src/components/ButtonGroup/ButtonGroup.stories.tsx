@@ -16,6 +16,11 @@ import { Button } from "../Button/Button";
 import { Input } from "../Input/Input";
 import { Select } from "../Select/Select";
 import { Popover } from "../Popover/Popover";
+import { Toggle } from "../Toggle/Toggle";
+import { NumberField } from "../NumberField/NumberField";
+import { Checkbox } from "../Checkbox/Checkbox";
+import { Switch } from "../Switch/Switch";
+import { Field } from "../Field/Field";
 
 const meta: Meta = {
   title: "Components/ButtonGroup",
@@ -376,6 +381,71 @@ export const Nested: Story = {
       <Alignment />
     </ButtonGroup.Root>
   ),
+};
+
+/* ============================================================
+ * Disabled cascade — a disabled group disables every control inside it,
+ * like <fieldset disabled> (George, 2026-11-18)
+ * ============================================================ */
+
+function DisabledCascadeDemo() {
+  const [disabled, setDisabled] = React.useState(true);
+  return (
+    <div className={`flex flex-col gap-6 ${WRAP}`}>
+      <Field.Root>
+        <Field.Group direction="row">
+          <Switch.Root checked={disabled} onCheckedChange={setDisabled} />
+          <Field.Label>Disable the groups</Field.Label>
+        </Field.Group>
+      </Field.Root>
+      <div className="flex flex-col gap-2">
+        <Heading>Attached: Select + Input + Button</Heading>
+        <ButtonGroup.Root attached disabled={disabled} variant="outline" aria-label="Invite">
+          <Select.Root defaultValue="editor" items={{ viewer: "Viewer", editor: "Editor" }}>
+            <Select.Trigger aria-label="Role">
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Positioner>
+                <Select.Popup>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                </Select.Popup>
+              </Select.Positioner>
+            </Select.Portal>
+          </Select.Root>
+          <Input aria-label="Email" placeholder="name@example.com" />
+          <Button>Invite</Button>
+        </ButtonGroup.Root>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Heading>Spaced: Toggle, NumberField, Checkbox, Switch, Button</Heading>
+        <ButtonGroup.Root disabled={disabled} stackBelow={false} aria-label="Mixed controls">
+          <Toggle aria-label="Bold">B</Toggle>
+          <NumberField.Root defaultValue={2} min={0} className="w-32">
+            <NumberField.Group inputProps={{ "aria-label": "Quantity" }} />
+          </NumberField.Root>
+          <Field.Root className="w-auto">
+            <Field.Group direction="row">
+              <Checkbox.Root />
+              <Field.Label>Gift wrap</Field.Label>
+            </Field.Group>
+          </Field.Root>
+          <Field.Root className="w-auto">
+            <Field.Group direction="row">
+              <Switch.Root />
+              <Field.Label>Express</Field.Label>
+            </Field.Group>
+          </Field.Root>
+          <Button>Add to basket</Button>
+        </ButtonGroup.Root>
+      </div>
+    </div>
+  );
+}
+
+export const DisabledCascade: Story = {
+  render: () => <DisabledCascadeDemo />,
 };
 
 /* ============================================================

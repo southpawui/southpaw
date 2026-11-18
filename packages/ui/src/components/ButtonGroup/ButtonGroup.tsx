@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
+import { Fieldset as BaseFieldset } from "@base-ui/react/fieldset";
 import { Separator as BaseSeparator } from "@base-ui/react/separator";
 import { cn } from "../../lib/cn";
 import { connectedClasses } from "../../lib/connected";
@@ -37,7 +38,9 @@ const LayoutContext = React.createContext<LayoutContextValue>({
  * ============================================================ */
 
 export interface ButtonGroupRootProps
-  extends Omit<React.ComponentPropsWithRef<"div">, "color">, ButtonGroupContextValue {
+  extends
+    Omit<React.ComponentPropsWithRef<"fieldset">, "color" | "disabled">,
+    ButtonGroupContextValue {
   /** Layout direction. Default: "horizontal" */
   orientation?: Orientation;
   /**
@@ -54,7 +57,11 @@ export interface ButtonGroupRootProps
   grow?: boolean;
   /** Alignment along the group's main axis (Spectrum). Default: "start" */
   align?: "start" | "center" | "end";
-  /** Replace the rendered element (Base UI `render`). Default: a `<div>`. */
+  /**
+   * Replace the rendered element (Base UI `render`). Default: a `<fieldset>`, which is what
+   * makes `disabled` cascade to every native control inside. Another element (e.g. `<nav>`)
+   * keeps the Button-level `disabled` (via context) but loses the native cascade.
+   */
   render?: useRender.RenderProp;
 }
 
@@ -66,7 +73,7 @@ const smJustify = {
 } as const;
 const itemsAlign = { start: "items-start", center: "items-center", end: "items-end" } as const;
 
-const Root = React.forwardRef<HTMLDivElement, ButtonGroupRootProps>(
+const Root = React.forwardRef<HTMLFieldSetElement, ButtonGroupRootProps>(
   (
     {
       className,
@@ -105,19 +112,24 @@ const Root = React.forwardRef<HTMLDivElement, ButtonGroupRootProps>(
     const horizontal = orientation === "horizontal";
     const stacks = !attached && horizontal && stackBelow === "sm";
 
-    const element = useRender({
-      render,
-      ref,
-      defaultTagName: "div",
-      props: {
-        role: "group",
-        "data-slot": "button-group",
-        "data-orientation": orientation,
-        "data-attached": attached ? "" : undefined,
-        "aria-disabled": disabled || undefined,
-        ...props,
-        className: cn(
-          "flex max-w-full",
+    // Rendered as a Base UI Fieldset (a native <fieldset>) so `disabled` cascades the way
+    // `<fieldset disabled>` does: every native control inside (Button, Toggle, Input, Select
+    // trigger, NumberField, OTPField…) is disabled and matches :disabled, and any Field.Root
+    // inside inherits it through Base UI's Fieldset context (George, 2026-11-18).
+    return (
+      <BaseFieldset.Root
+        ref={ref}
+        render={render as React.ComponentProps<typeof BaseFieldset.Root>["render"]}
+        disabled={disabled}
+        role="group"
+        data-slot="button-group"
+        data-orientation={orientation}
+        data-attached={attached ? "" : undefined}
+        aria-disabled={disabled || undefined}
+        {...(props as React.ComponentProps<typeof BaseFieldset.Root>)}
+        className={cn(
+          // A <fieldset>: reset its default chrome (min-inline-size: min-content would stop wrapping).
+          "m-0 flex min-w-0 max-w-full border-0 p-0",
           // ---- Attached (connected) ----
           attached && connectedClasses(orientation),
           attached && horizontal && cn("items-stretch", justify[align]),
@@ -149,16 +161,13 @@ const Root = React.forwardRef<HTMLDivElement, ButtonGroupRootProps>(
           grow && horizontal && "[&>:not([role=separator])]:flex-1",
           grow && !horizontal && "w-full [&>:not([role=separator])]:w-full",
           className,
-        ),
-        children: (
-          <ButtonGroupContext.Provider value={groupCtx}>
-            <LayoutContext.Provider value={layoutCtx}>{children}</LayoutContext.Provider>
-          </ButtonGroupContext.Provider>
-        ),
-      },
-    });
-
-    return element;
+        )}
+      >
+        <ButtonGroupContext.Provider value={groupCtx}>
+          <LayoutContext.Provider value={layoutCtx}>{children}</LayoutContext.Provider>
+        </ButtonGroupContext.Provider>
+      </BaseFieldset.Root>
+    );
   },
 );
 Root.displayName = "ButtonGroup.Root";
