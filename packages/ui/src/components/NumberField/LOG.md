@@ -104,3 +104,11 @@ Scope approved by George (via the coordinator) on 2026-11-16. The research is in
 ### Found along the way (outside this component)
 
 - **GEO-957:** `<Field.Error>` doesn't render when `Field.Root invalid` is the only signal. In Base UI 1.9, `Field.Error` renders only on real validity failure or `match`. This also affects Input's stories: the Input Themes story has 3 invalid fields and 0 rendered errors. NumberField's stories use `<Field.Error match>`. Logged as GEO-957. The coordinator fixes it at restack, so it is deliberately not fixed in this branch.
+
+## 2026-11-18 — Looks disabled inside a disabled fieldset / ButtonGroup (approved shared change, GEO-896 follow-up)
+
+- **Bug:** inside a disabled ButtonGroup (a native `<fieldset disabled>`), NumberField was functionally disabled (the input and steppers matched `:disabled`, couldn't be focused or clicked) but looked enabled at full opacity. Its styles keyed off Base UI's `data-disabled`/`aria-disabled`, and an ancestor fieldset sets neither.
+- **Fix:** the Group also styles from native `:disabled` (`has-[input:disabled]:` gives the sunken background, control border and disabled opacity), and the steppers too (`disabled:` gives the not-allowed cursor, faded icon and no hover/active fill). It's the same look as the Base UI-disabled path.
+- **Regression test:** inside `<fieldset disabled>`, the input and Increase are disabled, there's no `data-disabled`, and the native-disabled classes are present. 36 tests.
+- **Checked in Playwright:** the ButtonGroup DisabledCascade story shows NumberField dimmed. `pnpm verify numberfield` passes all checks.
+- **Approved** by George via the coordinator (2026-11-18).
