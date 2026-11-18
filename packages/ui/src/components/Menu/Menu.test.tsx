@@ -1,6 +1,6 @@
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   Menu,
@@ -280,6 +280,9 @@ describe("Menu", () => {
     const item = screen.getByRole("menuitem", { name: "Documentation" });
     expect(item).toHaveAttribute("aria-current", "true");
     expect(item).toHaveAttribute("data-active");
+    // Bold + tint; the bar is reserved for the highlight
+    expect(item.className).toContain("font-medium");
+    expect(item.className).not.toMatch(/(^|\s)after:bg-accent/);
   });
 
   it("calls onClick and closes on a normal item", async () => {
@@ -312,11 +315,76 @@ describe("Menu", () => {
       </Harness>,
     );
     expect(screen.getByRole("menuitem", { name: "Copy" }).className).toContain(
-      "data-[highlighted]:bg-accent",
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-accent",
     );
     expect(screen.getByRole("menuitem", { name: "Delete" }).className).toContain(
-      "data-[highlighted]:bg-danger",
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-danger",
     );
+  });
+
+  it("marks the subtle highlight with an accent bar, not the solid one", async () => {
+    const { unmount } = await open(
+      <Harness>
+        <Menu.Item>Copy</Menu.Item>
+        <Menu.Item variant="danger">Delete</Menu.Item>
+      </Harness>,
+    );
+    const copy = screen.getByRole("menuitem", { name: "Copy" }).className;
+    expect(copy).toContain(
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:w-0.5",
+    );
+    expect(copy).toContain(
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:bg-accent",
+    );
+    expect(copy).toContain(
+      "forced-colors:[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:outline-[color:Highlight]",
+    );
+    expect(screen.getByRole("menuitem", { name: "Delete" }).className).toContain(
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:bg-danger",
+    );
+    unmount();
+    await open(
+      <Harness popup={{ highlight: "solid" }}>
+        <Menu.Item>Copy</Menu.Item>
+      </Harness>,
+    );
+    const solid = screen.getByRole("menuitem", { name: "Copy" }).className;
+    expect(solid).not.toContain(
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:w-0.5",
+    );
+    // Forced colours outline applies to both styles
+    expect(solid).toContain(
+      "forced-colors:[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:outline-[color:Highlight]",
+    );
+  });
+
+  it("gates highlight visuals: enabled items, or disabled items reached by keyboard", async () => {
+    await open(
+      <Harness>
+        <Menu.Item disabled>Undo</Menu.Item>
+      </Harness>,
+    );
+    const cls = screen.getByRole("menuitem", { name: "Undo" }).className;
+    const highlightClasses = cls.split(/\s+/).filter((c) => c.includes("data-highlighted"));
+    expect(highlightClasses.length).toBeGreaterThan(0);
+    for (const c of highlightClasses) {
+      // Pointer hover on a disabled item matches neither branch, so it shows nothing
+      expect(c).toContain(":is(:not([data-disabled]),[data-input-modality=keyboard]_*)");
+    }
+  });
+
+  it("tracks pointer vs keyboard on the popup", async () => {
+    await open(
+      <Harness>
+        <Menu.Item>Copy</Menu.Item>
+      </Harness>,
+    );
+    const popup = screen.getByTestId("popup");
+    expect(popup).toHaveAttribute("data-input-modality", "pointer");
+    fireEvent.keyDown(popup, { key: "ArrowDown" });
+    expect(popup).toHaveAttribute("data-input-modality", "keyboard");
+    fireEvent.pointerMove(popup, { pointerType: "mouse" });
+    expect(popup).toHaveAttribute("data-input-modality", "pointer");
   });
 
   it("draws dividers only when asked", async () => {
@@ -327,8 +395,12 @@ describe("Menu", () => {
     );
     const cls = screen.getByRole("menuitem").className;
     expect(cls).toContain("[[role^=menuitem]+&]:before:block");
-    expect(cls).toContain("[[data-highlighted]+&]:before:opacity-0");
-    expect(cls).toContain("data-[highlighted]:before:opacity-0");
+    expect(cls).toContain(
+      "[[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)+&]:before:opacity-0",
+    );
+    expect(cls).toContain(
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:before:opacity-0",
+    );
   });
 
   /* ---------- other item types ---------- */

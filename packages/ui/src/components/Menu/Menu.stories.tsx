@@ -727,6 +727,48 @@ export const States: Story = {
 };
 
 /* ============================================================
+ * DISABLED ITEMS — every item type. Pointer hover shows no tint,
+ * bar or outline. The arrow keys still reach them (Base UI keeps
+ * disabled items focusable so screen readers announce them); the
+ * keyboard highlight shows at the faded disabled opacity.
+ * (Base UI LinkItem has no disabled state.)
+ * ============================================================ */
+
+export const DisabledItems: Story = {
+  render: () => (
+    <OpenMenu trigger="Disabled items" minHeight={380}>
+      <Menu.Item icon={<Copy />}>Enabled</Menu.Item>
+      <Menu.Item icon={<PencilSimple />} shortcut="F2" disabled>
+        Plain (disabled)
+      </Menu.Item>
+      <Menu.CheckboxItem disabled defaultChecked>
+        Checkbox (disabled)
+      </Menu.CheckboxItem>
+      <Menu.RadioGroup defaultValue="a">
+        <Menu.RadioItem value="a">Radio</Menu.RadioItem>
+        <Menu.RadioItem value="b" disabled>
+          Radio (disabled)
+        </Menu.RadioItem>
+      </Menu.RadioGroup>
+      <Menu.SubmenuRoot disabled>
+        <Menu.SubmenuTrigger icon={<ShareNetwork />}>Submenu (disabled)</Menu.SubmenuTrigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item>Never shown</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.SubmenuRoot>
+      <Menu.Separator />
+      <Menu.Item icon={<Trash />} variant="danger" disabled>
+        Danger (disabled)
+      </Menu.Item>
+    </OpenMenu>
+  ),
+};
+
+/* ============================================================
  * DENSITY
  * ============================================================ */
 
