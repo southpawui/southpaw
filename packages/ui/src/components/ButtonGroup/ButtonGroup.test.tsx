@@ -105,9 +105,7 @@ describe("ButtonGroup", () => {
         </ButtonGroup.Root>,
       );
       expect(group()).toHaveAttribute("data-attached");
-      expect(group().className).toContain(
-        "[data-base-ui-focus-guard],[aria-owns]:empty))]:!rounded-s-",
-      );
+      expect(group().className).toContain("[aria-owns]:empty,[type=hidden]))]:!rounded-s-");
       expect(group().className).not.toContain("gap-[var(--sp-control-gap)]");
     });
 
@@ -117,9 +115,7 @@ describe("ButtonGroup", () => {
           <Button>One</Button>
         </ButtonGroup.Root>,
       );
-      expect(group().className).toContain(
-        "[data-base-ui-focus-guard],[aria-owns]:empty))]:!rounded-t-",
-      );
+      expect(group().className).toContain("[aria-owns]:empty,[type=hidden]))]:!rounded-t-");
       expect(group().className).toContain("flex-col");
     });
 
@@ -131,7 +127,7 @@ describe("ButtonGroup", () => {
         </ButtonGroup.Root>,
       );
       expect(group().className).toContain(
-        "[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid])]:shadow-",
+        "[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-",
       );
       expect(screen.getByRole("button", { name: "One" })).toHaveAttribute("data-variant", "solid");
     });
@@ -454,18 +450,19 @@ describe("ButtonGroup", () => {
   describe("connectedClasses", () => {
     it("lifts hovered and focused children above their neighbours", () => {
       const cls = connectedClasses("horizontal");
-      expect(cls).toContain(":empty):focus-visible]:z-20");
-      expect(cls).toContain(":empty):has(:focus-visible)]:z-20");
+      expect(cls).toContain("[type=hidden]):focus-visible]:z-20");
+      expect(cls).toContain("[type=hidden]):has(:focus-visible)]:z-20");
     });
 
     it("ignores Base UI's hidden focus-guard spans around an open trigger (split button regression)", () => {
       // Opening a Popover inserts [data-base-ui-focus-guard] spans and an empty [aria-owns] span
       // next to the trigger. They used to steal :last-child (trigger lost its rounded end).
-      const S = ":not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)";
+      const S = ":not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])";
       const cls = connectedClasses("horizontal");
       expect(cls).toContain(`[&>:nth-last-child(1_of_${S})]:!rounded-e-`);
       expect(cls).toContain(`[&>:nth-child(1_of_${S})]:!rounded-s-`);
-      expect(cls).toContain(`${S}+[data-base-ui-focus-guard]+${S})]:-ms-0.5`);
+      expect(cls).toContain(`${S}+[data-base-ui-focus-guard]+${S},`);
+      expect(cls).toContain(`${S}+[type=hidden]+${S})]:-ms-0.5`);
     });
   });
 });

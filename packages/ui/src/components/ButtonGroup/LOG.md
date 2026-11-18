@@ -155,6 +155,13 @@ States story: valid/error don't apply to a group of actions (each Button carries
 - **Fieldset double-dimming** (labels and controls inside a disabled Fieldset at about 0.14) is flagged for its own ticket.
 - **Checks:** `pnpm test` 387 passed, `STORYBOOK_PORT=6009 pnpm verify buttongroup` all checks pass, eslint clean.
 
+## 2026-11-18 — Connected styling skips hidden form inputs (GEO-932)
+
+- A Toggle with `name` renders a hidden `<input type="hidden">` as its sibling. In an attached group that input counted as a segment, which broke the `:last-child`-style rounding and the `+` overlap and dividers.
+- `lib/connected.tsx` now excludes `[type=hidden]` from segments and allows `S+[type=hidden]+S` adjacency. ButtonGroup's solid dividers do the same.
+- ButtonGroup's selector tests were updated to match. `pnpm verify buttongroup` passes all checks.
+- **Toggles inside a group** are set back to `w-auto` (`[&>[data-slot=toggle]:not([data-icon-only])]:w-auto`). A Toggle is `w-fit` on its own, and the group's layout should decide its width, as for Buttons (George, GEO-932).
+
 ### Notes for other tickets
 
 - **GEO-959** (Tooltip on icon-only buttons): ButtonGroup itself renders no buttons. The **stories** use icon-only Buttons that need tooltips once GEO-959 lands: Pagination (Previous/Next page), Nested (Undo/Redo) and SplitButton ("More save options"). Not cherry-picked here.

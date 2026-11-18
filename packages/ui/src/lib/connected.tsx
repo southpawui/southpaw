@@ -21,33 +21,34 @@ export type ConnectedOrientation = "horizontal" | "vertical";
 /**
  * A "segment" is a direct child that is a real control: not a separator, and not one of
  * the hidden spans Base UI inserts around an open Popover/Menu trigger
- * (`[data-base-ui-focus-guard]` focus guards and an empty `[aria-owns]` portal owner).
+ * (`[data-base-ui-focus-guard]` focus guards and an empty `[aria-owns]` portal owner), nor a
+ * hidden form input (a Toggle with `name` renders one as its sibling — GEO-932).
  * Without excluding them, opening a split button's menu broke :last-child (the trigger
  * lost its rounded end) and the `+` adjacency (overlap and dividers).
  *
  * First/last use `:nth-child(1 of S)` / `:nth-last-child(1 of S)`; adjacency allows one
- * focus guard in between (Base UI puts exactly one before a trigger).
+ * focus guard (Base UI puts exactly one before a trigger) or one hidden input in between.
  */
 const base = [
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)]:relative",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)]:!rounded-none",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty):hover]:z-10",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty):focus-visible]:z-20",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty):has(:focus-visible)]:z-20",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])]:relative",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])]:!rounded-none",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]):hover]:z-10",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]):focus-visible]:z-20",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]):has(:focus-visible)]:z-20",
 ].join(" ");
 
 const horizontal = [
   "flex-row",
-  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty))]:-ms-0.5",
-  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty))]:!rounded-s-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty))]:!rounded-e-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[type=hidden]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:-ms-0.5",
+  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-s-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-e-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
 ].join(" ");
 
 const vertical = [
   "flex-col items-stretch",
-  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty)+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty))]:-mt-0.5",
-  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty))]:!rounded-t-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty))]:!rounded-b-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[type=hidden]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:-mt-0.5",
+  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-t-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-b-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
 ].join(" ");
 
 /** Classes for a connected group container in the given orientation. */
