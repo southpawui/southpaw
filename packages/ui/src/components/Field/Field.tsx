@@ -55,6 +55,9 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
       data-slot="field-label"
       className={cn(
         "text-fg-default text-sm font-medium",
+        // Dim with its control when the field is disabled (Base UI sets data-disabled from
+        // Field.Root, Field.Item, or an ancestor Fieldset / disabled ButtonGroup).
+        "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
         // In horizontal layout, align with control height on sm+
         "[[data-orientation=horizontal]>&]:sm:mt-2.5 [[data-orientation=horizontal]>&]:sm:w-[var(--sp-field-label-width,8rem)] [[data-orientation=horizontal]>&]:sm:shrink-0",
         className,
