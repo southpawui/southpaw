@@ -14,6 +14,8 @@ import { Input } from "../Input/Input";
 import { Textarea } from "../Textarea/Textarea";
 import { Select } from "../Select/Select";
 import { Combobox } from "../Combobox/Combobox";
+import { NumberField } from "../NumberField/NumberField";
+import { OTPField } from "../OTPField/OTPField";
 import { RadioGroup } from "../RadioGroup/RadioGroup";
 import { CheckboxGroup } from "../CheckboxGroup/CheckboxGroup";
 import { Checkbox } from "../Checkbox/Checkbox";
@@ -110,9 +112,8 @@ function Option({
 const fruits = ["Apple", "Banana", "Cherry", "Grape", "Mango"];
 
 /**
- * A realistic application form built from the form components in this
- * branch (NumberField and OTPField are added at the restack). Native
- * constraints plus Field.Error messages that match the summary's wording.
+ * A realistic application form built from the library's form components.
+ * Native constraints plus Field.Error messages that match the summary's wording.
  */
 function ApplicationForm({
   summary,
@@ -151,6 +152,16 @@ function ApplicationForm({
             Enter an email address in the correct format, like name@example.com
           </Field.Error>
         </Field.Root>
+        <Field.Root name="code">
+          <Field.Label>Confirmation code</Field.Label>
+          <Field.Description>
+            Enter the 6-digit code we sent to your email address.
+          </Field.Description>
+          <OTPField.Root length={6} groups={[3, 3]} required />
+          <Field.Error match="valueMissing">Enter the confirmation code</Field.Error>
+          {/* A partly filled code reports patternMismatch (the hidden input is \d{6}) */}
+          <Field.Error match="patternMismatch">Confirmation code must be 6 digits</Field.Error>
+        </Field.Root>
         <Field.Root name="country">
           <Field.Label>Country</Field.Label>
           <CountrySelect />
@@ -165,6 +176,17 @@ function ApplicationForm({
           <Combobox.Content />
         </Combobox.Root>
         <Field.Error match="valueMissing">Select a fruit</Field.Error>
+      </Field.Root>
+
+      <Field.Root name="books">
+        <Field.Label>How many books do you want to borrow at a time?</Field.Label>
+        <Field.Description>Up to 10.</Field.Description>
+        <NumberField.Root required min={1} max={10}>
+          <NumberField.Group />
+        </NumberField.Root>
+        <Field.Error match="valueMissing">
+          Enter how many books you want to borrow at a time
+        </Field.Error>
       </Field.Root>
 
       <Field.Root name="contact">
