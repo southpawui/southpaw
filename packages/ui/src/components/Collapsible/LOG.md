@@ -1,5 +1,9 @@
 # Collapsible — Change Log
 
+## 2026-11-16 — Export the completion hook for Accordion
+
+- Added `export const useCollapsibleOpenChangeComplete = useOpenChangeComplete;` (one line, no behaviour change). Accordion (GEO-922) uses it for per-item `onOpenChangeComplete`, so both components fire it the same way. It ships in the Accordion commit.
+
 ## 2026-11-16 — Unnamed show-more region warns (follow-up)
 
 George approved this on 2026-11-16 (relayed by the coordinator). It resolves the question flagged at sign-off.
