@@ -1,8 +1,14 @@
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Menu, type MenuPopupProps, menuItemClasses, toAriaKeyshortcuts } from "./Menu";
+import {
+  Menu,
+  type MenuPopupProps,
+  isKeyboardOpenChange,
+  menuItemClasses,
+  toAriaKeyshortcuts,
+} from "./Menu";
 
 function Harness({
   children,
@@ -36,7 +42,7 @@ async function open(ui: React.ReactElement) {
 describe("Menu", () => {
   /* ---------- structure ---------- */
 
-  it("renders an unstyled trigger with data-slot", () => {
+  it("renders a trigger with data-slot and no resting styles", () => {
     render(
       <Menu.Root>
         <Menu.Trigger>Open</Menu.Trigger>
@@ -44,7 +50,7 @@ describe("Menu", () => {
     );
     const trigger = screen.getByRole("button", { name: "Open" });
     expect(trigger).toHaveAttribute("data-slot", "menu-trigger");
-    expect(trigger.className).toBe("");
+    expect(trigger.className).not.toMatch(/(^|\s)(bg|border|text)-/);
   });
 
   it("opens on click and renders popup slots", async () => {
@@ -544,6 +550,101 @@ describe("Menu", () => {
     const sub = await screen.findByTestId("sub");
     expect(sub).toHaveAttribute("data-size", "lg");
     expect(sub).toHaveAttribute("data-highlight", "solid");
+  });
+
+  /* ---------- trigger open state ---------- */
+
+  it("styles the trigger as open only while it is expanded", async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness>
+        <Menu.Item>Copy</Menu.Item>
+      </Harness>,
+    );
+    const trigger = screen.getByRole("button", { name: "Open" });
+    // Styling hangs off data-popup-open, which Base UI sets with aria-expanded
+    expect(trigger.className).toContain(
+      "data-[popup-open]:shadow-[inset_0_0_0_1.5px_currentColor]",
+    );
+    expect(trigger.className).toContain("forced-colors:data-[popup-open]:outline-[Highlight]");
+    expect(trigger).not.toHaveAttribute("data-popup-open");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await user.click(trigger);
+    await screen.findByRole("menu");
+    expect(trigger).toHaveAttribute("data-popup-open");
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("keeps the consumer's className on the trigger", () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger className="custom">Open</Menu.Trigger>
+      </Menu.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Open" })).toHaveClass("custom");
+  });
+
+  /* ---------- keyboard opens skip the open animation ---------- */
+
+  it("marks pointer opens as animated", async () => {
+    await open(
+      <Harness>
+        <Menu.Item>Copy</Menu.Item>
+      </Harness>,
+    );
+    const popup = screen.getByTestId("popup");
+    expect(popup).not.toHaveAttribute("data-keyboard-open");
+    expect(popup.className).toContain("data-[keyboard-open]:data-[open]:transition-none");
+  });
+
+  it.each([
+    ["Enter", "{Enter}"],
+    ["Space", " "],
+    ["ArrowDown", "{ArrowDown}"],
+  ])("marks a %s open as a keyboard open (no open animation)", async (_, key) => {
+    const user = userEvent.setup();
+    render(
+      <Harness>
+        <Menu.Item>Copy</Menu.Item>
+      </Harness>,
+    );
+    screen.getByText("Open").focus();
+    await user.keyboard(key);
+    expect(await screen.findByTestId("popup")).toHaveAttribute("data-keyboard-open");
+  });
+
+  it("isKeyboardOpenChange reads Base UI's reason and click detail", () => {
+    expect(isKeyboardOpenChange({ reason: "list-navigation" })).toBe(true);
+    expect(
+      isKeyboardOpenChange({
+        reason: "trigger-press",
+        event: new MouseEvent("click", { detail: 0 }),
+      }),
+    ).toBe(true);
+    expect(
+      isKeyboardOpenChange({
+        reason: "trigger-press",
+        event: new MouseEvent("click", { detail: 1 }),
+      }),
+    ).toBe(false);
+    expect(isKeyboardOpenChange({ reason: "trigger-hover" })).toBe(false);
+  });
+
+  it("still calls the consumer's onOpenChange", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Menu.Root onOpenChange={onOpenChange}>
+        <Menu.Trigger>Open</Menu.Trigger>
+      </Menu.Root>,
+    );
+    await user.click(screen.getByText("Open"));
+    await waitFor(() =>
+      expect(onOpenChange).toHaveBeenCalledWith(
+        true,
+        expect.objectContaining({ reason: "trigger-press" }),
+      ),
+    );
   });
 
   /* ---------- helpers ---------- */
