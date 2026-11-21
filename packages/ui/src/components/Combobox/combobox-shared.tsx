@@ -377,8 +377,7 @@ export function controlClasses(ctx: Pick<ComboboxContextValue, "size" | "valid" 
     "has-[[aria-expanded=true]]:border-accent",
     // State priority: invalid > warning > valid (NumberField)
     ctx.valid && !ctx.warning && "border-success hover:border-success",
-    ctx.warning &&
-      "border-[var(--sp-warning,var(--sp-fg-default))] hover:border-[var(--sp-warning,var(--sp-fg-default))]",
+    ctx.warning && "border-warning hover:border-warning",
     "has-[[data-invalid]]:!border-danger data-[invalid]:!border-danger",
     "has-[input:disabled]:bg-surface-sunken has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
     "has-[input[readonly]]:bg-surface-sunken has-[input[readonly]]:border-border-default",

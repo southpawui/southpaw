@@ -119,7 +119,7 @@ export interface AlertDialogIconProps extends React.ComponentPropsWithRef<"span"
 
 const iconColorClasses: Record<string, string> = {
   danger: "bg-danger/10 text-danger",
-  warning: "bg-[oklch(0.92_0.04_85)] text-[oklch(0.5_0.15_85)]",
+  warning: "bg-warning-subtle text-warning",
   info: "bg-brand/10 text-brand",
   success: "bg-success-subtle text-success",
   default: "bg-surface-alternate text-fg-muted",

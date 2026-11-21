@@ -1,5 +1,9 @@
 # Meter — Change Log
 
+## 2026-11-21 — Warning fill now uses the `--sp-warning` token (GEO-970)
+
+The warning state was hard-coded as `oklch(0.7 0.15 85)`, the same colour in every theme. It now uses `bg-warning` (`--sp-warning`), so it follows the theme. Checked with Playwright: `#b45309` in light, `#fcd34d` in dark and `#7a4100` in high contrast. In light, this is a darker amber than before, 5:1 on white.
+
 ## 2026-11-10 — Full enhancement
 
 ### What changed

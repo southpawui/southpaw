@@ -119,7 +119,7 @@ const Indicator = React.forwardRef<
         // Colour from parent Root's data-state
         "[[data-state=default]_&]:bg-accent",
         "[[data-state=success]_&]:bg-success",
-        "[[data-state=warning]_&]:bg-[oklch(0.7_0.15_85)]",
+        "[[data-state=warning]_&]:bg-warning",
         "[[data-state=danger]_&]:bg-danger",
       ),
       className,

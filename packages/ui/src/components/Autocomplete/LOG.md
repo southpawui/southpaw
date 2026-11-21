@@ -2,6 +2,10 @@
 
 Autocomplete is built together with Combobox (GEO-934) and shares its styling module. The full history and decisions are in [Combobox/LOG.md](../Combobox/LOG.md). Entries here cover only what is specific to Autocomplete.
 
+## 2026-11-21 — Warning state now uses the `--sp-warning` token (GEO-970)
+
+The warning border was written as `border-[var(--sp-warning,var(--sp-fg-default))]`, which fell back to a dark border while the token was still on another branch (PR #44). The token is on the base now, so the state uses the `border-warning` utility and the fallback is gone. It comes from `controlClasses` in the shared Combobox module. The "Amber arrives at the restack" note in the story is gone. Checked with Playwright: the border is `#b45309` in light, `#fcd34d` in dark and `#7a4100` in high contrast, the same as the token.
+
 ## 2026-11-18 — Signed off; /improve findings fixed
 
 - Fixed with Combobox (details in Combobox/LOG.md):

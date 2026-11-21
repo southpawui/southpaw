@@ -210,8 +210,7 @@ const Group = React.forwardRef<HTMLDivElement, NumberFieldGroupProps>(
               "hover:border-fg-muted",
               "has-[input:focus-visible]:sp-focus-ring",
               ctx.valid && !ctx.warning && "border-success hover:border-success",
-              ctx.warning &&
-                "border-[var(--sp-warning,var(--sp-fg-default))] hover:border-[var(--sp-warning,var(--sp-fg-default))]",
+              ctx.warning && "border-warning hover:border-warning",
               "data-[invalid]:!border-danger",
               "data-[disabled]:bg-surface-sunken data-[disabled]:border-border-control data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
               // Also disabled by an ancestor <fieldset disabled> (e.g. a disabled ButtonGroup): Base UI
