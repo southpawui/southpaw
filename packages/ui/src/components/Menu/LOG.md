@@ -1,5 +1,99 @@
 # Menu — Change Log
 
+## 2026-11-18 — Signed off with Menubar (GEO-927)
+
+- George signed off the accent bar, the active item without a bar, the disabled-item pointer/keyboard split and the DisabledItems story. They're committed as their own `feat(menu):` commit before Menubar's.
+- **/improve, considered and rejected:** if a popup is kept mounted (`keepMounted`) and the menu is opened by keyboard twice in a row with pointer use in between, React doesn't rewrite `data-input-modality`, so it stays "pointer". The only effect is that the auto-highlight on that reopen gets no tint when the first item is disabled. The first key press puts the tint back. Fixing it would need open-state tracking in Popup for a corner case nothing uses yet.
+- Checks: `pnpm verify menu` and `contextmenu` pass; full suite 406 tests.
+
+## 2026-11-16 — Disabled items: no hover look; keyboard highlight stays visible (George review)
+
+### Problem
+
+Hovering a disabled item (Menubar Density story, Edit → Undo) showed the grey tint and the accent bar. Base UI sets `data-highlighted` on disabled items under the pointer.
+
+### Base UI behaviour (read in source)
+
+- **Disabled items are keyboard-focusable on purpose:** `menu/item/useMenuItem.js` has `focusableWhenDisabled: true`, and `menu/root/MenuRoot.js` has `disabledIndices: []`. So ArrowDown/ArrowUp stop on them (checked in Chromium). Only the first-item focus on open skips them.
+- **APG allows this:** screen reader users learn the command exists and that it's unavailable.
+- **Not configurable,** so they still need a visible focus position (WCAG 2.4.7).
+
+### Fix: pointer/keyboard split (same as Combobox/Autocomplete, Lane 5)
+
+- **`Menu.Popup` tracks the last input** in `data-input-modality`:
+  - `keyboard` on keydown (capture phase), and as the initial value for keyboard opens;
+  - `pointer` on (non-touch) pointer move.
+  - It's written straight to the element, so it causes no re-render.
+- **Every highlight style in `menuItemClasses`** now uses one literal variant: `[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:`, meaning "highlighted, and either enabled or reached by the keyboard". It covers:
+  - the subtle and solid fills, the danger fills, the accent bar, and the forced-colours outline;
+  - divider hiding (`[[data-highlighted]:is(…)+&]`) and the muted text, chevron and external-icon colours (`[[data-highlighted]:is(…)_&]`).
+- **Pointer hover on a disabled item:** no tint, no bar, no forced-colours outline, at disabled opacity (0.38).
+- **Keyboard highlight on a disabled item:** the tint and bar stay, faded by the row's disabled opacity, so the focus position stays visible.
+- **Considered and rejected:**
+  - a dashed outline at full contrast for keyboard focus on disabled items. Replaced by Lane 5's split, for consistency across menus and comboboxes.
+  - `:focus-visible` as the switch. Base UI focuses items on hover too, and Chromium sometimes marks that focus-visible, so the outline showed on hover.
+- **New story:** DisabledItems, with every item type disabled: plain, checkbox, radio, submenu trigger, danger. Base UI `LinkItem` has no disabled state.
+- **Tests:**
+  - every highlight class is gated;
+  - the popup switches `data-input-modality` between pointer and keyboard;
+  - existing class expectations updated.
+
+### Checks (Chromium, real pointer and keys, Menubar Edit menu, Undo disabled)
+
+| Case                                        | Opacity | Tint           | Bar  | Forced-colours outline |
+| ------------------------------------------- | ------- | -------------- | ---- | ---------------------- |
+| Pointer on disabled Undo (light, dark, HC)  | 0.38    | none           | none | none                   |
+| Keyboard on disabled Undo (light, dark, HC) | 0.38    | 8% / 10% / 16% | 2px  | solid (forced)         |
+| Pointer on enabled Redo                     | 1       | 8% / 10% / 16% | 2px  | solid (forced)         |
+
+- **Pointer hover on each disabled type** (plain, checkbox, radio, submenu, danger) in Menu, ContextMenu (States) and Menubar: transparent background, no bar.
+- **`pnpm verify`** for menu, contextmenu and menubar: pass. Full suite: 402 tests.
+- **Commit:** this goes in the same `feat(menu):` commit as the accent bar.
+
+## 2026-11-16 — Active item drops its bar (George: option a)
+
+- **What changed:** `active` (the current page) is now bold text plus the selected tint (subtle style). The `after:` accent bar it had is removed. Test added.
+- **Why:** the accent bar on the subtle highlight (entry below) made a highlighted row and the active row look almost the same. George chose (a): the bar now marks only the highlight. Bold weight is the non-colour cue for "current".
+- **Solid style:** `active` keeps bold text. There is no selected tint in solid, as before.
+- **Commit:** same `feat(menu):` commit as the accent bar, at Menubar signoff.
+
+## 2026-11-16 — Accent bar on the subtle highlight (George approved; Lane 5 proposal)
+
+Lands as a separate `feat(menu):` commit at Menubar (GEO-927) signoff.
+
+### What changed
+
+- **Why:** the subtle highlight tint alone measures 1.2–1.45:1 against the popup, under the 3:1 a focus indicator needs (WCAG 1.4.11).
+- **The bar:** a 2px bar now marks the start of the highlighted row in the subtle style, matching Combobox/Autocomplete (Lane 5): `after:` with `inset-y-1`, `start-0`, `w-0.5`, `rounded-full`.
+  - It uses `bg-accent` on default items and `bg-danger` on danger items, so it matches their tint. Lane 5 has no danger rows.
+  - The solid style is unchanged: no bar, because the accent fill is the indicator.
+  - It flips to the right in RTL through `start-0`.
+- **Forced colours:** highlighted items in both styles get a 2px `Highlight` outline (`-outline-offset-2`), because backgrounds are dropped there.
+- **Inherited by:** ContextMenu and Menubar, through `menuItemClasses`.
+- **Test:** the subtle style has a bar (accent, or danger for danger items); the solid style has none; both get the forced-colours outline.
+
+### Measured (Chromium, Themes story, bar over the highlighted row)
+
+| Theme         | Default item | Danger item |
+| ------------- | ------------ | ----------- |
+| light         | 14.51:1      | 5.21:1      |
+| dark          | 10.74:1      | 7.24:1      |
+| high contrast | 14.48:1      | 6.18:1      |
+
+Forced colours (emulated): `solid 2px Highlight` on every highlighted item.
+
+### Open question for George (resolved: option a, entry above)
+
+The **active** item (`active`, the current page) already has a near-identical bar (`after:` at `start-0.5`, `inset-y-2`) plus the selected tint. So a highlighted row and the active row now look almost the same. See the States and Themes stories.
+
+Options:
+
+- (a) Drop the active bar, keeping bold text and the selected tint. Bold is the non-colour cue. **Recommended.**
+- (b) Make the active indicator a different shape, such as a dot or a check-style mark.
+- (c) Keep both.
+
+Not changed until George decides.
+
 ## 2026-11-16 — Menu.Trigger shows its open state (George, ContextMenu review)
 
 Lands in the ContextMenu PR (GEO-926).

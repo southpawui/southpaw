@@ -303,7 +303,9 @@ describe("ContextMenu", () => {
     );
     fireEvent.contextMenu(screen.getByTestId("area"), { clientX: 40, clientY: 40 });
     const item = await screen.findByRole("menuitem", { name: "Copy" });
-    expect(item.className).toContain("data-[highlighted]:bg-accent");
+    expect(item.className).toContain(
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-accent",
+    );
     expect(item.className).toContain("min-h-[var(--sp-control-height)]");
   });
 

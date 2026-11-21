@@ -1,5 +1,9 @@
 # ContextMenu — Change Log
 
+## 2026-11-18 — Test updated for Menu's disabled-item fix
+
+- One expectation in ContextMenu.test.tsx now uses Menu's gated highlight variant. Hovering a disabled item shows nothing, and keyboard focus keeps a faded highlight; see Menu/LOG.md. No ContextMenu code changes.
+
 ## 2026-11-16 — Signed off by George (GEO-926)
 
 ### /improve findings
