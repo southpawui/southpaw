@@ -21,3 +21,7 @@ Styled Select with token system.
 **Read-only state**: Sunken background, non-interactive. Why: matches Input/Textarea read-only pattern. 2+ competitors (Spectrum, Mantine) have this.
 
 **`alignItemWithTrigger={false}` default on Positioner**: Why: Base UI's default positions the popup so the selected item overlays the trigger (native `<select>` feel). This caused positioning issues in our layout. Setting to `false` puts the popup below the trigger (dropdown feel), which is what shadcn and most modern libraries do.
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- Ref types now match what Base UI renders: `Select.Trigger` is `HTMLButtonElement` (it was `HTMLDivElement`, but it renders a `<button>`), and `Select.ItemText` is `HTMLDivElement` (it was `HTMLSpanElement`).

@@ -36,3 +36,7 @@ Added `direction` prop: `"row"` for inline checkbox/radio + label, `"column"` (d
 - **Known, not changed here:** Fieldset dims its whole container, so labels and controls inside a disabled Fieldset are dimmed twice (about 0.14). Inputs already were. Suggested fix for its own ticket: Fieldset dims only its legend and description.
 - **Tests:** the label gets `data-disabled` and the class when its Field is disabled, has no `data-disabled` when enabled, and dims inside a disabled `Fieldset.Root`.
 - **Checks:** `pnpm verify field` fails only on the pre-existing Input.Phone duplicate-ID issue (Base UI limitation). It fails the same way with the original Field.tsx, so it isn't caused by this change.
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- `Field.Error`'s ref type is now `HTMLDivElement`, matching what Base UI renders (a `<div>`). Before, it was `HTMLSpanElement`.

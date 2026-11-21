@@ -119,7 +119,7 @@ const ErrorIcon = () => (
   />
 );
 
-const Error = React.forwardRef<HTMLSpanElement, FieldErrorProps>(
+const Error = React.forwardRef<HTMLDivElement, FieldErrorProps>(
   ({ className, hideIcon = false, errors, children, ...props }, ref) => {
     // Determine content: errors array takes precedence over children
     const hasMultiple = errors && errors.length > 1;

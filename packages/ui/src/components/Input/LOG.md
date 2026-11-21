@@ -25,3 +25,9 @@ Styled Input with token system.
 ### Known limitation documented (GEO-902) — 49c1c73
 
 Base UI Field context propagates IDs to nested Select controls, causing duplicate IDs when PhoneCodeSelect is inside a Field. Why: Base UI's Select trigger inherits the Field's control ID automatically. We can't override it. Documented as TODO for Base UI upstream fix.
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- Change handlers are typed with Base UI's event (`InputChangeEvent`), not a plain React change event.
+- The phone country select adapts Base UI's `onValueChange(value | null, details)` to the `(code)` callback and ignores `null`.
+- No behaviour change.

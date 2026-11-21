@@ -21,7 +21,7 @@ interface SelectTriggerProps extends React.ComponentProps<typeof BaseSelect.Trig
   onClear?: () => void;
 }
 
-const Trigger = React.forwardRef<HTMLDivElement, SelectTriggerProps>(
+const Trigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ className, valid, onClear, children, ...props }, ref) => (
     <BaseSelect.Trigger
       ref={ref}
@@ -248,17 +248,16 @@ ItemIndicator.displayName = "Select.ItemIndicator";
  * ItemText
  * ============================================================ */
 
-const ItemText = React.forwardRef<
-  HTMLSpanElement,
-  React.ComponentProps<typeof BaseSelect.ItemText>
->(({ className, ...props }, ref) => (
-  <BaseSelect.ItemText
-    ref={ref}
-    data-slot="select-item-text"
-    className={cn(className)}
-    {...props}
-  />
-));
+const ItemText = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseSelect.ItemText>>(
+  ({ className, ...props }, ref) => (
+    <BaseSelect.ItemText
+      ref={ref}
+      data-slot="select-item-text"
+      className={cn(className)}
+      {...props}
+    />
+  ),
+);
 ItemText.displayName = "Select.ItemText";
 
 /* ============================================================

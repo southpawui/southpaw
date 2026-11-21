@@ -96,3 +96,7 @@ Research: see RESEARCH.md (all 9 libraries + Base UI source + Emil Kowalski's mo
 - **Reduced motion**: shared motion tokens zero all durations, which also removes the opacity fade. Emil says to keep opacity. This is a library-wide token decision, flagged to George.
 - **Button + `focusableWhenDisabled`**: Button's disabled styles target the `:disabled` attribute, so `focusableWhenDisabled` (which uses `aria-disabled`/`data-disabled`) loses the dimmed look. The States story adds `data-[disabled]:` classes locally. This belongs in Button.
 - **`Tooltip.Shortcut`**: switch to the Kbd component once GEO-940 (Lane 2) lands.
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- Test only: a ref callback in `Tooltip.test.tsx` returned `calls.push(node)` (a number), which isn't a valid React ref. It now returns nothing.

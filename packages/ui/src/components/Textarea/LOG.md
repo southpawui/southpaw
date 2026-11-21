@@ -25,3 +25,9 @@ Built Textarea alongside Input styling.
 **Overflow for resize** — e5998d0: Removed `overflow-hidden` thinking it was unnecessary, but CSS `resize` only works when `overflow ≠ visible`. Used `overflow-clip` instead — clips like hidden but doesn't create a scroll container (no double scrollbar risk).
 
 **Default autosize rows**: Changed from 1 to 3. Why: a textarea with 1 visible row looks identical to an input. 3 rows immediately communicates "this is for multi-line content."
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- `rows` now goes on the rendered `<textarea>` (`render={<textarea rows={…} />}`). Field.Control's props are typed for `<input>`, so it rejected `rows`.
+- The remaining textarea props are passed through with a cast, which is correct at runtime.
+- Checked in Chromium: rows stay 3 by default and 5 when set.

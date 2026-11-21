@@ -109,6 +109,11 @@ function addonPadding(content: React.ReactNode, side: "left" | "right"): string 
 /* ============================================================
  * Core Input
  * ============================================================ */
+/** Base UI's change event (a React change event plus Base UI's handler controls). */
+type InputChangeEvent = Parameters<
+  NonNullable<React.ComponentProps<typeof BaseInput>["onChange"]>
+>[0];
+
 export interface InputProps extends React.ComponentProps<typeof BaseInput> {
   purpose?: InputPurpose;
   prepend?: React.ReactNode;
@@ -140,7 +145,7 @@ const BaseInputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     const config = purpose ? purposeConfig[purpose] : undefined;
 
     const handleFormattedInput = React.useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
+      (e: InputChangeEvent) => {
         if (config?.format) e.target.value = config.format(e.target.value);
         onChange?.(e);
       },
@@ -248,7 +253,13 @@ function PhoneCodeSelect({
     );
   }
   return (
-    <BaseSelect.Root value={value} onValueChange={onChange} disabled={disabled}>
+    <BaseSelect.Root
+      value={value}
+      onValueChange={(code) => {
+        if (code != null) onChange(code);
+      }}
+      disabled={disabled}
+    >
       <BaseSelect.Trigger
         data-slot="input-phone-code"
         aria-label="Country code"
@@ -365,7 +376,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
     );
 
     const handleInput = React.useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
+      (e: InputChangeEvent) => {
         const input = e.target;
         const prevCursor = input.selectionStart ?? input.value.length;
 
@@ -454,7 +465,7 @@ const CardInput = React.forwardRef<HTMLInputElement, CardInputProps>(
     const [cardBrand, setCardBrand] = React.useState<CardBrand>("unknown");
 
     const handleChange = React.useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
+      (e: InputChangeEvent) => {
         if (field === "number") {
           e.target.value = formatCardNumber(e.target.value);
           const brand = detectCardBrand(e.target.value.replace(/\D/g, ""));

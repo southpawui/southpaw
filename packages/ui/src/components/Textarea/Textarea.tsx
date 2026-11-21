@@ -40,9 +40,9 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       >
         <BaseField.Control
           ref={ref}
-          render={<textarea />}
+          // `rows` belongs to the rendered <textarea>; Field.Control's props are input-typed.
+          render={<textarea rows={rows ?? 3} />}
           data-slot="textarea"
-          rows={rows ?? 3}
           className={cn(
             "text-fg-default placeholder:text-fg-muted w-full bg-transparent text-sm outline-none",
             "px-3 py-2 [[data-density=comfortable]_&]:px-4 [[data-density=comfortable]_&]:py-3 [[data-density=compact]_&]:px-2 [[data-density=compact]_&]:py-1.5",
@@ -52,7 +52,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             !autosize &&
               "min-h-20 [[data-density=comfortable]_&]:min-h-24 [[data-density=compact]_&]:min-h-16",
           )}
-          {...props}
+          // Field.Control is typed for <input>; it renders our <textarea>, so its props apply.
+          {...(props as React.ComponentProps<typeof BaseField.Control>)}
         />
         {valid && (
           <span
