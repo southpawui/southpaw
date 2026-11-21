@@ -1,0 +1,392 @@
+---
+title: Dialog
+description: A window over the page that holds a focused task. The page behind it is inert until the dialog closes.
+status: alpha
+---
+
+<ComponentPreview name="dialog-demo" title="Edit profile dialog" />
+
+## Installation
+
+<InstallTabs name="dialog" />
+
+## Usage
+
+```tsx
+import { Button } from "@/components/southpaw/components/Button/Button";
+import { Dialog } from "@/components/southpaw/components/Dialog/Dialog";
+
+<Dialog.Root>
+  <Dialog.Trigger render={<Button variant="solid" />}>Edit profile</Dialog.Trigger>
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Popup>
+      <Dialog.Header>
+        <div>
+          <Dialog.Title>Edit profile</Dialog.Title>
+          <Dialog.Description>Make changes to your profile here.</Dialog.Description>
+        </div>
+        <Dialog.CloseButton />
+      </Dialog.Header>
+      <Dialog.Body>{/* content */}</Dialog.Body>
+      <Dialog.Footer>
+        <Dialog.Close render={<Button variant="solid" />}>Save changes</Dialog.Close>
+      </Dialog.Footer>
+    </Dialog.Popup>
+  </Dialog.Portal>
+</Dialog.Root>;
+```
+
+## When to use
+
+<Guidance type="do">
+
+- A short, self-contained task that needs the user's full attention, such as editing a record or filling in a short form.
+- Information the user has to read before they carry on, such as terms they must accept.
+- A task the user starts from the current page and returns to it afterwards.
+
+</Guidance>
+
+## When not to use
+
+<Guidance type="dont">
+
+- **Confirming a destructive or irreversible action.** Use Alert Dialog. It needs an explicit choice and can't be dismissed by clicking outside.
+- **Long or multi-step flows.** Give them their own page, so they can be bookmarked, shared and navigated with Back.
+- **Content the user needs to compare with the page behind.** A modal hides the page. Use a Drawer or an inline panel.
+- **Non-blocking messages,** such as "Saved". Use a Toast.
+- **Errors in a form.** Show them next to the field and in an Error Summary, not in a pop-up.
+
+</Guidance>
+
+## Alternatives
+
+<Alternatives
+  items={[
+    {
+      name: "Alert Dialog",
+      reason: "Confirms destructive actions. Requires a choice and ignores clicks outside.",
+    },
+    {
+      name: "Drawer",
+      reason: "Slides in from an edge. Better for secondary content and on mobile.",
+    },
+    { name: "Popover", reason: "Small, non-modal content anchored to its trigger." },
+    {
+      name: "A new page",
+      reason: "Long or multi-step tasks, and anything people need to link to.",
+    },
+  ]}
+/>
+
+## Anatomy
+
+<Anatomy
+  tree={`Dialog.Root
+├── Dialog.Trigger
+└── Dialog.Portal
+    ├── Dialog.Backdrop
+    └── Dialog.Popup
+        ├── Dialog.Header
+        │   ├── Dialog.Title
+        │   ├── Dialog.Description
+        │   └── Dialog.CloseButton
+        ├── Dialog.Body
+        └── Dialog.Footer
+            └── Dialog.Close`}
+  parts={[
+    {
+      name: "Dialog.Root",
+      slot: null,
+      element: "nothing",
+      description: "Holds the open state. Takes open, defaultOpen, onOpenChange and modal.",
+      required: true,
+    },
+    {
+      name: "Dialog.Trigger",
+      slot: "dialog-trigger",
+      element: "<button>",
+      description: "Opens the dialog. Use render to make a Southpaw Button the trigger.",
+    },
+    {
+      name: "Dialog.Portal",
+      slot: null,
+      element: "nothing (moves children to <body>)",
+      description: "Keeps the popup clear of clipping and stacking contexts.",
+      required: true,
+    },
+    {
+      name: "Dialog.Backdrop",
+      slot: "dialog-backdrop",
+      element: "<div>",
+      description: "Dims the page. Clicking it closes the dialog.",
+    },
+    {
+      name: "Dialog.Popup",
+      slot: "dialog-popup",
+      element: '<div role="dialog">',
+      description: "The panel. Traps focus and sets data-size.",
+      required: true,
+    },
+    {
+      name: "Dialog.Header",
+      slot: "dialog-header",
+      element: "<div>",
+      description: "Title, description and close button in one row.",
+    },
+    {
+      name: "Dialog.Title",
+      slot: "dialog-title",
+      element: "<h2>",
+      description: "Names the dialog (aria-labelledby).",
+      required: true,
+    },
+    {
+      name: "Dialog.Description",
+      slot: "dialog-description",
+      element: "<p>",
+      description: "Describes the dialog (aria-describedby).",
+    },
+    {
+      name: "Dialog.CloseButton",
+      slot: "dialog-close-button",
+      element: '<button aria-label="Close">',
+      description: "The × button.",
+    },
+    {
+      name: "Dialog.Body",
+      slot: "dialog-body",
+      element: "<div>",
+      description: "The content. Scrolls when it overflows.",
+    },
+    {
+      name: "Dialog.Footer",
+      slot: "dialog-footer",
+      element: "<div>",
+      description: "The actions. Stacks full-width on mobile.",
+    },
+    {
+      name: "Dialog.Close",
+      slot: "dialog-close",
+      element: "<button>",
+      description: "Closes the dialog. Wrap an action with render.",
+    },
+  ]}
+/>
+
+## Sizes
+
+`size` on `Dialog.Popup` sets the maximum width. Choose it by content, not importance: `sm` for a sentence and two buttons, `md` (the default) for a short form, `lg` for wider forms. `full` fills the viewport. On narrow screens every size except `full` is meant to keep a 1rem margin (see [known issues](#known-issues)).
+
+<ComponentPreview name="dialog-sizes" title="Dialog sizes" />
+
+| Size   | Max width | Use for                                |
+| ------ | --------- | -------------------------------------- |
+| `sm`   | 384px     | A short message and one or two actions |
+| `md`   | 448px     | Default. Short forms                   |
+| `lg`   | 512px     | Forms with longer fields               |
+| `full` | Viewport  | Dense tasks on small screens           |
+
+Dialog has no colour variants. A dialog is a neutral surface (`surface-overlay`). Its actions carry the intent: brand for the main call to action, danger lives on Alert Dialog.
+
+## Examples
+
+### Long content
+
+The body scrolls while the header and footer stay in view. Cap the body's height with a class such as `max-h-[60vh]`.
+
+<ComponentPreview name="dialog-long-content" title="Terms of service dialog" />
+
+### With a form
+
+<ComponentPreview name="dialog-form" title="Create project dialog" />
+
+## States
+
+<StateTable
+  states={[
+    {
+      state: "Closed (default)",
+      support: "yes",
+      notes: "Only the trigger renders. The popup is unmounted.",
+    },
+    {
+      state: "Open",
+      support: "yes",
+      notes: "Backdrop and popup render. The page behind is inert and can't scroll.",
+    },
+    {
+      state: "Entering / exiting",
+      support: "yes",
+      notes: "Fades and scales from 95% over 350ms. Off when the user prefers reduced motion.",
+    },
+    {
+      state: "Hover",
+      support: "yes",
+      notes: "The close button darkens. Trigger and actions use Button's hover.",
+    },
+    {
+      state: "Focus",
+      support: "yes",
+      notes: "Two-tone focus ring on the close button. Trigger and actions use Button's ring.",
+    },
+    { state: "Active", support: "yes", notes: "From Button, on the trigger and actions." },
+    {
+      state: "Disabled",
+      support: "n/a",
+      notes: "The dialog itself can't be disabled. Disable the trigger Button instead.",
+    },
+    {
+      state: "Loading",
+      support: "n/a",
+      notes: "Put Button's loading state on the action that's busy.",
+    },
+    {
+      state: "Error",
+      support: "n/a",
+      notes: "Show errors on the fields inside, with Field and Error Summary.",
+    },
+    {
+      state: "Empty",
+      support: "n/a",
+      notes: "A dialog always has a title. Empty states belong to the content.",
+    },
+    { state: "Read-only", support: "n/a", notes: "Applies to the fields inside, not the dialog." },
+  ]}
+/>
+
+## Content guidance
+
+### Title
+
+Say what the dialog is for, in a few words. Use sentence case and no full stop.
+
+<ContentRule do="Edit profile" dont="Profile Editing Dialog." />
+
+### Description
+
+One sentence that adds something the title doesn't. Leave it out rather than repeat the title.
+
+<ContentRule
+  do="Make changes to your profile here."
+  dont="This dialog lets you edit your profile."
+/>
+
+### Buttons
+
+Name the main action with a verb that says what happens, and match the title where you can. Put it last; it shows first on mobile.
+
+<ContentRule do="Create project / Cancel" dont="OK / Cancel">
+  "OK" doesn't say what will happen. Users scanning the buttons should know the result without
+  reading the body.
+</ContentRule>
+
+You don't need a Cancel button when the only way out is closing: the × button, Escape and clicking outside all close the dialog.
+
+## Accessibility
+
+### Keyboard
+
+<KeyboardTable
+  rows={[
+    { keys: "Enter", action: "On the trigger: opens the dialog." },
+    { keys: "Space", action: "On the trigger: opens the dialog." },
+    {
+      keys: "Tab",
+      action:
+        "Moves to the next focusable element inside the dialog. Wraps from the last to the first.",
+    },
+    {
+      keys: "Shift+Tab",
+      action: "Moves to the previous focusable element. Wraps from the first to the last.",
+    },
+    { keys: "Escape", action: "Closes the dialog and returns focus to the trigger." },
+  ]}
+/>
+
+### Focus
+
+- When the dialog opens, focus moves to the first focusable element inside it. Change this with `initialFocus` on `Dialog.Popup`.
+- Focus is trapped: Tab never reaches the page behind.
+- When the dialog closes, focus returns to the trigger. Change this with `finalFocus`.
+- The page behind is inert while a modal dialog is open, and it can't scroll.
+
+### ARIA
+
+- `Dialog.Popup` has `role="dialog"` and `aria-modal="true"`.
+- `aria-labelledby` points at `Dialog.Title`, and `aria-describedby` at `Dialog.Description`. Always render a title.
+- `Dialog.CloseButton` has the accessible name "Close".
+- The trigger gets `aria-haspopup="dialog"` and `aria-expanded`.
+
+### Screen readers tested
+
+<ScreenReaderTable
+  rows={[
+    { reader: "VoiceOver", browser: "Safari (macOS)", status: "not-tested" },
+    { reader: "VoiceOver", browser: "Safari (iOS)", status: "not-tested" },
+    { reader: "NVDA", browser: "Firefox (Windows)", status: "not-tested" },
+    { reader: "JAWS", browser: "Chrome (Windows)", status: "not-tested" },
+    { reader: "TalkBack", browser: "Chrome (Android)", status: "not-tested" },
+  ]}
+/>
+
+Automated checks: axe-core found no violations in the Dialog stories at the last enhancement (2026-11-11), and none on this page. Manual screen reader testing hasn't happened yet; this table will record it when it does.
+
+### Known issues
+
+- **On phones the dialog touches the screen edges.** The 1rem mobile margin is meant to keep it clear of the edges, but it is currently overridden by the size's maximum width. This has been reported and a fix is pending.
+- **Very tall content can overflow the viewport.** The popup has no maximum height of its own. Cap `Dialog.Body` (for example `max-h-[60vh]`) when content might be long.
+- **The close button has no tooltip yet.** Southpaw's rule is that every icon-only button gets one. Its accessible name, "Close", is in place.
+- **Nested dialogs** work (Base UI supports them) but have no example yet.
+
+## API reference
+
+### Dialog.Root
+
+<APITable
+  path="Dialog/Dialog.tsx"
+  name="DialogRootProps"
+  type="React.ComponentProps<typeof Dialog.Root>"
+/>
+
+### Dialog.Popup
+
+<APITable path="Dialog/Dialog.tsx" name="DialogPopupProps" />
+
+### Dialog.Trigger
+
+<APITable
+  path="Dialog/Dialog.tsx"
+  name="DialogTriggerProps"
+  type="React.ComponentProps<typeof Dialog.Trigger>"
+/>
+
+### Dialog.Close and Dialog.CloseButton
+
+<APITable
+  path="Dialog/Dialog.tsx"
+  name="DialogCloseProps"
+  type="React.ComponentProps<typeof Dialog.Close>"
+/>
+
+### Dialog.Backdrop
+
+<APITable
+  path="Dialog/Dialog.tsx"
+  name="DialogBackdropProps"
+  type="React.ComponentProps<typeof Dialog.Backdrop>"
+/>
+
+### Dialog.Title and Dialog.Description
+
+<APITable
+  path="Dialog/Dialog.tsx"
+  name="DialogTitleProps"
+  type="React.ComponentProps<typeof Dialog.Title>"
+/>
+
+### Dialog.Header, Dialog.Body and Dialog.Footer
+
+These are styled `<div>` elements. They accept every `div` attribute and `className`, and forward `ref`.
+
+Every part also accepts the standard HTML attributes of the element it renders.

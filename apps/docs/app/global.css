@@ -1,0 +1,79 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@import "@southpawui/tokens/css";
+
+/* Component source + demos, so their utility classes are generated. */
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+@source "../../../packages/registry/examples/**/*.tsx";
+
+/*
+ * Fumadocs chrome themed with Southpaw tokens.
+ *
+ * Fumadocs reads --color-fd-*; each maps onto a semantic --sp-* token, so the
+ * sidebar, TOC, search and prose follow data-theme (light, dark, high-contrast)
+ * like every Southpaw component. `html[data-theme]` outranks Fumadocs' `:root`
+ * and `.dark` defaults. Brand stays for CTAs; the chrome's "primary" is accent.
+ */
+html[data-theme] {
+  --color-fd-background: var(--sp-surface-base);
+  --color-fd-foreground: var(--sp-fg-default);
+  --color-fd-muted: var(--sp-surface-sunken);
+  --color-fd-muted-foreground: var(--sp-fg-muted);
+  --color-fd-popover: var(--sp-surface-overlay);
+  --color-fd-popover-foreground: var(--sp-fg-default);
+  /* Cards, code blocks and API tables sit on the base surface, separated by borders. */
+  --color-fd-card: var(--sp-surface-base);
+  --color-fd-card-foreground: var(--sp-fg-default);
+  --color-fd-border: var(--sp-border-default);
+  --color-fd-primary: var(--sp-accent);
+  --color-fd-primary-foreground: var(--sp-surface-base);
+  --color-fd-secondary: var(--sp-surface-sunken);
+  --color-fd-secondary-foreground: var(--sp-fg-default);
+  --color-fd-accent: var(--sp-state-selected);
+  --color-fd-accent-foreground: var(--sp-fg-default);
+  --color-fd-ring: var(--sp-focus-outer);
+  --color-fd-overlay: rgb(0 0 0 / 0.5);
+  --color-fd-info: var(--sp-info);
+  --color-fd-warning: var(--sp-warning);
+  --color-fd-error: var(--sp-danger);
+  --color-fd-success: var(--sp-success);
+  --color-fd-idea: var(--sp-info);
+}
+
+/* The sidebar sits on the sunken surface so the page reads as the focus. */
+html[data-theme] #nd-sidebar {
+  --color-fd-muted: var(--sp-surface-base);
+  --color-fd-secondary: var(--sp-surface-base);
+}
+
+/* High contrast: no translucent hover fills, and the active item is underlined, not tinted. */
+html[data-theme="high-contrast"] {
+  --color-fd-accent: var(--sp-surface-sunken);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0 !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+body {
+  background-color: var(--sp-surface-base);
+  color: var(--sp-fg-default);
+}
+
+/* Keyboard focus in Fumadocs chrome matches Southpaw's two-tone ring. */
+#nd-sidebar a:focus-visible,
+#nd-sidebar button:focus-visible,
+#nd-toc a:focus-visible,
+#nd-page a:focus-visible,
+#nd-subnav a:focus-visible,
+#nd-subnav button:focus-visible {
+  outline: 2px solid var(--sp-focus-outer);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--sp-focus-inner);
+}

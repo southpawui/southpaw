@@ -8,12 +8,14 @@ import { mergeClassName } from "../../lib/merge-class-name";
  * Root (pass-through)
  * ============================================================ */
 
+/** Groups the parts of one dialog and owns its open state. Renders no element. */
 const Root = BaseDialog.Root;
 
 /* ============================================================
  * Trigger (pass-through with data-slot)
  * ============================================================ */
 
+/** The control that opens the dialog. Use `render` to make a Southpaw Button the trigger. */
 const Trigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof BaseDialog.Trigger>
@@ -31,12 +33,14 @@ Trigger.displayName = "Dialog.Trigger";
  * Portal (pass-through)
  * ============================================================ */
 
+/** Moves the backdrop and popup to the end of `<body>`, outside any clipping or stacking context. */
 const Portal = BaseDialog.Portal;
 
 /* ============================================================
  * Backdrop
  * ============================================================ */
 
+/** The dimmed layer behind the popup. Clicking it closes the dialog unless `disablePointerDismissal` is set on Root. */
 const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseDialog.Backdrop>>(
   ({ className, ...props }, ref) => (
     <BaseDialog.Backdrop
@@ -60,8 +64,13 @@ Backdrop.displayName = "Dialog.Backdrop";
  * Popup
  * ============================================================ */
 
+/** Props for `Dialog.Popup`: Base UI popup props plus `size`. */
 export interface DialogPopupProps extends React.ComponentProps<typeof BaseDialog.Popup> {
-  /** Dialog width */
+  /**
+   * Maximum width: sm 384px, md 448px, lg 512px. `full` fills the viewport with no radius.
+   * On narrow screens every size except `full` keeps a 1rem margin.
+   * @default "md"
+   */
   size?: "sm" | "md" | "lg" | "full";
 }
 
@@ -72,6 +81,7 @@ const sizeClasses: Record<string, string> = {
   full: "max-w-none h-screen w-screen rounded-none",
 };
 
+/** The dialog panel (`role="dialog"`). Traps focus while open and returns it to the trigger on close. */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(
   ({ className, size = "md", ...props }, ref) => (
     <BaseDialog.Popup
@@ -112,6 +122,7 @@ Popup.displayName = "Dialog.Popup";
  * Header
  * ============================================================ */
 
+/** Top row holding the title, description and close button. */
 const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">>(
   ({ className, ...props }, ref) => (
     <div
@@ -128,6 +139,7 @@ Header.displayName = "Dialog.Header";
  * Body (scrollable content area)
  * ============================================================ */
 
+/** The main content. Scrolls on its own when it overflows, so the header and footer stay visible. */
 const Body = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">>(
   ({ className, ...props }, ref) => (
     <div
@@ -144,6 +156,7 @@ Body.displayName = "Dialog.Body";
  * Footer
  * ============================================================ */
 
+/** Action buttons. Full-width and stacked on mobile (primary on top), in a right-aligned row from `sm` up. */
 const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">>(
   ({ className, ...props }, ref) => (
     <div
@@ -168,6 +181,7 @@ Footer.displayName = "Dialog.Footer";
  * Title
  * ============================================================ */
 
+/** The dialog heading. Names the dialog through `aria-labelledby`. Every dialog needs one. */
 const Title = React.forwardRef<HTMLHeadingElement, React.ComponentProps<typeof BaseDialog.Title>>(
   ({ className, ...props }, ref) => (
     <BaseDialog.Title
@@ -184,6 +198,7 @@ Title.displayName = "Dialog.Title";
  * Description
  * ============================================================ */
 
+/** Supporting text under the title. Describes the dialog through `aria-describedby`. */
 const Description = React.forwardRef<
   HTMLParagraphElement,
   React.ComponentProps<typeof BaseDialog.Description>
@@ -201,6 +216,7 @@ Description.displayName = "Dialog.Description";
  * Close (unstyled — for wrapping buttons)
  * ============================================================ */
 
+/** Unstyled close behaviour. Wrap an action with `render`, e.g. `<Dialog.Close render={<Button />}>Cancel</Dialog.Close>`. */
 const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BaseDialog.Close>>(
   ({ className, ...props }, ref) => (
     <BaseDialog.Close
@@ -217,6 +233,7 @@ Close.displayName = "Dialog.Close";
  * CloseButton (styled X in top-right corner)
  * ============================================================ */
 
+/** The styled × button for the header, with the accessible name "Close". */
 const CloseButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof BaseDialog.Close>
@@ -244,6 +261,7 @@ CloseButton.displayName = "Dialog.CloseButton";
  * Compound export
  * ============================================================ */
 
+/** A modal window over the page, built on the Base UI Dialog. */
 export const Dialog = {
   Root,
   Trigger,
