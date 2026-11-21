@@ -2,6 +2,7 @@ import * as React from "react";
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Check, Minus } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -17,26 +18,28 @@ const Root = React.forwardRef<HTMLButtonElement, CheckboxProps>(
     <BaseCheckbox.Root
       ref={ref}
       data-slot="checkbox"
-      className={cn(
-        // Base — fixed size
-        "inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-[4px]",
-        // Border
-        "border-border-control border-2",
-        // Transition
-        "transition-[background-color,border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-        // Hover
-        "hover:border-fg-muted",
-        // Focus
-        "focus-visible:sp-focus-ring",
-        // Checked / Indeterminate — uses accent
-        "data-[checked]:border-accent data-[checked]:bg-accent",
-        "data-[indeterminate]:border-accent data-[indeterminate]:bg-accent",
-        // Invalid (from Field context)
-        "data-[invalid]:!border-danger",
-        // Valid
-        valid && "data-[checked]:!border-success data-[checked]:!bg-success",
-        // Disabled
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+      className={mergeClassName(
+        cn(
+          // Base — fixed size
+          "inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-[4px]",
+          // Border
+          "border-border-control border-2",
+          // Transition
+          "transition-[background-color,border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          // Hover
+          "hover:border-fg-muted",
+          // Focus
+          "focus-visible:sp-focus-ring",
+          // Checked / Indeterminate — uses accent
+          "data-[checked]:border-accent data-[checked]:bg-accent",
+          "data-[indeterminate]:border-accent data-[indeterminate]:bg-accent",
+          // Invalid (from Field context)
+          "data-[invalid]:!border-danger",
+          // Valid
+          valid && "data-[checked]:!border-success data-[checked]:!bg-success",
+          // Disabled
+          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+        ),
         className,
       )}
       {...props}
@@ -58,7 +61,7 @@ const Indicator = React.forwardRef<
   <BaseCheckbox.Indicator
     ref={ref}
     data-slot="checkbox-indicator"
-    className={cn("text-fg-on-brand flex items-center justify-center", className)}
+    className={mergeClassName(cn("text-fg-on-brand flex items-center justify-center"), className)}
     {...props}
   >
     {children ?? <CheckOrMinus />}

@@ -100,3 +100,9 @@ Research: see RESEARCH.md (all 9 libraries + Base UI source + Emil Kowalski's mo
 ## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
 
 - Test only: a ref callback in `Tooltip.test.tsx` returned `calls.push(node)` (a number), which isn't a valid React ref. It now returns nothing.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

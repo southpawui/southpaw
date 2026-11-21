@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { Tooltip } from "../Tooltip/Tooltip";
 
 /* ============================================================
@@ -63,12 +64,14 @@ const Root = React.forwardRef<HTMLSpanElement, AvatarRootProps>(
       role: namedRole,
       // Without a tooltip the name goes straight onto the element.
       "aria-label": ariaLabel ?? (name && !showTooltip ? name : undefined),
-      className: cn(
-        "relative inline-flex shrink-0 items-center justify-center",
-        "bg-surface-alternate",
-        shape === "circle" && "rounded-full",
-        shape === "square" && "rounded-lg",
-        sizeClasses[size],
+      className: mergeClassName(
+        cn(
+          "relative inline-flex shrink-0 items-center justify-center",
+          "bg-surface-alternate",
+          shape === "circle" && "rounded-full",
+          shape === "square" && "rounded-lg",
+          sizeClasses[size],
+        ),
         className,
       ),
       ...props,
@@ -115,8 +118,8 @@ const Image = React.forwardRef<HTMLImageElement, React.ComponentProps<typeof Bas
     <BaseAvatar.Image
       ref={ref}
       data-slot="avatar-image"
-      className={cn(
-        "pointer-events-none h-full w-full select-none rounded-[inherit] object-cover",
+      className={mergeClassName(
+        cn("pointer-events-none h-full w-full select-none rounded-[inherit] object-cover"),
         className,
       )}
       draggable={false}
@@ -137,8 +140,10 @@ const Fallback = React.forwardRef<
   <BaseAvatar.Fallback
     ref={ref}
     data-slot="avatar-fallback"
-    className={cn(
-      "text-fg-muted flex h-full w-full select-none items-center justify-center rounded-[inherit] font-medium",
+    className={mergeClassName(
+      cn(
+        "text-fg-muted flex h-full w-full select-none items-center justify-center rounded-[inherit] font-medium",
+      ),
       className,
     )}
     {...props}
@@ -168,13 +173,15 @@ const Status = React.forwardRef<HTMLSpanElement, AvatarStatusProps>(
       ref={ref}
       data-slot="avatar-status"
       data-status={status}
-      className={cn(
-        "ring-surface-base absolute bottom-0 right-0 block rounded-full ring-2",
-        // Size scales with parent avatar via data-size
-        "[[data-size=sm]_&]:h-2 [[data-size=sm]_&]:w-2",
-        "[[data-size=md]_&]:h-2.5 [[data-size=md]_&]:w-2.5",
-        "[[data-size=lg]_&]:h-3.5 [[data-size=lg]_&]:w-3.5",
-        statusColours[status],
+      className={mergeClassName(
+        cn(
+          "ring-surface-base absolute bottom-0 right-0 block rounded-full ring-2",
+          // Size scales with parent avatar via data-size
+          "[[data-size=sm]_&]:h-2 [[data-size=sm]_&]:w-2",
+          "[[data-size=md]_&]:h-2.5 [[data-size=md]_&]:w-2.5",
+          "[[data-size=lg]_&]:h-3.5 [[data-size=lg]_&]:w-3.5",
+          statusColours[status],
+        ),
         className,
       )}
       role="img"
@@ -223,7 +230,7 @@ const Group = React.forwardRef<HTMLDivElement, AvatarGroupProps>(
         <div
           ref={ref}
           data-slot="avatar-group"
-          className={cn("flex -space-x-2", className)}
+          className={mergeClassName(cn("flex -space-x-2"), className)}
           {...props}
         >
           {visible.map((child, i) => (

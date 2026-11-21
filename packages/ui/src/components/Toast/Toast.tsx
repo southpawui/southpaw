@@ -10,6 +10,7 @@ import {
 import { Button } from "../Button/Button";
 import { Spinner } from "../Spinner/Spinner";
 import { cn } from "../../lib/cn";
+import { mergeClassName, resolveClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Types
@@ -179,13 +180,15 @@ const Viewport = React.forwardRef<HTMLDivElement, ToastViewportProps>(
           data-side={side}
           data-expand={expand ? "" : undefined}
           data-density={density}
-          className={cn(
-            "group/toast-viewport fixed inset-x-4 z-50 outline-none sm:inset-x-auto sm:w-[22.5rem]",
-            // +1 stacks downwards from the top edge, -1 upwards from the bottom edge.
-            side === "top" ? "[--sp-toast-dir:1]" : "[--sp-toast-dir:-1]",
-            expand && "flex gap-3",
-            expand && (side === "top" ? "flex-col" : "flex-col-reverse"),
-            positionClasses[position],
+          className={mergeClassName(
+            cn(
+              "group/toast-viewport fixed inset-x-4 z-50 outline-none sm:inset-x-auto sm:w-[22.5rem]",
+              // +1 stacks downwards from the top edge, -1 upwards from the bottom edge.
+              side === "top" ? "[--sp-toast-dir:1]" : "[--sp-toast-dir:-1]",
+              expand && "flex gap-3",
+              expand && (side === "top" ? "flex-col" : "flex-col-reverse"),
+              positionClasses[position],
+            ),
             className,
           )}
           {...props}
@@ -318,15 +321,17 @@ const Root = React.forwardRef<HTMLDivElement, ToastRootProps>(
           data-slot="toast"
           data-type={type}
           data-appearance={appearance}
-          className={cn(
-            "select-none rounded-[var(--radius-DEFAULT)] border shadow-lg outline-none",
-            "border-[var(--sp-toast-border)] bg-[var(--sp-toast-bg)] text-[var(--sp-toast-fg)]",
-            "forced-colors:border-[CanvasText]",
-            "focus-visible:sp-focus-ring",
-            intentClasses[type][appearance],
-            anchored
-              ? anchoredClasses
-              : ["w-full", viewport.expand ? listClasses : stackClasses, motionClasses],
+          className={mergeClassName(
+            cn(
+              "select-none rounded-[var(--radius-DEFAULT)] border shadow-lg outline-none",
+              "border-[var(--sp-toast-border)] bg-[var(--sp-toast-bg)] text-[var(--sp-toast-fg)]",
+              "forced-colors:border-[CanvasText]",
+              "focus-visible:sp-focus-ring",
+              intentClasses[type][appearance],
+              anchored
+                ? anchoredClasses
+                : ["w-full", viewport.expand ? listClasses : stackClasses, motionClasses],
+            ),
             className,
           )}
           {...props}
@@ -350,14 +355,16 @@ const Content = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Bas
       <BaseToast.Content
         ref={ref}
         data-slot="toast-content"
-        className={cn(
-          "relative flex items-start gap-3 overflow-hidden rounded-[inherit]",
-          "p-[calc(var(--sp-control-gap)*1.5)]",
-          // Reserve room for the × only when one is rendered.
-          "has-[>[data-slot=toast-close-button]]:pe-[calc(var(--sp-control-height-sm)+var(--sp-control-gap))]",
-          "transition-opacity duration-[var(--sp-duration-slow)] ease-[var(--sp-easing-default)]",
-          // In a collapsed stack only the front toast's content is visible.
-          !expand && "data-[behind]:opacity-0 data-[expanded]:opacity-100",
+        className={mergeClassName(
+          cn(
+            "relative flex items-start gap-3 overflow-hidden rounded-[inherit]",
+            "p-[calc(var(--sp-control-gap)*1.5)]",
+            // Reserve room for the × only when one is rendered.
+            "has-[>[data-slot=toast-close-button]]:pe-[calc(var(--sp-control-height-sm)+var(--sp-control-gap))]",
+            "transition-opacity duration-[var(--sp-duration-slow)] ease-[var(--sp-easing-default)]",
+            // In a collapsed stack only the front toast's content is visible.
+            !expand && "data-[behind]:opacity-0 data-[expanded]:opacity-100",
+          ),
           className,
         )}
         {...props}
@@ -373,7 +380,7 @@ const Body = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">
     <div
       ref={ref}
       data-slot="toast-body"
-      className={cn("flex min-w-0 flex-1 flex-col gap-0.5", className)}
+      className={mergeClassName(cn("flex min-w-0 flex-1 flex-col gap-0.5"), className)}
       {...props}
     />
   ),
@@ -385,8 +392,8 @@ const Title = React.forwardRef<HTMLHeadingElement, React.ComponentProps<typeof B
     <BaseToast.Title
       ref={ref}
       data-slot="toast-title"
-      className={cn(
-        "text-sm font-semibold text-[var(--sp-toast-fg,var(--sp-fg-default))]",
+      className={mergeClassName(
+        cn("text-sm font-semibold text-[var(--sp-toast-fg,var(--sp-fg-default))]"),
         className,
       )}
       {...props}
@@ -402,7 +409,10 @@ const Description = React.forwardRef<
   <BaseToast.Description
     ref={ref}
     data-slot="toast-description"
-    className={cn("text-sm text-[var(--sp-toast-muted,var(--sp-fg-muted))]", className)}
+    className={mergeClassName(
+      cn("text-sm text-[var(--sp-toast-muted,var(--sp-fg-muted))]"),
+      className,
+    )}
     {...props}
   />
 ));
@@ -414,7 +424,10 @@ const Caption = React.forwardRef<HTMLParagraphElement, React.ComponentPropsWithR
     <p
       ref={ref}
       data-slot="toast-caption"
-      className={cn("mt-1 text-xs text-[var(--sp-toast-muted,var(--sp-fg-muted))]", className)}
+      className={mergeClassName(
+        cn("mt-1 text-xs text-[var(--sp-toast-muted,var(--sp-fg-muted))]"),
+        className,
+      )}
       {...props}
     />
   ),
@@ -453,10 +466,12 @@ const Icon = React.forwardRef<HTMLSpanElement, ToastIconProps>(
         ref={ref}
         aria-hidden
         data-slot="toast-icon"
-        className={cn(
-          "inline-flex shrink-0 text-[var(--sp-toast-icon)] [&_svg]:size-5",
-          // Optically centre on the first line of the title.
-          "mt-px",
+        className={mergeClassName(
+          cn(
+            "inline-flex shrink-0 text-[var(--sp-toast-icon)] [&_svg]:size-5",
+            // Optically centre on the first line of the title.
+            "mt-px",
+          ),
           className,
         )}
         {...props}
@@ -481,7 +496,7 @@ const Actions = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"di
     <div
       ref={ref}
       data-slot="toast-actions"
-      className={cn("mt-2 flex flex-wrap items-center gap-2", className)}
+      className={mergeClassName(cn("mt-2 flex flex-wrap items-center gap-2"), className)}
       {...props}
     />
   ),
@@ -502,7 +517,15 @@ const Action = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof B
       <BaseToast.Action
         ref={ref}
         data-slot="toast-action"
-        render={<Button size="sm" variant="outline" className={cn(onToastButton, className)} />}
+        render={(renderProps, state) => (
+          // A render function, so a state-function className resolves with this part's state (GEO-958).
+          <Button
+            {...(renderProps as React.ComponentProps<typeof Button>)}
+            size="sm"
+            variant="outline"
+            className={cn(onToastButton, renderProps.className, resolveClassName(className, state))}
+          />
+        )}
         onClick={(event) => {
           onClick?.(event);
           // Base UI also runs the toast's actionProps.onClick; check after every handler ran.
@@ -525,16 +548,19 @@ const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Ba
     <BaseToast.Close
       ref={ref}
       data-slot="toast-close"
-      render={
+      render={(renderProps, state) => (
+        // A render function, so a state-function className resolves with this part's state (GEO-958).
         <Button
+          {...(renderProps as React.ComponentProps<typeof Button>)}
           size="sm"
           variant="ghost"
           className={cn(
             "text-[var(--sp-toast-fg)] hover:bg-[color-mix(in_oklab,var(--sp-toast-fg)_10%,transparent)]",
-            className,
+            renderProps.className,
+            resolveClassName(className, state),
           )}
         />
-      }
+      )}
       {...props}
     />
   ),
@@ -555,8 +581,10 @@ const CloseButton = React.forwardRef<HTMLButtonElement, ToastCloseButtonProps>(
     <BaseToast.Close
       ref={ref}
       data-slot="toast-close-button"
-      render={
+      render={(renderProps, state) => (
+        // A render function, so a state-function className resolves with this part's state (GEO-958).
         <Button
+          {...(renderProps as React.ComponentProps<typeof Button>)}
           size="icon"
           variant="ghost"
           srOnly={label}
@@ -565,10 +593,11 @@ const CloseButton = React.forwardRef<HTMLButtonElement, ToastCloseButtonProps>(
             "absolute end-[calc(var(--sp-control-gap)*0.5)] top-[calc(var(--sp-control-gap)*0.5)]",
             "size-[var(--sp-control-height-sm)] rounded-[var(--radius-sm)]",
             "text-[var(--sp-toast-fg)] hover:bg-[color-mix(in_oklab,var(--sp-toast-fg)_10%,transparent)]",
-            className,
+            renderProps.className,
+            resolveClassName(className, state),
           )}
         />
-      }
+      )}
       {...props}
     />
   ),
@@ -642,7 +671,7 @@ const Progress = React.forwardRef<HTMLSpanElement, ToastProgressProps>(
         ref={ref}
         aria-hidden
         data-slot="toast-progress"
-        className={cn("absolute inset-x-0 bottom-0 h-1 overflow-hidden", className)}
+        className={mergeClassName(cn("absolute inset-x-0 bottom-0 h-1 overflow-hidden"), className)}
         {...props}
       >
         <span
@@ -668,7 +697,7 @@ const Positioner = React.forwardRef<
     data-slot="toast-positioner"
     sideOffset={sideOffset}
     collisionPadding={collisionPadding}
-    className={cn("z-50", className)}
+    className={mergeClassName(cn("z-50"), className)}
     {...props}
   />
 ));
@@ -679,12 +708,14 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseT
     <BaseToast.Arrow
       ref={ref}
       data-slot="toast-arrow"
-      className={cn(
-        "size-2.5 rotate-45 border-[var(--sp-toast-border)] bg-[var(--sp-toast-bg)] forced-colors:hidden",
-        "data-[side=top]:-bottom-[5px] data-[side=top]:border-b data-[side=top]:border-e",
-        "data-[side=bottom]:-top-[5px] data-[side=bottom]:border-s data-[side=bottom]:border-t",
-        "data-[side=left]:-right-[5px] data-[side=left]:border-e data-[side=left]:border-t",
-        "data-[side=right]:-left-[5px] data-[side=right]:border-b data-[side=right]:border-s",
+      className={mergeClassName(
+        cn(
+          "size-2.5 rotate-45 border-[var(--sp-toast-border)] bg-[var(--sp-toast-bg)] forced-colors:hidden",
+          "data-[side=top]:-bottom-[5px] data-[side=top]:border-b data-[side=top]:border-e",
+          "data-[side=bottom]:-top-[5px] data-[side=bottom]:border-s data-[side=bottom]:border-t",
+          "data-[side=left]:-right-[5px] data-[side=left]:border-e data-[side=left]:border-t",
+          "data-[side=right]:-left-[5px] data-[side=right]:border-b data-[side=right]:border-s",
+        ),
         className,
       )}
       {...props}

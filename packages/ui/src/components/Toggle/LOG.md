@@ -68,3 +68,9 @@ States has no "valid" state: a toggle is an action, not a validated value (the s
 - Reads `ToggleGroupContext` (`ToggleGroup/context.ts`): a group's `readOnly` is OR-ed with the Toggle's own, and a group's `invalid` sets `aria-invalid`.
 - The visible label is wrapped in `<span data-slot="toggle-label" class="inline-flex items-center gap-2">`, so a ToggleGroup's `hideLabelsBelow` can make it screen-reader-only. The gap keeps a Badge inside the label spaced as before; the WithBadge story is unchanged.
 - `pnpm verify toggle` passes all checks.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

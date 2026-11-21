@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { usePlatform } from "../Kbd/Kbd";
 import { KeyboardOpenContext, Menu, useKeyboardOpenTracking } from "../Menu/Menu";
 
@@ -131,13 +132,15 @@ const Trigger = React.forwardRef<HTMLDivElement, ContextMenuTriggerProps>(
             openFromKeyboard(event.target as Element);
           }
         }}
-        className={cn(
-          "focus-visible:sp-focus-ring outline-none",
-          // Highlight the area whose menu is open (Finder, Gmail, VS Code),
-          // with the same tint as Menu's subtle item highlight.
-          "data-[popup-open]:bg-[var(--sp-state-pressed)]",
-          // Backgrounds are dropped in forced colours: draw a frame instead.
-          "forced-colors:data-[popup-open]:outline-solid forced-colors:data-[popup-open]:outline-2 forced-colors:data-[popup-open]:-outline-offset-2",
+        className={mergeClassName(
+          cn(
+            "focus-visible:sp-focus-ring outline-none",
+            // Highlight the area whose menu is open (Finder, Gmail, VS Code),
+            // with the same tint as Menu's subtle item highlight.
+            "data-[popup-open]:bg-[var(--sp-state-pressed)]",
+            // Backgrounds are dropped in forced colours: draw a frame instead.
+            "forced-colors:data-[popup-open]:outline-solid forced-colors:data-[popup-open]:outline-2 forced-colors:data-[popup-open]:-outline-offset-2",
+          ),
           className,
         )}
         {...props}
@@ -158,7 +161,7 @@ const Positioner = React.forwardRef<
   <BaseContextMenu.Positioner
     ref={ref}
     data-slot="context-menu-positioner"
-    className={cn("z-50 outline-none", className)}
+    className={mergeClassName(cn("z-50 outline-none"), className)}
     {...props}
   />
 ));

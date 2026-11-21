@@ -26,3 +26,9 @@
 - **Focus trap**: Mantine and Spectrum (2/9) have optional focus trap for popover forms. Base UI doesn't include this on Popover (it's a Dialog concern). Consumers who need focus trap should use Dialog instead.
 - **Match trigger width**: Mantine has `width="target"`, Primer has preset sizes. Rather than a prop, we expose Base UI's `--anchor-width` CSS variable — consumers use `className="w-[var(--anchor-width)]"` on Popup. More flexible than a boolean prop.
 - **CloseButton (styled X)**: Popovers are small — a styled X button takes up disproportionate space. The unstyled Close wrapped in a small Button is sufficient. Unlike Dialog/Drawer, popovers also close on click-outside and Escape.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

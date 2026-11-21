@@ -184,3 +184,10 @@ States story: valid/error don't apply to a group of actions (each Button carries
 - Storybook's Tailwind `@source` now scans `packages/ui/src/**/*.{ts,tsx}` (it was `.tsx` only), so the connected classes can live in a `.ts` file. The comment in the file is updated, and the imports have no extension, so they don't change.
 - Checked in Chromium after a Storybook restart: an attached group's radii are still `10px 0 0 10px | 0 | 0 10px 10px 0` with the -2px overlap, and ToggleGroup's separator split still rounds each run.
 - `pnpm verify` passes all checks for buttongroup, togglegroup and toggle.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- The local `mergeClassName` helper (added in GEO-896) moved to `lib/merge-class-name.ts`, and this file imports it.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

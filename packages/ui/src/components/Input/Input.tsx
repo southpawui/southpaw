@@ -10,6 +10,7 @@ import {
   CheckIcon,
 } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { Button } from "../Button/Button";
 
 // Heavy deps — only pulled in when Input.Phone or Input.Card are used
@@ -114,7 +115,13 @@ type InputChangeEvent = Parameters<
   NonNullable<React.ComponentProps<typeof BaseInput>["onChange"]>
 >[0];
 
-export interface InputProps extends React.ComponentProps<typeof BaseInput> {
+export interface InputProps extends Omit<React.ComponentProps<typeof BaseInput>, "className"> {
+  /**
+   * Classes for the outer input group (the bordered box), so a string. Base UI's
+   * function-of-state form isn't available there; style states with the group's
+   * data attributes / `has-[]` instead (GEO-958).
+   */
+  className?: string;
   purpose?: InputPurpose;
   prepend?: React.ReactNode;
   append?: React.ReactNode;
@@ -168,19 +175,21 @@ const BaseInputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div
         data-slot="input-group"
-        className={cn(
-          "flex items-center",
-          "bg-surface-base w-full rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-          "border-border-control border-2",
-          "h-[var(--sp-control-height)]",
-          "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-          "hover:border-fg-muted",
-          "has-[:focus-visible]:sp-focus-ring",
-          "has-[[data-invalid]]:border-danger",
-          valid && "border-success",
-          "has-[:disabled]:bg-surface-sunken has-[:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
-          "has-[input:read-only]:bg-surface-sunken has-[input:read-only]:border-border-default",
-          config?.maxWidth,
+        className={mergeClassName(
+          cn(
+            "flex items-center",
+            "bg-surface-base w-full rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+            "border-border-control border-2",
+            "h-[var(--sp-control-height)]",
+            "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+            "hover:border-fg-muted",
+            "has-[:focus-visible]:sp-focus-ring",
+            "has-[[data-invalid]]:border-danger",
+            valid && "border-success",
+            "has-[:disabled]:bg-surface-sunken has-[:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+            "has-[input:read-only]:bg-surface-sunken has-[input:read-only]:border-border-default",
+            config?.maxWidth,
+          ),
           className,
         )}
       >

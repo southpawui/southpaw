@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -30,25 +31,27 @@ const Root = React.forwardRef<HTMLButtonElement, SwitchProps>(
       <BaseSwitch.Root
         ref={ref}
         data-slot="switch"
-        className={cn(
-          // Base
-          "relative inline-flex shrink-0 cursor-pointer items-center rounded-full",
-          // Size — wider when labels are present
-          hasLabels ? "h-7 w-14" : "h-6 w-11",
-          // Background — unchecked uses muted track
-          "bg-border-default",
-          // Transition
-          "transition-[background-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-          // Focus
-          "focus-visible:sp-focus-ring",
-          // Checked — uses accent
-          "data-[checked]:bg-accent",
-          // Invalid (from Field context)
-          "data-[invalid]:ring-danger data-[invalid]:ring-2 data-[invalid]:ring-offset-1",
-          // Valid
-          valid && "data-[checked]:!bg-success",
-          // Disabled
-          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+        className={mergeClassName(
+          cn(
+            // Base
+            "relative inline-flex shrink-0 cursor-pointer items-center rounded-full",
+            // Size — wider when labels are present
+            hasLabels ? "h-7 w-14" : "h-6 w-11",
+            // Background — unchecked uses muted track
+            "bg-border-default",
+            // Transition
+            "transition-[background-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+            // Focus
+            "focus-visible:sp-focus-ring",
+            // Checked — uses accent
+            "data-[checked]:bg-accent",
+            // Invalid (from Field context)
+            "data-[invalid]:ring-danger data-[invalid]:ring-2 data-[invalid]:ring-offset-1",
+            // Valid
+            valid && "data-[checked]:!bg-success",
+            // Disabled
+            "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+          ),
           className,
         )}
         {...props}

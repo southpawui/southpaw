@@ -7,6 +7,7 @@ import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { CaretDown, Check, CheckCircle, Plus, WarningCircle, X } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { menuItemClasses, type MenuHighlight, type MenuSize } from "../Menu/Menu";
 import { ScrollArea } from "../ScrollArea/ScrollArea";
 import { Spinner } from "../Spinner/Spinner";
@@ -801,11 +802,13 @@ export function createInput(kind: ComboboxKind) {
         <BaseCombobox.Input
           ref={ref}
           data-slot={`${kind}-input`}
-          className={cn(
-            inputClasses,
-            // In the chips row: control − 2×2px border − 2×3px row padding
-            ctx.multiple && "h-[calc(var(--sp-cb-height)-10px)]",
-            startIcon == null && !ctx.multiple && "ps-3",
+          className={mergeClassName(
+            cn(
+              inputClasses,
+              // In the chips row: control − 2×2px border − 2×3px row padding
+              ctx.multiple && "h-[calc(var(--sp-cb-height)-10px)]",
+              startIcon == null && !ctx.multiple && "ps-3",
+            ),
             className,
           )}
           {...props}
@@ -1072,7 +1075,10 @@ export function createContent(kind: ComboboxKind) {
                   ...style,
                 } as React.CSSProperties
               }
-              className={cn(popupClasses, ctx.fullScreen && fullScreenPopup, className)}
+              className={mergeClassName(
+                cn(popupClasses, ctx.fullScreen && fullScreenPopup),
+                className,
+              )}
               {...props}
             >
               {ctx.fullScreen && <FullScreenHeader kind={kind} />}
@@ -1318,7 +1324,7 @@ export function List({
   return (
     <BaseCombobox.List
       data-slot={`${kind}-list`}
-      className={cn("p-1 outline-none empty:hidden", className)}
+      className={mergeClassName(cn("p-1 outline-none empty:hidden"), className)}
       {...props}
     >
       {typeof children === "function" || children === undefined
@@ -1372,7 +1378,10 @@ export function VirtualList({
 
   const total = virtualizer.getTotalSize();
   return (
-    <BaseCombobox.List data-slot={`${kind}-list`} className={cn("outline-none", className)}>
+    <BaseCombobox.List
+      data-slot={`${kind}-list`}
+      className={mergeClassName(cn("outline-none"), className)}
+    >
       {items.length > 0 ? (
         <div role="presentation" className="relative w-full" style={{ height: total }}>
           {virtualizer.getVirtualItems().map((row) => (
@@ -1583,10 +1592,12 @@ function ItemBase({
       data-slot={`${kind}-item`}
       value={value}
       disabled={disabled || maxed}
-      className={cn(
-        menuItemClasses({ size: ctx.size, highlight: ctx.highlight, dividers: false }),
-        highlightIndicator,
-        "data-[selected]:font-medium",
+      className={mergeClassName(
+        cn(
+          menuItemClasses({ size: ctx.size, highlight: ctx.highlight, dividers: false }),
+          highlightIndicator,
+          "data-[selected]:font-medium",
+        ),
         className,
       )}
       {...(props as Record<string, unknown>)}
@@ -1764,7 +1775,7 @@ export function Group({
   return (
     <BaseCombobox.Group
       data-slot={`${kind}-group`}
-      className={cn("[&+&]:mt-1", className)}
+      className={mergeClassName(cn("[&+&]:mt-1"), className)}
       {...props}
     />
   );
@@ -1779,10 +1790,12 @@ export function GroupLabel({
   return (
     <BaseCombobox.GroupLabel
       data-slot={`${kind}-group-label`}
-      className={cn(
-        "text-fg-muted px-2 pb-1 pt-2 text-xs font-semibold",
-        ctx.stickyGroupLabels &&
-          "bg-surface-overlay sticky top-0 z-[1] -mx-1 px-3 shadow-[0_1px_0_var(--sp-border-default)]",
+      className={mergeClassName(
+        cn(
+          "text-fg-muted px-2 pb-1 pt-2 text-xs font-semibold",
+          ctx.stickyGroupLabels &&
+            "bg-surface-overlay sticky top-0 z-[1] -mx-1 px-3 shadow-[0_1px_0_var(--sp-border-default)]",
+        ),
         className,
       )}
       {...props}
@@ -1799,7 +1812,10 @@ export function createSeparator(kind: ComboboxKind) {
     <BaseSep
       ref={ref}
       data-slot={`${kind}-separator`}
-      className={cn("border-border-default -mx-1 my-1 h-0 shrink-0 border-t", className)}
+      className={mergeClassName(
+        cn("border-border-default -mx-1 my-1 h-0 shrink-0 border-t"),
+        className,
+      )}
       {...props}
     />
   ));

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root (pass-through)
@@ -19,7 +20,7 @@ const Trigger = React.forwardRef<
   <BaseAlertDialog.Trigger
     ref={ref}
     data-slot="alert-dialog-trigger"
-    className={cn(className)}
+    className={mergeClassName(cn(""), className)}
     {...props}
   />
 ));
@@ -42,10 +43,12 @@ const Backdrop = React.forwardRef<
   <BaseAlertDialog.Backdrop
     ref={ref}
     data-slot="alert-dialog-backdrop"
-    className={cn(
-      "fixed inset-0 bg-black/50",
-      "transition-opacity duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
-      "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+    className={mergeClassName(
+      cn(
+        "fixed inset-0 bg-black/50",
+        "transition-opacity duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
+        "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      ),
       className,
     )}
     {...props}
@@ -62,19 +65,21 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseA
     <BaseAlertDialog.Popup
       ref={ref}
       data-slot="alert-dialog-popup"
-      className={cn(
-        // Position
-        "fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2",
-        // Width: mobile-safe, then sm max-width
-        "max-w-[calc(100vw-2rem)] sm:max-w-sm",
-        // Surface
-        "bg-surface-overlay rounded-[var(--radius-lg)] shadow-lg",
-        // Layout
-        "flex flex-col",
-        // Animation
-        "transition-[opacity,transform] duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
-        "data-[ending-style]:scale-[var(--sp-scale-enter)] data-[ending-style]:opacity-0",
-        "data-[starting-style]:scale-[var(--sp-scale-enter)] data-[starting-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          // Position
+          "fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2",
+          // Width: mobile-safe, then sm max-width
+          "max-w-[calc(100vw-2rem)] sm:max-w-sm",
+          // Surface
+          "bg-surface-overlay rounded-[var(--radius-lg)] shadow-lg",
+          // Layout
+          "flex flex-col",
+          // Animation
+          "transition-[opacity,transform] duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
+          "data-[ending-style]:scale-[var(--sp-scale-enter)] data-[ending-style]:opacity-0",
+          "data-[starting-style]:scale-[var(--sp-scale-enter)] data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -92,7 +97,7 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="alert-dialog-header"
-      className={cn("flex flex-col gap-3 p-6 pb-0", className)}
+      className={mergeClassName(cn("flex flex-col gap-3 p-6 pb-0"), className)}
       {...props}
     />
   ),
@@ -137,11 +142,13 @@ const Icon = React.forwardRef<HTMLSpanElement, AlertDialogIconProps>(
     <span
       ref={ref}
       data-slot="alert-dialog-icon"
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center",
-        iconColorClasses[color],
-        iconShapeClasses[shape],
-        iconSizeClasses[size],
+      className={mergeClassName(
+        cn(
+          "inline-flex shrink-0 items-center justify-center",
+          iconColorClasses[color],
+          iconShapeClasses[shape],
+          iconSizeClasses[size],
+        ),
         className,
       )}
       aria-hidden="true"
@@ -160,11 +167,13 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="alert-dialog-footer"
-      className={cn(
-        "flex flex-col-reverse gap-2 p-6 pt-0",
-        "[&>[data-slot=alert-dialog-close]>[data-slot=button]]:w-full [&>[data-slot=button]]:w-full",
-        "sm:flex-row sm:items-center sm:justify-end sm:gap-3",
-        "sm:[&>[data-slot=alert-dialog-close]>[data-slot=button]]:w-auto sm:[&>[data-slot=button]]:w-auto",
+      className={mergeClassName(
+        cn(
+          "flex flex-col-reverse gap-2 p-6 pt-0",
+          "[&>[data-slot=alert-dialog-close]>[data-slot=button]]:w-full [&>[data-slot=button]]:w-full",
+          "sm:flex-row sm:items-center sm:justify-end sm:gap-3",
+          "sm:[&>[data-slot=alert-dialog-close]>[data-slot=button]]:w-auto sm:[&>[data-slot=button]]:w-auto",
+        ),
         className,
       )}
       {...props}
@@ -184,7 +193,7 @@ const Title = React.forwardRef<
   <BaseAlertDialog.Title
     ref={ref}
     data-slot="alert-dialog-title"
-    className={cn("text-fg-default text-lg font-semibold", className)}
+    className={mergeClassName(cn("text-fg-default text-lg font-semibold"), className)}
     {...props}
   />
 ));
@@ -201,7 +210,7 @@ const Description = React.forwardRef<
   <BaseAlertDialog.Description
     ref={ref}
     data-slot="alert-dialog-description"
-    className={cn("text-fg-muted mt-2 text-sm", className)}
+    className={mergeClassName(cn("text-fg-muted mt-2 text-sm"), className)}
     {...props}
   />
 ));
@@ -218,7 +227,7 @@ const Close = React.forwardRef<
   <BaseAlertDialog.Close
     ref={ref}
     data-slot="alert-dialog-close"
-    className={cn(className)}
+    className={mergeClassName(cn(""), className)}
     {...props}
   />
 ));

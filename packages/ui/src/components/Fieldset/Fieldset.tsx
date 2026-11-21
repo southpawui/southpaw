@@ -2,6 +2,7 @@ import * as React from "react";
 import { Fieldset as BaseFieldset } from "@base-ui/react/fieldset";
 import { WarningCircle } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -36,10 +37,12 @@ const Legend = React.forwardRef<
   <BaseFieldset.Legend
     ref={ref}
     data-slot="fieldset-legend"
-    className={cn(
-      "text-fg-default text-sm font-semibold",
-      // Base UI sets data-disabled on the legend from its Fieldset (GEO-962).
-      "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+    className={mergeClassName(
+      cn(
+        "text-fg-default text-sm font-semibold",
+        // Base UI sets data-disabled on the legend from its Fieldset (GEO-962).
+        "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+      ),
       className,
     )}
     {...props}
@@ -56,10 +59,12 @@ const Description = React.forwardRef<HTMLParagraphElement, React.ComponentPropsW
     <p
       ref={ref}
       data-slot="fieldset-description"
-      className={cn(
-        "text-fg-muted mt-1 text-sm",
-        // A plain <p>: dim from the disabled Fieldset around it (Base UI sets data-disabled there).
-        "[[data-slot=fieldset][data-disabled]_&]:opacity-[var(--sp-state-disabled-opacity)]",
+      className={mergeClassName(
+        cn(
+          "text-fg-muted mt-1 text-sm",
+          // A plain <p>: dim from the disabled Fieldset around it (Base UI sets data-disabled there).
+          "[[data-slot=fieldset][data-disabled]_&]:opacity-[var(--sp-state-disabled-opacity)]",
+        ),
         className,
       )}
       {...props}
@@ -87,7 +92,10 @@ const Error = React.forwardRef<HTMLParagraphElement, FieldsetErrorProps>(
         ref={ref}
         data-slot="fieldset-error"
         role="alert"
-        className={cn("text-danger mt-2 flex items-start gap-1.5 text-sm", className)}
+        className={mergeClassName(
+          cn("text-danger mt-2 flex items-start gap-1.5 text-sm"),
+          className,
+        )}
         {...props}
       >
         <WarningCircle weight="fill" className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />

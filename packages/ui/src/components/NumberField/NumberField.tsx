@@ -8,6 +8,7 @@ import {
   PlusIcon,
 } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { Spinner } from "../Spinner/Spinner";
 
 /* ============================================================
@@ -43,20 +44,6 @@ const heightVar: Record<NumberFieldSize, string> = {
   md: "[--sp-nf-height:var(--sp-control-height)]",
   lg: "[--sp-nf-height:var(--sp-control-height-lg)]",
 };
-
-/**
- * Base UI accepts `className` as a string OR a function of the part's state.
- * `cn()` (clsx) silently drops functions, so merge each case explicitly.
- */
-type ClassNameProp<State> = string | ((state: State) => string | undefined) | undefined;
-
-function mergeClassName<State>(
-  base: string,
-  className: ClassNameProp<State>,
-): ClassNameProp<State> {
-  if (typeof className === "function") return (state: State) => cn(base, className(state));
-  return cn(base, className);
-}
 
 function isDev(): boolean {
   const env = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env;
@@ -423,13 +410,15 @@ const Stepper = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"s
     <span
       ref={ref}
       data-slot="number-field-stepper"
-      className={cn(
-        // Overlap the group's 2px border on the top, end and bottom edges.
-        "relative -my-0.5 -me-0.5 flex h-[calc(100%+4px)] w-[calc(var(--sp-nf-height)*0.75)] shrink-0 flex-col [border-color:inherit]",
-        // Separators drawn inside the outer border so they don't notch it.
-        "before:bg-border-default before:pointer-events-none before:absolute before:inset-y-0.5 before:start-0 before:w-px",
-        "after:bg-border-default after:pointer-events-none after:absolute after:end-0.5 after:start-0 after:top-1/2 after:h-px after:-translate-y-1/2",
-        "forced-colors:before:bg-[CanvasText] forced-colors:before:[forced-color-adjust:none] forced-colors:after:bg-[CanvasText] forced-colors:after:[forced-color-adjust:none]",
+      className={mergeClassName(
+        cn(
+          // Overlap the group's 2px border on the top, end and bottom edges.
+          "relative -my-0.5 -me-0.5 flex h-[calc(100%+4px)] w-[calc(var(--sp-nf-height)*0.75)] shrink-0 flex-col [border-color:inherit]",
+          // Separators drawn inside the outer border so they don't notch it.
+          "before:bg-border-default before:pointer-events-none before:absolute before:inset-y-0.5 before:start-0 before:w-px",
+          "after:bg-border-default after:pointer-events-none after:absolute after:end-0.5 after:start-0 after:top-1/2 after:h-px after:-translate-y-1/2",
+          "forced-colors:before:bg-[CanvasText] forced-colors:before:[forced-color-adjust:none] forced-colors:after:bg-[CanvasText] forced-colors:after:[forced-color-adjust:none]",
+        ),
         className,
       )}
       {...props}
@@ -454,7 +443,7 @@ const Loading = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"s
     <span
       ref={ref}
       data-slot="number-field-loading"
-      className={cn("text-fg-muted flex shrink-0 items-center pe-2.5", className)}
+      className={mergeClassName(cn("text-fg-muted flex shrink-0 items-center pe-2.5"), className)}
       {...props}
     >
       <Spinner aria-label="Loading" />

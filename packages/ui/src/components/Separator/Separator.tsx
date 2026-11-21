@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Separator as BaseSeparator } from "@base-ui/react/separator";
 import { cn } from "../../lib/cn";
+import { mergeClassName, resolveClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Separator
@@ -25,7 +26,12 @@ export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
           data-slot="separator"
           role="separator"
           aria-orientation={props.orientation ?? "horizontal"}
-          className={cn("flex items-center gap-3", isVertical && "flex-col", className)}
+          // A plain <div> when labelled: resolve a state-function className here (GEO-958).
+          className={cn(
+            "flex items-center gap-3",
+            isVertical && "flex-col",
+            resolveClassName(className, { orientation: props.orientation ?? "horizontal" }),
+          )}
         >
           <span
             className={cn(
@@ -50,10 +56,12 @@ export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
       <BaseSeparator
         ref={ref}
         data-slot="separator"
-        className={cn(
-          "bg-border-default shrink-0",
-          "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full",
-          "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
+        className={mergeClassName(
+          cn(
+            "bg-border-default shrink-0",
+            "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full",
+            "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
+          ),
           className,
         )}
         {...props}

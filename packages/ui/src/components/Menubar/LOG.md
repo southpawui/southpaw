@@ -158,3 +158,9 @@ With a menu open, ArrowRight opened the next menu, but focus went to the popup i
 3. **Narrow screens** (Ant ellipsis menu, Carbon hamburger, GOV.UK mobile toggle): _Recommended: a responsive story pattern that collapses the bar into one "Menu" button with submenus under a container width, rather than automatic overflow measuring._
 4. **Current/selected top-level item** (Ant, Carbon, GOV.UK): _Recommended: reject._ All three are navigation patterns, and a menubar is for commands; for navigation, use links in `<nav>` (APG, GOV.UK, MOJ).
 5. **Controlled open by index** (Mantine `openIndex`): _Recommended: a story pattern using each Menu's controlled `open`, Base UI's own model, rather than a new index API._
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

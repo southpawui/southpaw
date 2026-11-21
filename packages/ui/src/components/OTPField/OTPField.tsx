@@ -2,24 +2,11 @@ import * as React from "react";
 import { OTPField as BaseOTPField } from "@base-ui/react/otp-field";
 import { MinusIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Helpers
  * ============================================================ */
-
-/**
- * Base UI accepts `className` as a string OR a function of the part's state.
- * `cn()` (clsx) silently drops functions, so merge each case explicitly.
- */
-type ClassNameProp<State> = string | ((state: State) => string | undefined) | undefined;
-
-function mergeClassName<State>(
-  base: string,
-  className: ClassNameProp<State>,
-): ClassNameProp<State> {
-  if (typeof className === "function") return (state: State) => cn(base, className(state));
-  return cn(base, className);
-}
 
 function isDev(): boolean {
   const env = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env;
@@ -239,10 +226,12 @@ const Group = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"spa
       <span
         ref={ref}
         data-slot="otp-field-group"
-        className={cn(
-          // min-w-0 lets the slots shrink on narrow screens instead of overflowing.
-          "flex min-w-0 max-w-full items-center",
-          !attached && "gap-[var(--sp-control-gap)]",
+        className={mergeClassName(
+          cn(
+            // min-w-0 lets the slots shrink on narrow screens instead of overflowing.
+            "flex min-w-0 max-w-full items-center",
+            !attached && "gap-[var(--sp-control-gap)]",
+          ),
           className,
         )}
         {...props}

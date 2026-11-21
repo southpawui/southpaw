@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Accordion as BaseAccordion } from "@base-ui/react/accordion";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { Button } from "../Button/Button";
 import {
   CollapsibleChevron,
@@ -397,7 +398,10 @@ const Root = React.forwardRef<HTMLDivElement, AccordionRootProps>((props, ref) =
         disabled={disabled}
         hiddenUntilFound={hiddenUntilFound}
         onKeyDown={handleKeyDown}
-        className={cn("w-full", needsList ? "flex flex-col gap-2" : listClasses, className)}
+        className={mergeClassName(
+          cn("w-full", needsList ? "flex flex-col gap-2" : listClasses),
+          className,
+        )}
         style={
           typeof style === "function"
             ? (state) => ({ ...vars, ...style(state) })
@@ -490,13 +494,15 @@ const Item = React.forwardRef<HTMLDivElement, AccordionItemProps>((props, ref) =
         value={value}
         disabled={disabled}
         render={render ?? (root.ordered ? <li /> : undefined)}
-        className={cn(
-          // Reset so nested accordions don't inherit the outer item's corners
-          "[--sp-accordion-radius-bottom:0px] [--sp-accordion-radius-top:0px]",
-          root.ordered && "[counter-increment:sp-accordion-item]",
-          root.variant === "filled" &&
-            "transition-colors duration-[var(--sp-duration-normal)] motion-reduce:transition-none",
-          itemVariantClasses[root.variant],
+        className={mergeClassName(
+          cn(
+            // Reset so nested accordions don't inherit the outer item's corners
+            "[--sp-accordion-radius-bottom:0px] [--sp-accordion-radius-top:0px]",
+            root.ordered && "[counter-increment:sp-accordion-item]",
+            root.variant === "filled" &&
+              "transition-colors duration-[var(--sp-duration-normal)] motion-reduce:transition-none",
+            itemVariantClasses[root.variant],
+          ),
           className,
         )}
         {...rest}
@@ -536,7 +542,10 @@ const Header = React.forwardRef<HTMLHeadingElement, AccordionHeaderProps>((props
       ref={ref}
       data-slot="accordion-header"
       render={render ?? <Heading />}
-      className={cn("m-0 flex min-w-0 flex-1 font-[inherit] text-[length:inherit]", className)}
+      className={mergeClassName(
+        cn("m-0 flex min-w-0 flex-1 font-[inherit] text-[length:inherit]"),
+        className,
+      )}
       {...rest}
     />
   );
@@ -651,19 +660,21 @@ const Trigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>((prop
       ref={ref}
       data-slot="accordion-trigger"
       aria-disabled={locked || undefined}
-      className={cn(
-        "text-fg-default flex w-full cursor-pointer items-center text-start font-medium",
-        "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
-        "focus-visible:sp-focus-ring outline-none",
-        // box-shadow rings are dropped in forced colours: fall back to an outline
-        "forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
-        "aria-disabled:cursor-default aria-disabled:hover:bg-transparent aria-disabled:active:bg-transparent",
-        collapsibleStyles.triggerSize[root.size],
-        summary !== undefined && "py-2",
-        // Actions take the row's end corners
-        "[[data-slot=accordion-header-row]_&]:rounded-e-none",
-        triggerVariantClasses[root.variant],
+      className={mergeClassName(
+        cn(
+          "text-fg-default flex w-full cursor-pointer items-center text-start font-medium",
+          "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
+          "focus-visible:sp-focus-ring outline-none",
+          // box-shadow rings are dropped in forced colours: fall back to an outline
+          "forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
+          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
+          "aria-disabled:cursor-default aria-disabled:hover:bg-transparent aria-disabled:active:bg-transparent",
+          collapsibleStyles.triggerSize[root.size],
+          summary !== undefined && "py-2",
+          // Actions take the row's end corners
+          "[[data-slot=accordion-header-row]_&]:rounded-e-none",
+          triggerVariantClasses[root.variant],
+        ),
         className,
       )}
       {...rest}
@@ -740,11 +751,13 @@ const Panel = React.forwardRef<HTMLDivElement, AccordionPanelProps>((props, ref)
       role={root.regions ? "region" : undefined}
       // ...and its aria-labelledby, which is prohibited on a role-less div
       {...(root.regions ? {} : { "aria-labelledby": undefined })}
-      className={cn(
-        "overflow-hidden",
-        "h-[var(--accordion-panel-height)] transition-[height,opacity] data-[ending-style]:h-0 data-[starting-style]:h-0",
-        collapsibleStyles.motion,
-        root.animateOpacity && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          "overflow-hidden",
+          "h-[var(--accordion-panel-height)] transition-[height,opacity] data-[ending-style]:h-0 data-[starting-style]:h-0",
+          collapsibleStyles.motion,
+          root.animateOpacity && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...rest}
@@ -795,7 +808,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, AccordionSkeletonProps>((props
       ref={ref}
       role="status"
       data-slot="accordion-skeleton"
-      className={cn("w-full", listVariantClasses[variant], className)}
+      className={mergeClassName(cn("w-full", listVariantClasses[variant]), className)}
       {...rest}
     >
       <span className="sr-only">{label}</span>

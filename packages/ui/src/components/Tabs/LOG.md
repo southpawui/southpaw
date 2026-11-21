@@ -29,3 +29,9 @@
 - **Lazy loading**: Only Chakra (1/8). Doesn't meet 2+ threshold. Base UI renders all panels anyway — lazy loading would require custom keepMounted logic.
 - **Fitted/stretch width**: Chakra, MUI (2/8). Achievable with `className="w-full [&>button]:flex-1"` on List — doesn't need a dedicated prop.
 - **Segmented control variant**: 0/8 competitors have this on Tabs. It's a separate pattern better suited to ToggleGroup.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

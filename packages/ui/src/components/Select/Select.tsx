@@ -2,6 +2,7 @@ import * as React from "react";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { CaretDown, Check, X } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { Button } from "../Button/Button";
 
 /* ============================================================
@@ -26,17 +27,19 @@ const Trigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
     <BaseSelect.Trigger
       ref={ref}
       data-slot="select-trigger"
-      className={cn(
-        "bg-surface-base text-fg-default inline-flex h-[var(--sp-control-height)] w-full items-center justify-between gap-2 rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))] px-3 text-sm",
-        "border-border-control border-2",
-        "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-        "hover:border-fg-muted",
-        "focus-visible:sp-focus-ring",
-        "data-[popup-open]:border-accent",
-        "data-[invalid]:!border-danger",
-        valid && "!border-success",
-        "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
-        "data-[readonly]:bg-surface-sunken data-[readonly]:border-border-default",
+      className={mergeClassName(
+        cn(
+          "bg-surface-base text-fg-default inline-flex h-[var(--sp-control-height)] w-full items-center justify-between gap-2 rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))] px-3 text-sm",
+          "border-border-control border-2",
+          "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          "hover:border-fg-muted",
+          "focus-visible:sp-focus-ring",
+          "data-[popup-open]:border-accent",
+          "data-[invalid]:!border-danger",
+          valid && "!border-success",
+          "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
+          "data-[readonly]:bg-surface-sunken data-[readonly]:border-border-default",
+        ),
         className,
       )}
       {...props}
@@ -94,7 +97,7 @@ const Value = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
     <BaseSelect.Value
       ref={ref}
       data-slot="select-value"
-      className={cn("text-sm", "data-[placeholder]:text-fg-muted", className)}
+      className={mergeClassName(cn("text-sm", "data-[placeholder]:text-fg-muted"), className)}
       {...props}
     />
   ),
@@ -110,9 +113,11 @@ const SelectIcon = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof
     <BaseSelect.Icon
       ref={ref}
       data-slot="select-icon"
-      className={cn(
-        "text-fg-muted transition-transform duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-        "[[data-popup-open]_&]:rotate-180",
+      className={mergeClassName(
+        cn(
+          "text-fg-muted transition-transform duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          "[[data-popup-open]_&]:rotate-180",
+        ),
         className,
       )}
       {...props}
@@ -143,7 +148,7 @@ const Positioner = React.forwardRef<
     data-slot="select-positioner"
     sideOffset={sideOffset}
     alignItemWithTrigger={alignItemWithTrigger}
-    className={cn("outline-none", className)}
+    className={mergeClassName(cn("outline-none"), className)}
     {...props}
   />
 ));
@@ -158,14 +163,16 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
     <BaseSelect.Popup
       ref={ref}
       data-slot="select-popup"
-      className={cn(
-        "bg-surface-overlay z-50 max-h-[var(--available-height)] min-w-[var(--anchor-width)] overflow-y-auto rounded-[var(--radius-DEFAULT)] p-1 outline-none",
-        "border-border-default border shadow-lg",
-        // Entry/exit animation
-        "origin-[var(--transform-origin)]",
-        "transition-[transform,scale,opacity] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-        "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
-        "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          "bg-surface-overlay z-50 max-h-[var(--available-height)] min-w-[var(--anchor-width)] overflow-y-auto rounded-[var(--radius-DEFAULT)] p-1 outline-none",
+          "border-border-default border shadow-lg",
+          // Entry/exit animation
+          "origin-[var(--transform-origin)]",
+          "transition-[transform,scale,opacity] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+          "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -188,9 +195,11 @@ const List = React.forwardRef<HTMLDivElement, SelectListProps>(
     <BaseSelect.List
       ref={ref}
       data-slot="select-list"
-      className={cn(
-        "outline-none",
-        virtualized && "[contain-intrinsic-size:auto_2000px] [content-visibility:auto]",
+      className={mergeClassName(
+        cn(
+          "outline-none",
+          virtualized && "[contain-intrinsic-size:auto_2000px] [content-visibility:auto]",
+        ),
         className,
       )}
       {...props}
@@ -208,10 +217,12 @@ const Item = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseSe
     <BaseSelect.Item
       ref={ref}
       data-slot="select-item"
-      className={cn(
-        "text-fg-default relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 pl-8 text-sm outline-none",
-        "data-[highlighted]:bg-[var(--sp-state-hover)]",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+      className={mergeClassName(
+        cn(
+          "text-fg-default relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 pl-8 text-sm outline-none",
+          "data-[highlighted]:bg-[var(--sp-state-hover)]",
+          "data-[disabled]:pointer-events-none data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+        ),
         className,
       )}
       {...props}
@@ -233,8 +244,8 @@ const ItemIndicator = React.forwardRef<
   <BaseSelect.ItemIndicator
     ref={ref}
     data-slot="select-item-indicator"
-    className={cn(
-      "text-accent absolute left-2 flex h-4 w-4 items-center justify-center",
+    className={mergeClassName(
+      cn("text-accent absolute left-2 flex h-4 w-4 items-center justify-center"),
       className,
     )}
     {...props}
@@ -253,7 +264,7 @@ const ItemText = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Ba
     <BaseSelect.ItemText
       ref={ref}
       data-slot="select-item-text"
-      className={cn(className)}
+      className={mergeClassName(cn(""), className)}
       {...props}
     />
   ),
@@ -269,7 +280,7 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
     <BaseSelect.Arrow
       ref={ref}
       data-slot="select-arrow"
-      className={cn("fill-surface-overlay stroke-border-default", className)}
+      className={mergeClassName(cn("fill-surface-overlay stroke-border-default"), className)}
       {...props}
     />
   ),
@@ -282,7 +293,12 @@ Arrow.displayName = "Select.Arrow";
 
 const Group = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseSelect.Group>>(
   ({ className, ...props }, ref) => (
-    <BaseSelect.Group ref={ref} data-slot="select-group" className={cn(className)} {...props} />
+    <BaseSelect.Group
+      ref={ref}
+      data-slot="select-group"
+      className={mergeClassName(cn(""), className)}
+      {...props}
+    />
   ),
 );
 Group.displayName = "Select.Group";
@@ -294,7 +310,7 @@ const GroupLabel = React.forwardRef<
   <BaseSelect.GroupLabel
     ref={ref}
     data-slot="select-group-label"
-    className={cn("text-fg-muted px-2 py-1.5 text-xs font-semibold", className)}
+    className={mergeClassName(cn("text-fg-muted px-2 py-1.5 text-xs font-semibold"), className)}
     {...props}
   />
 ));
@@ -311,7 +327,7 @@ const Separator = React.forwardRef<
   <BaseSelect.Separator
     ref={ref}
     data-slot="select-separator"
-    className={cn("bg-border-default -mx-1 my-1 h-px", className)}
+    className={mergeClassName(cn("bg-border-default -mx-1 my-1 h-px"), className)}
     {...props}
   />
 ));
@@ -328,7 +344,7 @@ const ScrollUpArrow = React.forwardRef<
   <BaseSelect.ScrollUpArrow
     ref={ref}
     data-slot="select-scroll-up-arrow"
-    className={cn("text-fg-muted flex items-center justify-center py-1", className)}
+    className={mergeClassName(cn("text-fg-muted flex items-center justify-center py-1"), className)}
     {...props}
   />
 ));
@@ -341,7 +357,7 @@ const ScrollDownArrow = React.forwardRef<
   <BaseSelect.ScrollDownArrow
     ref={ref}
     data-slot="select-scroll-down-arrow"
-    className={cn("text-fg-muted flex items-center justify-center py-1", className)}
+    className={mergeClassName(cn("text-fg-muted flex items-center justify-center py-1"), className)}
     {...props}
   />
 ));

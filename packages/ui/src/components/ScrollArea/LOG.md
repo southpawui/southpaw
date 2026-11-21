@@ -91,3 +91,9 @@ Added 8 tests (composed forwarding ×4, render prop ×2, scroll-padding class, s
 - **`scrollbars={false}`** (Mantine): redundant with `type="never"`, which hides the bars but keeps scrolling.
 - **Inline-style fade masks**: the first version computed masks in JS `style`. Moved to Tailwind arbitrary properties so the horizontal mask can flip with `ltr:`/`rtl:` variants, and so there's no style computation at runtime.
 - **`aria-rowcount` on the virtualized list**: not allowed on `role=list` (axe `aria-allowed-attr`). Items use `aria-setsize` / `aria-posinset` instead.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
