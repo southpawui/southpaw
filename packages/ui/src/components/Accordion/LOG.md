@@ -1,5 +1,9 @@
 # Accordion — Change Log
 
+## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
+
+`sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the trigger's own `forced-colors:focus-visible:outline-*` fallback is gone. It was the first workaround, the one GEO-950 named. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
+
 ## 2026-11-16 — Signed off; /improve fixes before commit
 
 George signed off on 2026-11-16 (relayed by the coordinator), including the hover-divider tweak below. /improve (quick, scoped to this folder plus the Collapsible export) found 5 issues. All are fixed, with 4 new regression tests:

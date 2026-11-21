@@ -108,8 +108,7 @@ const triggerSize: Record<NavigationMenuSize, string> = {
   lg: "min-h-[var(--sp-control-height-lg)] gap-2 px-4 text-base",
 };
 
-const focusRing =
-  "focus-visible:sp-focus-ring outline-none forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-2 forced-colors:focus-visible:outline-[Highlight]";
+const focusRing = "focus-visible:sp-focus-ring outline-none";
 
 /** Top-level trigger and link: same box so the row lines up. */
 const topLevelItem = cn(
