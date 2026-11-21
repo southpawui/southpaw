@@ -1,5 +1,10 @@
 # RadioGroup — Change Log
 
+## 2026-11-21 — ChoiceCards class strings fixed (GEO-970)
+
+- **Bug, found in the GEO-939 research:** the ChoiceCards story joined its class strings with `+` and no spaces. Three classes ran together as `ease-[…]hover:border-fg-mutedhas-[[data-checked]]:border-accent`, so the easing, the hover border and the selected border never applied. The earlier LOG entry said this was fixed, but the code was never changed. It now passes separate strings to `cn()`.
+- **Checked with Playwright.** Before the fix, the selected card kept the grey control border, and hovering didn't change any border. After the fix, the selected card has the accent border, and hovering an unselected card darkens its border.
+
 ## 2026-11-07
 
 ### Initial styling (Phase 1) — f00b5c1
