@@ -1,6 +1,8 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { SkipLink } from "./SkipLink";
+import { NavigationMenu } from "../NavigationMenu/NavigationMenu";
+import { cn } from "../../lib/cn";
 
 const meta: Meta<typeof SkipLink> = {
   title: "Components/SkipLink",
@@ -24,35 +26,41 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 );
 
 /*
- * Placeholder site header. NavigationMenu (GEO-924) lives in another lane;
- * a story with it replaces this at the restack.
+ * The site header a skip link jumps past: a home link and the main
+ * NavigationMenu (one disclosure panel plus plain links).
  */
 function SiteHeader({ sticky = false }: { sticky?: boolean }) {
-  const links = ["Books", "Events", "Your account", "Help"];
   return (
     <header
-      className={
-        "border-border-default bg-surface-base flex flex-wrap items-center gap-6 border-b px-6 py-4" +
-        (sticky ? " sticky top-0 z-10" : "")
-      }
+      className={cn(
+        "border-border-default bg-surface-base flex items-center gap-6 border-b px-6 py-3",
+        sticky && "sticky top-0 z-10",
+      )}
     >
-      <a href="/" className="text-fg-default text-lg font-semibold">
+      <a href="/" className="text-fg-default shrink-0 text-lg font-semibold">
         City Library
       </a>
-      <nav aria-label="Main">
-        <ul className="flex flex-wrap gap-4 text-sm">
-          {links.map((link) => (
-            <li key={link}>
-              <a
-                href={`/${link.toLowerCase().replace(/ /g, "-")}`}
-                className="text-fg-default underline"
-              >
+      <NavigationMenu.Root aria-label="Main" className="min-w-0 flex-1">
+        <NavigationMenu.List>
+          <NavigationMenu.Item value="books">
+            <NavigationMenu.Trigger>Books</NavigationMenu.Trigger>
+            <NavigationMenu.Content>
+              <NavigationMenu.Group className="sm:w-60">
+                <NavigationMenu.Link href="/catalogue">Search the catalogue</NavigationMenu.Link>
+                <NavigationMenu.Link href="/new-arrivals">New arrivals</NavigationMenu.Link>
+                <NavigationMenu.Link href="/ebooks">eBooks and audiobooks</NavigationMenu.Link>
+              </NavigationMenu.Group>
+            </NavigationMenu.Content>
+          </NavigationMenu.Item>
+          {["Events", "Your account", "Help"].map((link) => (
+            <NavigationMenu.Item key={link}>
+              <NavigationMenu.Link href={`/${link.toLowerCase().replace(/ /g, "-")}`}>
                 {link}
-              </a>
-            </li>
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
           ))}
-        </ul>
-      </nav>
+        </NavigationMenu.List>
+      </NavigationMenu.Root>
     </header>
   );
 }
