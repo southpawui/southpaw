@@ -105,7 +105,7 @@ describe("ButtonGroup", () => {
         </ButtonGroup.Root>,
       );
       expect(group()).toHaveAttribute("data-attached");
-      expect(group().className).toContain("[aria-owns]:empty,[type=hidden]))]:!rounded-s-");
+      expect(group().className).toContain("[type=hidden],[data-connected-ignore]))]:!rounded-s-");
       expect(group().className).not.toContain("gap-[var(--sp-control-gap)]");
     });
 
@@ -115,7 +115,7 @@ describe("ButtonGroup", () => {
           <Button>One</Button>
         </ButtonGroup.Root>,
       );
-      expect(group().className).toContain("[aria-owns]:empty,[type=hidden]))]:!rounded-t-");
+      expect(group().className).toContain("[type=hidden],[data-connected-ignore]))]:!rounded-t-");
       expect(group().className).toContain("flex-col");
     });
 
@@ -450,19 +450,38 @@ describe("ButtonGroup", () => {
   describe("connectedClasses", () => {
     it("lifts hovered and focused children above their neighbours", () => {
       const cls = connectedClasses("horizontal");
-      expect(cls).toContain("[type=hidden]):focus-visible]:z-20");
-      expect(cls).toContain("[type=hidden]):has(:focus-visible)]:z-20");
+      expect(cls).toContain("[data-connected-ignore]):focus-visible]:z-20");
+      expect(cls).toContain("[data-connected-ignore]):has(:focus-visible)]:z-20");
     });
 
     it("ignores Base UI's hidden focus-guard spans around an open trigger (split button regression)", () => {
       // Opening a Popover inserts [data-base-ui-focus-guard] spans and an empty [aria-owns] span
       // next to the trigger. They used to steal :last-child (trigger lost its rounded end).
-      const S = ":not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])";
+      const S =
+        ":not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])";
       const cls = connectedClasses("horizontal");
       expect(cls).toContain(`[&>:nth-last-child(1_of_${S})]:!rounded-e-`);
       expect(cls).toContain(`[&>:nth-child(1_of_${S})]:!rounded-s-`);
       expect(cls).toContain(`${S}+[data-base-ui-focus-guard]+${S},`);
       expect(cls).toContain(`${S}+[type=hidden]+${S})]:-ms-0.5`);
+    });
+  });
+
+  describe("separator splits an attached group (GEO-933)", () => {
+    it("rounds the item either side of a separator and turns the separator into a gap", () => {
+      for (const [o, end, start, size] of [
+        ["horizontal", "rounded-e-", "rounded-s-", "!w-[var(--sp-control-gap)]"],
+        ["vertical", "rounded-b-", "rounded-t-", "!h-[var(--sp-control-gap)]"],
+      ] as const) {
+        const cls = connectedClasses(o);
+        expect(cls).toContain(
+          `:is(:has(+[role=separator]),:has(+[type=hidden]+[role=separator]))]:!${end}`,
+        );
+        expect(cls).toContain(`[&>[role=separator]+:not(`);
+        expect(cls).toContain(`]:!${start}`);
+        expect(cls).toContain(`[&>[role=separator]]:${size}`);
+        expect(cls).toContain("[&>[role=separator]]:!bg-transparent");
+      }
     });
   });
 });

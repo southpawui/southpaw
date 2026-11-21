@@ -162,6 +162,17 @@ States story: valid/error don't apply to a group of actions (each Button carries
 - ButtonGroup's selector tests were updated to match. `pnpm verify buttongroup` passes all checks.
 - **Toggles inside a group** are set back to `w-auto` (`[&>[data-slot=toggle]:not([data-icon-only])]:w-auto`). A Toggle is `w-fit` on its own, and the group's layout should decide its width, as for Buttons (George, GEO-932).
 
+## 2026-11-21 — Connected styling: `[data-connected-ignore]` (GEO-933)
+
+- `lib/connected.tsx` now also skips any child marked `data-connected-ignore`. ToggleGroup uses it for its visually hidden `required` input, which has to be a real text input for constraint validation, so `[type=hidden]` doesn't cover it.
+- ButtonGroup's selector tests were updated. `pnpm verify buttongroup` passes all checks.
+
+## 2026-11-21 — Separator splits an attached group (GEO-933, George's decision)
+
+- In attached groups, `ButtonGroup.Separator` is now a break between runs rather than a line. The button before it gets the end rounding, the button after it the start rounding, and the separator becomes a control-gap space (`lib/connected.tsx`, both orientations).
+- The SeparatorAndText story's "Undo | Redo" now shows as two rounded runs, and its heading is updated. Spaced groups keep their visible inset line.
+- Test for the connected classes. `pnpm verify buttongroup` passes all checks.
+
 ### Notes for other tickets
 
 - **GEO-959** (Tooltip on icon-only buttons): ButtonGroup itself renders no buttons. The **stories** use icon-only Buttons that need tooltips once GEO-959 lands: Pagination (Previous/Next page), Nested (Undo/Redo) and SplitButton ("More save options"). Not cherry-picked here.

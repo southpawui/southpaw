@@ -7,7 +7,8 @@
  * - neighbouring 2px borders overlap so a seam is 2px, not 4px
  * - hovered / focused children lift above their neighbours so their border
  *   and focus ring aren't clipped by the overlap
- * - separators (role="separator") are left alone
+ * - a separator (role="separator") splits the group into runs: the items either side get the
+ *   run's end/start rounding and the separator becomes a control-gap space (GEO-933)
  *
  * NOTE: this file is .tsx (not .ts) on purpose. Storybook's Tailwind only scans
  * `packages/ui/src/**\/*.tsx` (apps/storybook/styles.css `@source`), so class names in a
@@ -22,7 +23,8 @@ export type ConnectedOrientation = "horizontal" | "vertical";
  * A "segment" is a direct child that is a real control: not a separator, and not one of
  * the hidden spans Base UI inserts around an open Popover/Menu trigger
  * (`[data-base-ui-focus-guard]` focus guards and an empty `[aria-owns]` portal owner), nor a
- * hidden form input (a Toggle with `name` renders one as its sibling — GEO-932).
+ * hidden form input (a Toggle with `name` renders one as its sibling — GEO-932), nor anything
+ * marked `data-connected-ignore` (e.g. ToggleGroup's visually hidden `required` input — GEO-933).
  * Without excluding them, opening a split button's menu broke :last-child (the trigger
  * lost its rounded end) and the `+` adjacency (overlap and dividers).
  *
@@ -30,25 +32,33 @@ export type ConnectedOrientation = "horizontal" | "vertical";
  * focus guard (Base UI puts exactly one before a trigger) or one hidden input in between.
  */
 const base = [
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])]:relative",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])]:!rounded-none",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]):hover]:z-10",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]):focus-visible]:z-20",
-  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]):has(:focus-visible)]:z-20",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])]:relative",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])]:!rounded-none",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]):hover]:z-10",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]):focus-visible]:z-20",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]):has(:focus-visible)]:z-20",
 ].join(" ");
 
 const horizontal = [
   "flex-row",
-  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[type=hidden]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:-ms-0.5",
-  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-s-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-e-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])+[type=hidden]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]))]:-ms-0.5",
+  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]))]:!rounded-s-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]))]:!rounded-e-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  // A separator splits the group into runs (George, GEO-933): the item before it ends a run,
+  // the item after it starts one, and the separator becomes a control-gap space with no line.
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]):is(:has(+[role=separator]),:has(+[type=hidden]+[role=separator]))]:!rounded-e-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>[role=separator]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])]:!rounded-s-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>[role=separator]]:!m-0 [&>[role=separator]]:!w-[var(--sp-control-gap)] [&>[role=separator]]:!bg-transparent",
 ].join(" ");
 
 const vertical = [
   "flex-col items-stretch",
-  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden])+[type=hidden]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:-mt-0.5",
-  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-t-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden]))]:!rounded-b-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:is(:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])+[data-base-ui-focus-guard]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]),:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])+[type=hidden]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]))]:-mt-0.5",
+  "[&>:nth-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]))]:!rounded-t-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:nth-last-child(1_of_:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]))]:!rounded-b-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore]):is(:has(+[role=separator]),:has(+[type=hidden]+[role=separator]))]:!rounded-b-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>[role=separator]+:not([role=separator],[data-base-ui-focus-guard],[aria-owns]:empty,[type=hidden],[data-connected-ignore])]:!rounded-t-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+  "[&>[role=separator]]:!m-0 [&>[role=separator]]:!h-[var(--sp-control-gap)] [&>[role=separator]]:!bg-transparent",
 ].join(" ");
 
 /** Classes for a connected group container in the given orientation. */

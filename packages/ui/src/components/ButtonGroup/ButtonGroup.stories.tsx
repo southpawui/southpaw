@@ -222,7 +222,7 @@ function Pagination() {
 export const SeparatorAndText: Story = {
   render: () => (
     <div className={`flex flex-col gap-6 ${WRAP}`}>
-      <Heading>Separator in an attached solid group</Heading>
+      <Heading>Separator splits an attached group into runs</Heading>
       <ButtonGroup.Root attached aria-label="History">
         <Button icon={<ArrowCounterClockwiseIcon />}>Undo</Button>
         <ButtonGroup.Separator />

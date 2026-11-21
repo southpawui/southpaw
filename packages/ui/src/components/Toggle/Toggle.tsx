@@ -4,6 +4,7 @@ import { CheckIcon } from "@phosphor-icons/react";
 import { Spinner } from "../Spinner/Spinner";
 import { cn } from "../../lib/cn";
 import { ButtonGroupContext } from "../ButtonGroup/context";
+import { ToggleGroupContext } from "../ToggleGroup/context";
 
 function isDev(): boolean {
   const env = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env;
@@ -138,7 +139,7 @@ export const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
       srOnly,
       indicator = false,
       loading = false,
-      readOnly = false,
+      readOnly: readOnlyProp = false,
       inactive = false,
       name,
       value,
@@ -153,6 +154,9 @@ export const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
   ) => {
     // Inside a ButtonGroup (or later ToggleGroup/Toolbar), the group's settings are defaults.
     const group = React.useContext(ButtonGroupContext);
+    // A ToggleGroup also passes read-only and invalid to its items (GEO-933).
+    const toggleGroup = React.useContext(ToggleGroupContext);
+    const readOnly = readOnlyProp || Boolean(toggleGroup?.readOnly);
     const variant = variantProp ?? group?.variant ?? "outline";
     const color = colorProp ?? group?.color ?? "default";
     const size = sizeProp ?? group?.size ?? "md";
@@ -245,6 +249,7 @@ export const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
           disabled={disabled}
           aria-disabled={locked || undefined}
           aria-busy={loading || undefined}
+          aria-invalid={toggleGroup?.invalid || undefined}
           aria-label={ariaLabel}
           className={cn(
             "group/toggle inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-medium",
@@ -296,9 +301,12 @@ export const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
                   <span className="sr-only">{srOnly}</span>
                   {textContent}
                 </>
-              ) : (
-                textContent
-              )}
+              ) : textContent != null && textContent !== false ? (
+                // Wrapped so a ToggleGroup can hide visible labels on small screens (hideLabelsBelow).
+                <span data-slot="toggle-label" className="inline-flex items-center gap-2">
+                  {textContent}
+                </span>
+              ) : null}
               {iconPosition === "end" && iconNode}
             </>
           )}
