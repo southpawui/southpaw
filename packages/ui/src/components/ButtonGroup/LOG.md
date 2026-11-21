@@ -178,3 +178,9 @@ States story: valid/error don't apply to a group of actions (each Button carries
 - **GEO-959** (Tooltip on icon-only buttons): ButtonGroup itself renders no buttons. The **stories** use icon-only Buttons that need tooltips once GEO-959 lands: Pagination (Previous/Next page), Nested (Undo/Redo) and SplitButton ("More save options"). Not cherry-picked here.
 - **Pre-existing Button issue (not changed here):** a loading Button gets `disabled`, so `disabled:opacity-[--sp-state-disabled-opacity]` applies on top of `opacity-80`, contradicting the "Loading keeps full opacity" comment (see the States story). Flagged to the coordinator; needs a Button ticket.
 - **GEO-957:** no Field.Error in this component.
+
+## 2026-11-21 — `lib/connected.tsx` renamed to `.ts` (GEO-970 Part A)
+
+- Storybook's Tailwind `@source` now scans `packages/ui/src/**/*.{ts,tsx}` (it was `.tsx` only), so the connected classes can live in a `.ts` file. The comment in the file is updated, and the imports have no extension, so they don't change.
+- Checked in Chromium after a Storybook restart: an attached group's radii are still `10px 0 0 10px | 0 | 0 10px 10px 0` with the -2px overlap, and ToggleGroup's separator split still rounds each run.
+- `pnpm verify` passes all checks for buttongroup, togglegroup and toggle.

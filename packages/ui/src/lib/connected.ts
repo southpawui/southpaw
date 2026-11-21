@@ -10,9 +10,8 @@
  * - a separator (role="separator") splits the group into runs: the items either side get the
  *   run's end/start rounding and the separator becomes a control-gap space (GEO-933)
  *
- * NOTE: this file is .tsx (not .ts) on purpose. Storybook's Tailwind only scans
- * `packages/ui/src/**\/*.tsx` (apps/storybook/styles.css `@source`), so class names in a
- * .ts file would never be generated. Rename once `@source` also covers .ts.
+ * Storybook's Tailwind `@source` scans `packages/ui/src/**\/*.{ts,tsx}` (widened in GEO-970), so
+ * this lives in a .ts file. It started as .tsx because `@source` used to scan .tsx only.
  *
  * Every class below is a literal: Tailwind can't see class names built at runtime.
  */
