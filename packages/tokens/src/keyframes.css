@@ -1,0 +1,45 @@
+/*
+ * Southpaw Component Keyframes
+ *
+ * Keyframes that components reference through Tailwind's
+ * `animate-[name_duration_easing_iteration]`. They ship with the tokens CSS,
+ * so every app that imports `@southpawui/tokens/css` gets them. Before this
+ * file existed, they lived only in Storybook's styles, and consumers got a
+ * static bar (GEO-970).
+ *
+ * Names are prefixed `sp-` so they don't clash with an app's own keyframes.
+ * Durations are literal, not motion tokens: the tokens drop to 0ms under
+ * prefers-reduced-motion, which would freeze an infinite loop instead of
+ * swapping it. Components pick a reduced-motion alternative themselves.
+ */
+
+/* Progress, indeterminate: a third-width bar sweeps across the track */
+@keyframes sp-progress-indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+/* The same sweep for right-to-left: transforms aren't logical, so mirror it */
+@keyframes sp-progress-indeterminate-rtl {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-400%);
+  }
+}
+
+/* Reduced motion: no movement, a slow opacity pulse still reads as busy */
+@keyframes sp-progress-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

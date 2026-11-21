@@ -92,4 +92,28 @@ describe("Progress", () => {
     );
     expect(screen.getByTestId("progress").className).toContain("test-class");
   });
+
+  describe("indeterminate animation", () => {
+    const indicator = () => {
+      render(
+        <Progress.Root value={null} aria-label="Loading">
+          <Progress.Track>
+            <Progress.Indicator data-testid="indicator" />
+          </Progress.Track>
+        </Progress.Root>,
+      );
+      return screen.getByTestId("indicator");
+    };
+
+    it("sweeps with motion, mirrors in RTL, and pulses under reduced motion", () => {
+      const cls = indicator().className;
+      expect(cls).toContain(
+        "motion-safe:[[data-indeterminate]_&]:animate-[sp-progress-indeterminate_",
+      );
+      expect(cls).toContain(
+        "motion-safe:rtl:[[data-indeterminate]_&]:animate-[sp-progress-indeterminate-rtl_",
+      );
+      expect(cls).toContain("motion-reduce:[[data-indeterminate]_&]:animate-[sp-progress-pulse_");
+    });
+  });
 });

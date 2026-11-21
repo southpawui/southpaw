@@ -75,9 +75,13 @@ const Indicator = React.forwardRef<
       "[[data-color=success]_&]:bg-success",
       "[[data-color=danger]_&]:bg-danger",
       "[[data-color=warning]_&]:bg-warning",
-      // Indeterminate animation
-      "[[data-indeterminate]_&]:animate-[progress-indeterminate_1.5s_ease-in-out_infinite]",
+      // Indeterminate: a third-width bar sweeps across (keyframes ship in the tokens CSS)
       "[[data-indeterminate]_&]:w-1/3",
+      "motion-safe:[[data-indeterminate]_&]:animate-[sp-progress-indeterminate_1.5s_ease-in-out_infinite]",
+      // Right-to-left sweeps the other way (transforms aren't logical)
+      "motion-safe:rtl:[[data-indeterminate]_&]:animate-[sp-progress-indeterminate-rtl_1.5s_ease-in-out_infinite]",
+      // Reduced motion: no sweep. A full-width bar pulses slowly, so it still reads as busy
+      "motion-reduce:[[data-indeterminate]_&]:w-full motion-reduce:[[data-indeterminate]_&]:animate-[sp-progress-pulse_2s_ease-in-out_infinite]",
       className,
     )}
     {...props}
