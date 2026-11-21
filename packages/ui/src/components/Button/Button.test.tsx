@@ -150,4 +150,20 @@ describe("Button", () => {
       expect(screen.getByRole("button", { name: "Next" })).toHaveFocus();
     });
   });
+
+  it("loading keeps a 90% fade, not the disabled fade (GEO-961 regression)", () => {
+    render(<Button loading label="Saving" />);
+    const btn = screen.getByRole("button", { name: /Saving/ });
+    expect(btn).toBeDisabled();
+    expect(btn.className).toContain("opacity-90");
+    // The :disabled rule out-ranked the loading opacity, so loading showed at the disabled fade.
+    expect(btn.className).not.toContain("disabled:opacity-");
+  });
+
+  it("a plain disabled Button still gets the disabled fade", () => {
+    render(<Button disabled label="Off" />);
+    expect(screen.getByRole("button", { name: "Off" }).className).toContain(
+      "disabled:opacity-[var(--sp-state-disabled-opacity)]",
+    );
+  });
 });

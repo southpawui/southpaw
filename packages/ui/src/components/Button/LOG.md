@@ -58,3 +58,17 @@ Styled with token system. Basic unstyled Base UI wrapper.
 - Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
 - Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
 - Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Loading Button no longer shows the disabled fade (GEO-961, GEO-970 Part A)
+
+- **Bug:** a loading Button is natively `disabled`. The `disabled:opacity-[--sp-state-disabled-opacity]` rule has higher specificity than `opacity-80`, so every loading Button rendered at **0.38**, the full disabled fade. The comment said loading keeps its look.
+- **Fix:** the disabled fade applies only when the Button isn't loading. Loading keeps a light **`opacity-90`** (the busy cue) along with the spinner and `aria-busy`. `pointer-events-none` stays.
+- **0.9, not 0.8 (George, at sign-off):** at 0.8, brand on light measured 4.5028:1, which passes AA with no margin. 0.9 gives it room.
+- **Measured in Chromium (Loading story):**
+  - Opacity before: all variants 0.38. After: all variants 0.9.
+  - Label contrast at 0.9, composited over the page:
+    - light: solid, outline and ghost 13.10, brand **5.55**, danger 5.54;
+    - dark: solid 13.93, brand 7.49, danger 6.81;
+    - high-contrast: solid 17.49, brand 8.07, danger 6.86.
+  - Everything is at least 5.5:1. At 0.8, light-theme brand was 4.50.
+- **Tests:** loading has `opacity-90` and no disabled-fade class; plain disabled keeps the disabled fade. `pnpm verify button` passes all checks.

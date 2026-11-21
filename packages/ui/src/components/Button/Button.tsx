@@ -131,9 +131,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             // Focus — two-tone ring
             "focus-visible:sp-focus-ring",
             // Disabled / loading
-            "disabled:pointer-events-none disabled:opacity-[var(--sp-state-disabled-opacity)]",
-            // Loading keeps full opacity (unlike disabled)
-            loading && "pointer-events-none opacity-80",
+            "disabled:pointer-events-none",
+            // Loading is natively disabled too, but it isn't "unavailable": it keeps a light 90%
+            // fade (busy) instead of the disabled fade. Before GEO-961 the :disabled rule won
+            // (higher specificity), so a loading Button showed at the full disabled fade.
+            loading
+              ? "pointer-events-none opacity-90"
+              : "disabled:opacity-[var(--sp-state-disabled-opacity)]",
             // Inactive: the disabled look, but pointer events stay on so a Tooltip can open.
             isInactive && "cursor-not-allowed opacity-[var(--sp-state-disabled-opacity)]",
 
