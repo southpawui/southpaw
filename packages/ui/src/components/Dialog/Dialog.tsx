@@ -81,9 +81,12 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(
       className={mergeClassName(
         cn(
           // Position
-          "fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2",
-          // Mobile: slight inset so it doesn't touch edges (except full)
-          size !== "full" && "max-w-[calc(100vw-2rem)]",
+          "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+          // Phones: a 1rem inset each side so it doesn't touch the screen edges (except full).
+          // On width, not max-width: a `max-w-[calc(100vw-2rem)]` was merged away by
+          // tailwind-merge in favour of the size's `max-w-*`, so phones got edge-to-edge
+          // popups (GEO-970). Width keeps the inset; the size's max-width still caps it.
+          size === "full" ? "w-full" : "w-[calc(100%-2rem)]",
           // Size
           size !== "full" && sizeClasses[size],
           size === "full" && sizeClasses.full,
