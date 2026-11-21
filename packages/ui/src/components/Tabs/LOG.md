@@ -1,5 +1,11 @@
 # Tabs — Change Log
 
+## 2026-11-21 — Selected tab style now applies (GEO-970)
+
+- **Bug:** the selected style used `data-[selected]`, but Base UI 1.9 marks the selected tab with `data-active`. The accent colour and semibold weight never applied, so without `<Tabs.Indicator />` nothing showed which tab was selected. The fix is `data-[active]:text-accent data-[active]:font-semibold`.
+- **Checked with Playwright** in light, dark and high contrast. Before, the selected tab had the same muted colour and weight 500 as the others. After, it has the accent colour at weight 600. A new test pins `data-active` on the selected tab, so a Base UI rename would fail loudly.
+- **Not changed: `scrollbar-none`.** The GEO-939 research said it was undefined, but Tailwind 4.3.4 ships it as `scrollbar-width: none`. Computed styles confirm the list's scrollbar is already hidden, so it stays.
+
 ## 2026-11-10 — Full enhancement
 
 ### What changed
