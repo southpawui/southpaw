@@ -52,8 +52,6 @@ const linkClasses = cn(
   "underline-offset-2 hover:underline",
   // :focus, not :focus-visible, so it always shows when it has focus
   "focus:sp-focus-ring outline-none",
-  // Forced colours: sp-focus-ring is invisible there (GEO-950); a system outline until the restack
-  "forced-colors:focus:outline-solid forced-colors:focus:outline-2 forced-colors:focus:outline-[color:Highlight]",
   "print:hidden",
 );
 

@@ -1,5 +1,9 @@
 # SkipLink — Change Log
 
+## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
+
+`sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the link's `forced-colors:focus:outline-*` fallback is gone. That was the local workaround noted at sign-off. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
+
 ## 2026-11-18 — Signed off by George; /improve findings fixed
 
 The read-only audit found 9 issues. All of them checked out against the code, and each is fixed, with 10 new regression tests.

@@ -1,5 +1,9 @@
 # NavigationMenu — Change Log
 
+## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
+
+`sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the `forced-colors:` outline classes in `focusRing` are gone. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
+
 ## 2026-11-16 — Scope approved (GEO-924, Lane 3)
 
 Research across all 9 libraries is in RESEARCH.md. George approved the proposed scope on 2026-11-16 (relayed by the coordinator), with these decisions:

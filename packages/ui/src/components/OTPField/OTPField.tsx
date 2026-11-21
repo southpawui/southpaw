@@ -301,8 +301,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               ctx.warning && "border-[var(--sp-warning,var(--sp-fg-default))]",
               "aria-invalid:!border-danger",
               "focus-visible:sp-focus-ring",
-              // GEO-950: box-shadow rings vanish in forced colours — draw a system outline instead.
-              "forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
               "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
               "read-only:bg-surface-sunken read-only:border-border-default",
             ),
