@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Input } from "./Input";
+import { Kbd } from "../Kbd/Kbd";
 import { Field } from "../Field/Field";
 import { Button } from "../Button/Button";
 import {
@@ -8,7 +9,6 @@ import {
   CreditCardIcon,
   CheckIcon,
   CopyIcon,
-  CommandIcon,
   CaretDownIcon,
   PaperPlaneRightIcon,
   LinkIcon,
@@ -354,11 +354,7 @@ export const Custom: Story = {
         <p className="text-fg-muted text-xs font-medium uppercase tracking-wide">Command palette</p>
         <Input
           prepend={<MagnifyingGlassIcon />}
-          append={
-            <kbd className="text-fg-muted bg-surface-sunken pointer-events-none inline-flex h-5 items-center rounded px-1.5 font-mono text-xs">
-              <CommandIcon className="mr-0.5 h-3 w-3" />K
-            </kbd>
-          }
+          append={<Kbd keys="Mod+K" size="sm" variant="subtle" />}
           placeholder="Search..."
           aria-label="Command palette"
         />

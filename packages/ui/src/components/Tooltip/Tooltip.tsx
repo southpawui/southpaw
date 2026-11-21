@@ -2,6 +2,7 @@ import * as React from "react";
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { CheckCircleIcon, InfoIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { Kbd } from "../Kbd/Kbd";
 import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
@@ -553,18 +554,17 @@ const Shortcut = React.forwardRef<HTMLElement, ShortcutProps>(
       return () => setShortcutKeys(undefined);
     }, [keys, setShortcutKeys]);
 
+    // Kbd (GEO-940) instead of a hand-rolled <kbd> (GEO-970). `outline` is `border-current/30`, so it
+    // takes the tooltip's own (inverse) colour. Hidden from AT: `keys` sets aria-keyshortcuts on
+    // the trigger instead.
     return (
-      <kbd
+      <Kbd
         ref={ref}
         aria-hidden="true"
         data-slot="tooltip-shortcut"
-        className={mergeClassName(
-          cn(
-            "ms-1 inline-flex items-center rounded-[calc(var(--radius-sm)-2px)] px-1",
-            "border-current/30 border font-sans text-[0.85em] leading-tight opacity-80",
-          ),
-          className,
-        )}
+        variant="outline"
+        size="sm"
+        className={mergeClassName(cn("ms-1 opacity-80"), className)}
         {...props}
       />
     );

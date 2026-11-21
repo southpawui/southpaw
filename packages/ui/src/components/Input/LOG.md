@@ -38,3 +38,8 @@ Base UI Field context propagates IDs to nested Select controls, causing duplicat
 - Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
 - **Type narrowed:** `InputProps.className` is now `string`. It lands on the outer input group `<div>`, where Base UI's input state doesn't exist, so a function never worked there. Style states with the group's data attributes or `has-[]`.
 - Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Command-palette story uses Kbd (GEO-970 Part A)
+
+- The Custom story's hand-styled `<kbd><CommandIcon/>K</kbd>` append is now `<Kbd keys="Mod+K" size="sm" variant="subtle" />`. It's platform-aware (⌘K on Apple, Ctrl+K elsewhere) and has a spoken name ("command k"). The unused `CommandIcon` import is removed.
+- `pnpm verify input` fails only on the pre-existing Input.Phone duplicate IDs.
