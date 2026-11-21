@@ -183,7 +183,7 @@ describe("OTPField", () => {
       const { container } = render(<Labelled length={3} valid warning />);
       expect(root(container)).toHaveAttribute("data-warning");
       expect(root(container)).not.toHaveAttribute("data-success");
-      expect(slots(container)[0].className).toContain("--sp-warning");
+      expect(slots(container)[0].className).toContain("border-warning");
       expect(slots(container)[0].className).not.toContain("border-success");
     });
 

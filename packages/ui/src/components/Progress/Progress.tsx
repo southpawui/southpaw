@@ -74,7 +74,7 @@ const Indicator = React.forwardRef<
       "[[data-color=brand]_&]:bg-brand",
       "[[data-color=success]_&]:bg-success",
       "[[data-color=danger]_&]:bg-danger",
-      "[[data-color=warning]_&]:bg-[oklch(0.7_0.15_85)]",
+      "[[data-color=warning]_&]:bg-warning",
       // Indeterminate animation
       "[[data-indeterminate]_&]:animate-[progress-indeterminate_1.5s_ease-in-out_infinite]",
       "[[data-indeterminate]_&]:w-1/3",

@@ -1,5 +1,19 @@
 # AlertDialog — Change Log
 
+## 2026-11-21 — Warning icon uses the `--sp-warning` tokens (GEO-970)
+
+The `warning` colour for `AlertDialog.Icon` was hard-coded as `oklch(0.92 0.04 85)` behind `oklch(0.5 0.15 85)`. Those are light-theme colours, so they were used unchanged in dark and high contrast. It now uses `bg-warning-subtle text-warning`, the same pattern as `success`, so it follows the theme.
+
+Icon contrast, measured with Playwright:
+
+| Theme         | Before                | After                           |
+| ------------- | --------------------- | ------------------------------- |
+| Light         | 4.76:1                | 4.51:1 (`#b45309` on `#fef3c7`) |
+| Dark          | 4.76:1 (a light chip) | 10.8:1                          |
+| High contrast | 4.76:1                | 7.3:1                           |
+
+Every theme is well above the 3:1 non-text minimum. A test pins the token classes.
+
 ## 2026-11-11 — Full enhancement
 
 ### What changed

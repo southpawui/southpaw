@@ -117,4 +117,12 @@ describe("AlertDialog", () => {
       "alert-dialog-description",
     );
   });
+
+  it("warning icon uses the warning tokens, not hard-coded colours", () => {
+    render(<AlertDialog.Icon color="warning" data-testid="icon" />);
+    const icon = screen.getByTestId("icon");
+    expect(icon.className).toContain("bg-warning-subtle");
+    expect(icon.className).toContain("text-warning");
+    expect(icon.className).not.toContain("oklch");
+  });
 });

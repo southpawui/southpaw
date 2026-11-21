@@ -298,7 +298,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "placeholder:text-fg-muted focus:placeholder:text-transparent",
               !hasState && "enabled:not-read-only:hover:border-fg-muted",
               ctx.valid && !ctx.warning && "border-success",
-              ctx.warning && "border-[var(--sp-warning,var(--sp-fg-default))]",
+              ctx.warning && "border-warning",
               "aria-invalid:!border-danger",
               "focus-visible:sp-focus-ring",
               "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
