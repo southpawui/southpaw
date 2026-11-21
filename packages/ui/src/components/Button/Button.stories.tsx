@@ -164,6 +164,39 @@ export const Disabled: Story = {
   ),
 };
 
+/* ============================================================
+ * INACTIVE — looks disabled, stays focusable/hoverable (Primer `inactive`)
+ * Pair with a Tooltip explaining why (GEO-959 once Tooltip lands).
+ * ============================================================ */
+
+export const Inactive: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <p className="text-fg-muted max-w-md text-sm">
+        Inactive buttons keep their tab stop and hover, so a tooltip can explain why they&apos;re
+        unavailable. Activating them does nothing. Tab through: disabled is skipped, inactive is
+        not.
+      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        {variants.map((variant) => (
+          <Button key={variant} inactive variant={variant} label={`Inactive ${variant}`} />
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button inactive color="brand" label="Brand" />
+        <Button inactive color="danger" label="Danger" />
+        <Button inactive icon={<PlusIcon />} label="With icon" />
+        <Button inactive size="icon" icon={<GearSixIcon />} srOnly="Settings (unavailable)" />
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button label="Enabled" />
+        <Button disabled label="Disabled (skipped)" />
+        <Button inactive label="Inactive (focusable)" />
+      </div>
+    </div>
+  ),
+};
+
 export const Loading: Story = {
   render: () => (
     <div className="flex flex-col gap-6">

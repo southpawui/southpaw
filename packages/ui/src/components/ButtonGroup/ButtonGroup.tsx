@@ -130,6 +130,10 @@ const Root = React.forwardRef<HTMLFieldSetElement, ButtonGroupRootProps>(
         className={cn(
           // A <fieldset>: reset its default chrome (min-inline-size: min-content would stop wrapping).
           "m-0 flex min-w-0 max-w-full border-0 p-0",
+          // Toggles fit their content on their own (w-fit); inside a group the group's layout
+          // decides, as for Buttons (stretch when vertical/stacked, grow when `grow`). Icon-only
+          // toggles keep their square.
+          "[&>[data-slot=toggle]:not([data-icon-only])]:w-auto",
           // ---- Attached (connected) ----
           attached && connectedClasses(orientation),
           attached && horizontal && cn("items-stretch", justify[align]),
@@ -139,10 +143,10 @@ const Root = React.forwardRef<HTMLFieldSetElement, ButtonGroupRootProps>(
           // contrasts with its fill (the surface colour vanished on inverse buttons).
           attached &&
             horizontal &&
-            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid])]:shadow-[inset_1px_0_0_color-mix(in_srgb,currentColor_50%,transparent)]",
+            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_1px_0_0_color-mix(in_srgb,currentColor_50%,transparent)]",
           attached &&
             !horizontal &&
-            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid])]:shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_50%,transparent)]",
+            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_50%,transparent)]",
           // Inputs and Select triggers fill the remaining space in an attached row (shadcn, Ant).
           attached &&
             horizontal &&

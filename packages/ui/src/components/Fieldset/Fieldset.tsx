@@ -14,7 +14,9 @@ const Root = React.forwardRef<HTMLFieldSetElement, React.ComponentProps<typeof B
       data-slot="fieldset"
       className={cn(
         "border-border-default rounded-lg border p-6",
-        "disabled:opacity-[var(--sp-state-disabled-opacity)]",
+        // No container opacity when disabled (GEO-962): the controls and Field.Labels inside dim
+        // themselves (native :disabled / Base UI data-disabled from this Fieldset), so dimming the
+        // container too left them at ~0.14. Only the legend and description dim here.
         className,
       )}
       {...props}
@@ -34,7 +36,12 @@ const Legend = React.forwardRef<
   <BaseFieldset.Legend
     ref={ref}
     data-slot="fieldset-legend"
-    className={cn("text-fg-default text-sm font-semibold", className)}
+    className={cn(
+      "text-fg-default text-sm font-semibold",
+      // Base UI sets data-disabled on the legend from its Fieldset (GEO-962).
+      "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+      className,
+    )}
     {...props}
   />
 ));
@@ -49,7 +56,12 @@ const Description = React.forwardRef<HTMLParagraphElement, React.ComponentPropsW
     <p
       ref={ref}
       data-slot="fieldset-description"
-      className={cn("text-fg-muted mt-1 text-sm", className)}
+      className={cn(
+        "text-fg-muted mt-1 text-sm",
+        // A plain <p>: dim from the disabled Fieldset around it (Base UI sets data-disabled there).
+        "[[data-slot=fieldset][data-disabled]_&]:opacity-[var(--sp-state-disabled-opacity)]",
+        className,
+      )}
       {...props}
     />
   ),

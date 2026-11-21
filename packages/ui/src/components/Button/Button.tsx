@@ -21,6 +21,20 @@ export interface ButtonProps extends Omit<React.ComponentProps<typeof BaseButton
   srOnly?: string;
   /** Show a loading spinner. Disables the button and replaces the icon. */
   loading?: boolean;
+  /**
+   * Looks and acts disabled but stays focusable and hoverable (Primer `inactive`), so a
+   * Tooltip can explain why it's unavailable. Exposed as `aria-disabled="true"`; clicks and
+   * Enter/Space do nothing. Prefer `disabled` when no explanation is needed.
+   */
+  inactive?: boolean;
+}
+
+/** Drop `hover:` classes (inactive buttons must not react to hover). Source keeps the literals. */
+function withoutHover(classes: string | undefined): string | undefined {
+  return classes
+    ?.split(" ")
+    .filter((c) => !c.startsWith("hover:"))
+    .join(" ");
 }
 
 // Color × variant class map
@@ -61,6 +75,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconPosition = "start",
       srOnly,
       loading = false,
+      inactive = false,
       disabled: disabledProp,
       children,
       ...props
@@ -74,6 +89,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const color = colorProp ?? group?.color ?? "default";
     const size = sizeProp ?? group?.size ?? "md";
     const disabled = Boolean(group?.disabled) || disabledProp;
+    // Inactive only applies while the button isn't genuinely disabled or loading.
+    const isInactive = inactive && !disabled && !loading;
     const isIconOnly = size === "icon";
     // When loading, show spinner in place of icon
     const displayIcon = loading ? <Spinner /> : icon;
@@ -92,7 +109,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         data-variant={variant}
         aria-label={ariaLabel}
         aria-busy={loading || undefined}
-        disabled={loading || disabled}
+        disabled={loading || disabled || isInactive}
+        // Base UI keeps a focusable-when-disabled button in the tab order with aria-disabled
+        // and swallows activation (GEO-932: Primer `inactive`).
+        focusableWhenDisabled={isInactive || undefined}
+        data-inactive={isInactive ? "" : undefined}
         className={cn(
           // Base
           "inline-flex cursor-pointer items-center justify-center font-medium",
@@ -104,16 +125,20 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "transition-[color,background-color,border-color,box-shadow,transform]",
           "duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
           // Press feedback (Emil's scale) — not when loading
-          !loading && "active:scale-[var(--sp-scale-press)]",
+          !loading && !isInactive && "active:scale-[var(--sp-scale-press)]",
           // Focus — two-tone ring
           "focus-visible:sp-focus-ring",
           // Disabled / loading
           "disabled:pointer-events-none disabled:opacity-[var(--sp-state-disabled-opacity)]",
           // Loading keeps full opacity (unlike disabled)
           loading && "pointer-events-none opacity-80",
+          // Inactive: the disabled look, but pointer events stay on so a Tooltip can open.
+          isInactive && "cursor-not-allowed opacity-[var(--sp-state-disabled-opacity)]",
 
           // Color × Variant
-          colorVariantClasses[color]?.[variant],
+          isInactive
+            ? withoutHover(colorVariantClasses[color]?.[variant])
+            : colorVariantClasses[color]?.[variant],
 
           // Sizes (density-aware) — tighten padding on icon side
           // Icon-only buttons are square; inside a sized ButtonGroup they match its height.
