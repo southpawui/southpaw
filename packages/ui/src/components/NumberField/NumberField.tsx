@@ -229,6 +229,9 @@ const Group = React.forwardRef<HTMLDivElement, NumberFieldGroupProps>(
                 "border-[var(--sp-warning,var(--sp-fg-default))] hover:border-[var(--sp-warning,var(--sp-fg-default))]",
               "data-[invalid]:!border-danger",
               "data-[disabled]:bg-surface-sunken data-[disabled]:border-border-control data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+              // Also disabled by an ancestor <fieldset disabled> (e.g. a disabled ButtonGroup): Base UI
+              // doesn't set data-disabled then, but the native input matches :disabled.
+              "has-[input:disabled]:bg-surface-sunken has-[input:disabled]:border-border-control has-[input:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
               "data-[readonly]:bg-surface-sunken data-[readonly]:border-border-default",
             ),
             className,
@@ -338,6 +341,8 @@ const stepperBase = cn(
   // Fade only the icon: in the stacked layout the button also draws the group's outer border.
   // Base UI marks disabled AND read-only steppers with aria-disabled (read-only has no `disabled` attr).
   "aria-disabled:cursor-not-allowed aria-disabled:[&_svg]:opacity-[var(--sp-state-disabled-opacity)] aria-disabled:hover:bg-transparent aria-disabled:hover:text-fg-muted aria-disabled:active:bg-transparent",
+  // Natively disabled by an ancestor <fieldset disabled> (no aria-disabled then): same look.
+  "disabled:cursor-not-allowed disabled:[&_svg]:opacity-[var(--sp-state-disabled-opacity)] disabled:hover:bg-transparent disabled:hover:text-fg-muted disabled:active:bg-transparent",
   "[&_svg]:size-[calc(var(--sp-control-icon)*0.8)]",
 );
 

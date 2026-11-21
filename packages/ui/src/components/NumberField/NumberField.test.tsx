@@ -293,6 +293,24 @@ describe("NumberField", () => {
       render(<Labelled disabled />);
       expect(input()).toBeDisabled();
     });
+
+    it("looks disabled when an ancestor <fieldset disabled> disables it (regression)", () => {
+      // Base UI sets no data-disabled/aria-disabled in this case; only native :disabled matches.
+      const { container } = render(
+        <fieldset disabled>
+          <Labelled />
+        </fieldset>,
+      );
+      expect(input()).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Increase" })).toBeDisabled();
+      expect(group(container)).not.toHaveAttribute("data-disabled");
+      expect(group(container).className).toContain(
+        "has-[input:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+      );
+      expect(screen.getByRole("button", { name: "Increase" }).className).toContain(
+        "disabled:[&_svg]:opacity-[var(--sp-state-disabled-opacity)]",
+      );
+    });
   });
 
   describe("adornments + size", () => {

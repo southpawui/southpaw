@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { CheckboxGroup } from "./CheckboxGroup";
 import { Checkbox } from "../Checkbox/Checkbox";
+import { Field } from "../Field/Field";
 
 describe("CheckboxGroup", () => {
   it("renders with data-slot", () => {
@@ -40,5 +41,33 @@ describe("CheckboxGroup", () => {
       </CheckboxGroup.Root>,
     );
     expect(screen.getByRole("checkbox", { name: "A" })).toHaveAttribute("data-disabled", "");
+  });
+
+  it("exposes aria-disabled when disabled directly or via Field (regression)", () => {
+    const { rerender } = render(
+      <CheckboxGroup.Root data-testid="group" disabled>
+        <Checkbox.Root name="a" aria-label="A" />
+      </CheckboxGroup.Root>,
+    );
+    expect(screen.getByTestId("group")).toHaveAttribute("aria-disabled", "true");
+    rerender(
+      <Field.Root disabled>
+        <CheckboxGroup.Root data-testid="group">
+          <Checkbox.Root name="a" aria-label="A" />
+        </CheckboxGroup.Root>
+      </Field.Root>,
+    );
+    expect(screen.getByTestId("group")).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("has no aria-disabled when enabled, and a consumer render still wins", () => {
+    render(
+      <CheckboxGroup.Root data-testid="group" render={<section />}>
+        <Checkbox.Root name="a" aria-label="A" />
+      </CheckboxGroup.Root>,
+    );
+    const g = screen.getByTestId("group");
+    expect(g).not.toHaveAttribute("aria-disabled");
+    expect(g.tagName).toBe("SECTION");
   });
 });

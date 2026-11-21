@@ -21,3 +21,12 @@ Styled with token system. Basic unstyled Base UI wrapper.
 **Nested radius via `--sp-nested-radius`**: When a button is inside a container (card, toolbar), it reads the container's radius variable and adjusts. Why: concentric border radius is a Material Design 3 principle — inner radius = outer radius - padding.
 
 **Brand colour reserved for CTAs**: `color="default"` uses accent (not brand). Brand is only for primary CTAs. Why: user decision — brand should be rare and intentional, accent is for everyday UI controls.
+
+## 2026-11-18 — ButtonGroup integration (GEO-896, approved shared change)
+
+- **Reads `ButtonGroupContext`** (`../ButtonGroup/context.ts`). The group's `size`, `variant` and `color` are defaults, and the Button's own prop wins. The group's `disabled` disables every Button, even one with `disabled={false}` (MUI, Spectrum).
+- **Adds `data-variant`**, so an attached ButtonGroup can draw dividers between solid buttons.
+- **Icon-only size follows the group.** `size="icon"` takes the sm, md or lg square from the group's size, so it matches its neighbours. It's unchanged outside a group (still the md square).
+- **Bug fix:** `disabled` is destructured out of the rest props. Before, `{...props}` came after `disabled={loading || props.disabled}`, so an explicit `disabled={false}` re-enabled a loading Button. A regression test is in ButtonGroup.test.tsx.
+- **Pre-existing, not changed:** a loading Button is also `disabled`, so the disabled opacity stacks on top of `opacity-80`, which contradicts the "Loading keeps full opacity" comment. Flagged for its own ticket.
+- `pnpm verify button`: all checks pass. The existing Button tests are unchanged and pass.

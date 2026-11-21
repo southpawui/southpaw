@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { Field } from "./Field";
+import { Fieldset } from "../Fieldset/Fieldset";
 import { Input } from "../Input/Input";
 
 describe("Field.Root", () => {
@@ -49,6 +50,34 @@ describe("Field.Root", () => {
 });
 
 describe("Field.Label", () => {
+  it("dims when its field is disabled, not otherwise", () => {
+    const { rerender } = render(
+      <Field.Root disabled>
+        <Field.Label>Email</Field.Label>
+      </Field.Root>,
+    );
+    const label = screen.getByText("Email");
+    expect(label).toHaveAttribute("data-disabled");
+    expect(label.className).toContain("data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]");
+    rerender(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+      </Field.Root>,
+    );
+    expect(screen.getByText("Email")).not.toHaveAttribute("data-disabled");
+  });
+
+  it("dims inside a disabled Fieldset (Base UI context cascade)", () => {
+    render(
+      <Fieldset.Root disabled>
+        <Field.Root>
+          <Field.Label>Email</Field.Label>
+        </Field.Root>
+      </Fieldset.Root>,
+    );
+    expect(screen.getByText("Email")).toHaveAttribute("data-disabled");
+  });
+
   it("renders label text", () => {
     render(
       <Field.Root>

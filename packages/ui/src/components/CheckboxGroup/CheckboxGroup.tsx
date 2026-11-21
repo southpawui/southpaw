@@ -7,11 +7,20 @@ import { cn } from "../../lib/cn";
  * ============================================================ */
 
 const Root = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseCheckboxGroup>>(
-  ({ className, ...props }, ref) => (
+  ({ className, render, ...props }, ref) => (
     <BaseCheckboxGroup
       ref={ref}
       data-slot="checkbox-group"
       className={cn("flex flex-col gap-[var(--sp-control-gap)]", className)}
+      // Base UI's CheckboxGroup (unlike RadioGroup) doesn't expose aria-disabled, so a disabled
+      // group — set directly, from Field.Root, or from an ancestor Fieldset — wasn't announced
+      // as disabled, and its (dimmed) group label failed axe contrast.
+      render={
+        render ??
+        ((renderProps, state) => (
+          <div {...renderProps} aria-disabled={state.disabled || undefined} />
+        ))
+      }
       {...props}
     />
   ),
