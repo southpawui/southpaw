@@ -62,3 +62,9 @@ States has no "valid" state: a toggle is an action, not a validated value (the s
 - **Tests:** the default is `w-fit` and `w-full` overrides it; the group's override class is present; an icon-only toggle in a group keeps its square (regression).
 
 **Signed off** by George, 2026-11-18. /improve was a quick self-review of the diff with no new findings. Before it, Playwright caught and fixed the focus-ring/box-shadow conflict.
+
+## 2026-11-21 — ToggleGroup hooks (GEO-933)
+
+- Reads `ToggleGroupContext` (`ToggleGroup/context.ts`): a group's `readOnly` is OR-ed with the Toggle's own, and a group's `invalid` sets `aria-invalid`.
+- The visible label is wrapped in `<span data-slot="toggle-label" class="inline-flex items-center gap-2">`, so a ToggleGroup's `hideLabelsBelow` can make it screen-reader-only. The gap keeps a Badge inside the label spaced as before; the WithBadge story is unchanged.
+- `pnpm verify toggle` passes all checks.
