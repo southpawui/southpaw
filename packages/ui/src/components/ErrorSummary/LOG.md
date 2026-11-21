@@ -16,7 +16,7 @@ The Default demo now includes the two form controls that weren't on the branch w
 - The code link focuses the first OTP slot, and the books link focuses the number input.
 - A partly filled code shows the right message.
 
-**Found, not fixed here (reported):** OTPField slots get `data-invalid` but not `aria-invalid` when the form is invalid. OTPField styles its error border with `aria-invalid:`, so the slots stay grey while the other controls turn red.
+**Found while checking the demo:** OTPField slots got `data-invalid` but not `aria-invalid` when the form was invalid, so they stayed grey while the other controls turned red. This is fixed in OTPField by the next GEO-970 commit; see OTPField/LOG.md.
 
 ## 2026-11-18 — Signed off by George; /improve findings fixed
 

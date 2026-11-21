@@ -306,6 +306,19 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ),
             className,
           )}
+          // Base UI sets aria-invalid only from Field.Root's `invalid` prop. A field that
+          // fails validation (e.g. on Form submit) gets data-invalid but not aria-invalid,
+          // so screen readers miss it and the error border doesn't apply. Mirror the
+          // field's validity onto each slot.
+          render={(inputProps, state) => (
+            <input
+              {...inputProps}
+              aria-invalid={
+                inputProps["aria-invalid"] ??
+                (state.valid === false && !state.disabled ? true : undefined)
+              }
+            />
+          )}
           {...props}
         />
       </span>
