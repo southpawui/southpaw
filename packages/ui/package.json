@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@tanstack/react-virtual": "^3.14.26",
     "clsx": "^2",
     "country-codes-list": "^3.2.0",
     "imask": "^7.6.1",
@@ -27,7 +28,6 @@
   },
   "devDependencies": {
     "@phosphor-icons/react": "^2.1.10",
-    "@tanstack/react-virtual": "^3.14.26",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

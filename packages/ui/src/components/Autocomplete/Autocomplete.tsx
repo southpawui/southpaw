@@ -1,244 +1,388 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Base UI's Root is generic over the
+   consumer's item type; our wrapper forwards it and handles sentinel items internally. */
 import * as React from "react";
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
-import { cn } from "../../lib/cn";
+import type { Virtualizer } from "@tanstack/react-virtual";
+import {
+  ComboboxContext,
+  RETRY,
+  createContent,
+  createInput,
+  createItem,
+  createSeparator,
+  defaultItemLabel,
+  defaultLabels,
+  Group as GroupBase,
+  GroupLabel as GroupLabelBase,
+  Highlight,
+  isKeyboardOpen,
+  isSentinel,
+  List as ListBase,
+  scrollVirtualToHighlight,
+  sentinelKind,
+  useControllableState,
+  useAnnouncer,
+  useNarrowScreen,
+  VirtualList as VirtualListBase,
+  type ComboboxContentProps,
+  type ComboboxContextValue,
+  type ComboboxHighlight,
+  type ComboboxInputProps,
+  type ComboboxItemProps,
+  type ComboboxLabels,
+  type ComboboxListProps,
+  type ComboboxSize,
+  type ComboboxVirtualListProps,
+} from "../Combobox/combobox-shared";
 
-const Root = BaseAutocomplete.Root;
+export type AutocompleteContentProps = ComboboxContentProps;
+export type AutocompleteInputProps = ComboboxInputProps;
+export type AutocompleteItemProps = ComboboxItemProps;
+export type AutocompleteListProps = ComboboxListProps;
+export type AutocompleteVirtualListProps = ComboboxVirtualListProps;
+export type AutocompleteLabels = ComboboxLabels;
 
-const Trigger = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BaseAutocomplete.Trigger>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Trigger
-    ref={ref}
-    data-slot="autocomplete-trigger"
-    className={cn(
-      "inline-flex items-center text-neutral-500 transition-colors hover:text-neutral-700",
-      className,
-    )}
-    {...props}
-  />
-));
-Trigger.displayName = "Autocomplete.Trigger";
+/* ============================================================
+ * Root
+ * ============================================================ */
 
-const Input = React.forwardRef<
-  HTMLInputElement,
-  React.ComponentProps<typeof BaseAutocomplete.Input>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Input
-    ref={ref}
-    data-slot="autocomplete-input"
-    className={cn(
-      "h-10 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm placeholder:text-neutral-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 disabled:cursor-not-allowed disabled:opacity-50",
-      className,
-    )}
-    {...props}
-  />
-));
-Input.displayName = "Autocomplete.Input";
+type BaseRootProps<Item> = Omit<BaseAutocomplete.Root.Props<Item>, "items"> & {
+  items?: readonly Item[] | readonly { value?: unknown; items: readonly Item[] }[];
+};
 
-const InputGroup = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BaseAutocomplete.InputGroup>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.InputGroup
-    ref={ref}
-    data-slot="autocomplete-input-group"
-    className={cn("relative flex items-center", className)}
-    {...props}
-  />
-));
-InputGroup.displayName = "Autocomplete.InputGroup";
+export interface AutocompleteOwnProps {
+  /** Control and row size. Heights follow `data-density`. Default `md`. */
+  size?: ComboboxSize;
+  /** Highlight style for rows. `subtle` (default) tints; `solid` fills with accent. */
+  highlight?: ComboboxHighlight;
+  /** Valid state: green border and check. Field `invalid` overrides it. */
+  valid?: boolean;
+  /** Warning state: amber border (`--sp-warning`). Overrides `valid`; Field `invalid` overrides both. */
+  warning?: boolean;
+  /** Suggestions are loading: spinner in the field, "Loading…" in the list, `aria-busy`. */
+  loading?: boolean;
+  /** Loading failed. `true` shows `labels.error`; a node shows that. Adds a "Try again" option. */
+  error?: React.ReactNode;
+  /** Called when the user picks "Try again". */
+  onRetry?: () => void;
+  /** More suggestions exist: `onLoadMore` fires when the list is scrolled to the end. */
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  /** Replace any built-in string (i18n). */
+  labels?: Partial<ComboboxLabels>;
+  /** Characters needed before suggestions show (GOV.UK `minLength`). */
+  minLength?: number;
+  /** Where the query must match. Default `contains`. Ignored when `filter` is set. */
+  matchFrom?: "contains" | "start";
+  /** Bold the matched part of each suggestion. */
+  highlightMatches?: boolean;
+  /** Delay before the result count is announced (ms). Default 1400 (GOV.UK). */
+  statusDelay?: number;
+  /** Fill the input with the highlighted suggestion when it loses focus (GOV.UK `confirmOnBlur`). */
+  autoSelectOnBlur?: boolean;
+  /** Blur the input after a pick, to hide the on-screen keyboard. `touch` limits it to touch. */
+  blurOnSelect?: boolean | "touch" | "mouse";
+  /** Below 640px the list opens full screen with the input inside (Primer, Spectrum). */
+  fullScreenOnMobile?: boolean;
+  /** Title for the full-screen sheet. Defaults to the input's `aria-label`. */
+  fullScreenTitle?: React.ReactNode;
+  /** Enter submits the surrounding form, even while a suggestion is highlighted (Chakra `alwaysSubmitOnEnter`). */
+  submitOnEnter?: boolean;
+}
 
-const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseAutocomplete.Popup>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.Popup
-      ref={ref}
-      data-slot="autocomplete-popup"
-      className={cn(
-        "z-50 max-h-[var(--available-height)] overflow-y-auto rounded-md border border-neutral-200 bg-white p-1 shadow-lg outline-none",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
-Popup.displayName = "Autocomplete.Popup";
+export type AutocompleteRootProps<Item = any> = BaseRootProps<Item> & AutocompleteOwnProps;
 
-const Positioner = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BaseAutocomplete.Positioner>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Positioner
-    ref={ref}
-    data-slot="autocomplete-positioner"
-    className={cn("outline-none", className)}
-    {...props}
-  />
-));
-Positioner.displayName = "Autocomplete.Positioner";
+function Root<Item = any>(props: AutocompleteRootProps<Item>) {
+  const {
+    size = "md",
+    highlight = "subtle",
+    valid = false,
+    warning = false,
+    loading = false,
+    error,
+    onRetry,
+    hasMore,
+    onLoadMore,
+    labels: labelsProp,
+    minLength = 0,
+    matchFrom = "contains",
+    highlightMatches = false,
+    statusDelay = 1400,
+    autoSelectOnBlur = false,
+    blurOnSelect = false,
+    fullScreenOnMobile = false,
+    fullScreenTitle,
+    submitOnEnter = false,
+    items,
+    filter,
+    value: valueProp,
+    defaultValue,
+    onValueChange,
+    open: openProp,
+    defaultOpen,
+    onOpenChange,
+    onItemHighlighted,
+    itemToStringValue,
+    limit,
+    locale,
+    children,
+    ...rest
+  } = props as AutocompleteRootProps<any> & { locale?: Intl.LocalesArgument };
 
-const List = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseAutocomplete.List>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.List
-      ref={ref}
-      data-slot="autocomplete-list"
-      className={cn("outline-none", className)}
-      {...props}
-    />
-  ),
-);
+  const labels = React.useMemo(() => ({ ...defaultLabels, ...labelsProp }), [labelsProp]);
+  const [value, setValueState] = useControllableState<string>(
+    valueProp as string | undefined,
+    (defaultValue as string | undefined) ?? "",
+  );
+  const [open, setOpenState] = useControllableState<boolean>(openProp, defaultOpen ?? false);
+  const [keyboardOpen, setKeyboardOpen] = React.useState(false);
+  const [stickyGroupLabels, setStickyGroupLabels] = React.useState(false);
+  const [announcement, setAnnouncement] = React.useState({ text: "", key: 0 });
+  const lastSelectionAt = React.useRef(0);
+  const pointerTypeRef = React.useRef("");
+  const highlightedRef = React.useRef<unknown>(undefined);
+  const virtualizerRef = React.useRef<Virtualizer<HTMLDivElement, Element> | null>(null);
+  const fullScreenInputRef = React.useRef(null);
+  const fullScreen = useNarrowScreen(fullScreenOnMobile);
+  // Values of the options rendered as disabled (autoSelectOnBlur must not pick them)
+  const disabledItems = React.useRef(new Set<unknown>());
+
+  const itemToLabel = React.useCallback(
+    (item: unknown) => {
+      if (isSentinel(item)) return "";
+      return itemToStringValue ? itemToStringValue(item) : defaultItemLabel(item);
+    },
+    [itemToStringValue],
+  );
+
+  const announce = useAnnouncer(setAnnouncement);
+
+  const core = BaseAutocomplete.useFilter({ locale });
+  const wrappedFilter = React.useCallback(
+    (item: unknown, query: string, toString?: (item: unknown) => string) => {
+      if (isSentinel(item)) return true;
+      // `filter={null}` turns client filtering off (server-side search)
+      if (filter === null) return true;
+      if (filter) return filter(item as never, query, toString as never);
+      const stringify = toString ?? itemToLabel;
+      return matchFrom === "start"
+        ? core.startsWith(item, query, stringify)
+        : core.contains(item, query, stringify);
+    },
+    [filter, matchFrom, core, itemToLabel],
+  );
+
+  const query = value.trim();
+  const belowMin = minLength > 0 && query.length < minLength;
+  const collection = React.useMemo(() => {
+    if (items === undefined) return undefined;
+    if (error) return [RETRY];
+    if (belowMin) return [];
+    return items as readonly unknown[];
+  }, [items, error, belowMin]);
+
+  const maybeBlur = () => {
+    const type = pointerTypeRef.current || "keyboard";
+    const should =
+      blurOnSelect === true ||
+      (blurOnSelect === "touch" && (type === "touch" || type === "pen")) ||
+      (blurOnSelect === "mouse" && type === "mouse");
+    if (should) queueMicrotask(() => (document.activeElement as HTMLElement | null)?.blur());
+  };
+
+  const setValue = (next: string, details: any) => {
+    setValueState(next);
+    onValueChange?.(next, details);
+  };
+
+  const ctx: ComboboxContextValue = {
+    kind: "autocomplete",
+    size,
+    highlight,
+    valid,
+    warning,
+    loading,
+    error: error === false ? null : error,
+    hasMore: !!hasMore,
+    onLoadMore,
+    labels,
+    inputValue: value,
+    open,
+    minLength,
+    highlightMatches,
+    indicatorPosition: "start",
+    multiple: false,
+    itemToLabel,
+    isSelected: () => false,
+    value,
+    atMax: false,
+    isFixed: () => false,
+    selectAllState: "none",
+    selectAllTotal: 0,
+    keyboardOpen,
+    fullScreen,
+    statusDelay,
+    lastSelectionAt,
+    announcement,
+    announce,
+    virtualizerRef,
+    selectionDisplay: "chips",
+    reorderable: false,
+    moveValue: () => {},
+    tagHandlers: submitOnEnter
+      ? {
+          onKeyDown: (event) => {
+            if (event.key !== "Enter" || event.nativeEvent.isComposing) return;
+            // Enter on "Try again" retries; it doesn't submit the old query
+            if (open && isSentinel(highlightedRef.current)) return;
+            const form = event.currentTarget.form;
+            // After Base UI fills the input with the highlighted suggestion
+            window.setTimeout(() => form?.requestSubmit());
+          },
+          onPaste: () => {},
+        }
+      : undefined,
+    pointerTypeRef,
+    stickyGroupLabels,
+    setStickyGroupLabels,
+    close: () => {
+      setOpenState(false);
+      onOpenChange?.(false, { reason: "close-press" } as never);
+    },
+    fullScreenTitle,
+    fullScreenInputRef,
+    composed: items === undefined,
+    disabledItems,
+    notePressed: (item) => (highlightedRef.current = item),
+  };
+
+  return (
+    <ComboboxContext.Provider value={ctx}>
+      {/* Remount when the full-screen layout switches: Base UI decides once whether
+          the input lives inside the popup. Value, input and open state are held
+          here, so nothing is lost. */}
+      <BaseAutocomplete.Root
+        key={fullScreen ? "full-screen" : "inline"}
+        {...(rest as any)}
+        items={collection as any}
+        filter={wrappedFilter as any}
+        limit={limit != null && error ? limit + 1 : limit}
+        locale={locale}
+        value={value}
+        onValueChange={(next: string, details: any) => {
+          if (details?.reason === "item-press") {
+            if (sentinelKind(highlightedRef.current) === "retry") {
+              onRetry?.();
+              return;
+            }
+            lastSelectionAt.current = Date.now();
+            maybeBlur();
+          }
+          setValue(next, details);
+        }}
+        open={open}
+        onOpenChange={(next: boolean, details: any) => {
+          if (next) setKeyboardOpen(isKeyboardOpen(details));
+          // autoSelectOnBlur (GOV.UK confirmOnBlur): leaving the field takes the
+          // highlighted suggestion. Base UI closes before blur fires, so act here.
+          const highlighted = highlightedRef.current;
+          if (
+            !next &&
+            autoSelectOnBlur &&
+            (details?.reason === "focus-out" || details?.reason === "outside-press") &&
+            highlighted !== undefined &&
+            !isSentinel(highlighted) &&
+            !disabledItems.current.has(highlighted)
+          ) {
+            setValue(itemToLabel(highlighted), details);
+          }
+          setOpenState(next);
+          onOpenChange?.(next, details);
+        }}
+        onItemHighlighted={(item: any, details: any) => {
+          highlightedRef.current = item;
+          scrollVirtualToHighlight(virtualizerRef.current, details);
+          // Internal rows (retry) reach the consumer as no item
+          onItemHighlighted?.(isSentinel(item) ? undefined : item, details);
+        }}
+        itemToStringValue={(item: unknown) =>
+          sentinelKind(item) === "retry" ? value : itemToLabel(item)
+        }
+      >
+        <PointerTypeTracker pointerTypeRef={pointerTypeRef} />
+        {children}
+      </BaseAutocomplete.Root>
+    </ComboboxContext.Provider>
+  );
+}
+
+function PointerTypeTracker({
+  pointerTypeRef,
+}: {
+  pointerTypeRef: React.MutableRefObject<string>;
+}) {
+  React.useEffect(() => {
+    const onPointer = (event: PointerEvent) => (pointerTypeRef.current = event.pointerType);
+    const onKey = () => (pointerTypeRef.current = "keyboard");
+    document.addEventListener("pointerdown", onPointer, true);
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer, true);
+      document.removeEventListener("keydown", onKey, true);
+    };
+  }, [pointerTypeRef]);
+  return null;
+}
+
+/* ============================================================
+ * Parts
+ * ============================================================ */
+
+const Input = createInput("autocomplete");
+const Content = createContent("autocomplete");
+const Item = createItem("autocomplete");
+const Separator = createSeparator("autocomplete");
+
+function List(props: ComboboxListProps) {
+  return <ListBase kind="autocomplete" {...props} />;
+}
 List.displayName = "Autocomplete.List";
 
-const Item = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseAutocomplete.Item>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.Item
-      ref={ref}
-      data-slot="autocomplete-item"
-      className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-neutral-100 data-[disabled]:opacity-50",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
-Item.displayName = "Autocomplete.Item";
+function VirtualList(props: ComboboxVirtualListProps) {
+  return <VirtualListBase kind="autocomplete" {...props} />;
+}
+VirtualList.displayName = "Autocomplete.VirtualList";
 
-const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseAutocomplete.Arrow>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.Arrow
-      ref={ref}
-      data-slot="autocomplete-arrow"
-      className={cn("fill-white stroke-neutral-200", className)}
-      {...props}
-    />
-  ),
-);
-Arrow.displayName = "Autocomplete.Arrow";
-
-const Portal = BaseAutocomplete.Portal;
-
-const Group = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseAutocomplete.Group>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.Group
-      ref={ref}
-      data-slot="autocomplete-group"
-      className={cn(className)}
-      {...props}
-    />
-  ),
-);
+function Group(props: React.ComponentProps<typeof BaseAutocomplete.Group>) {
+  return <GroupBase kind="autocomplete" {...props} />;
+}
 Group.displayName = "Autocomplete.Group";
 
-const GroupLabel = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BaseAutocomplete.GroupLabel>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.GroupLabel
-    ref={ref}
-    data-slot="autocomplete-group-label"
-    className={cn("px-2 py-1.5 text-xs font-semibold text-neutral-500", className)}
-    {...props}
-  />
-));
+function GroupLabel(props: React.ComponentProps<typeof BaseAutocomplete.GroupLabel>) {
+  return <GroupLabelBase kind="autocomplete" {...props} />;
+}
 GroupLabel.displayName = "Autocomplete.GroupLabel";
-
-const Empty = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseAutocomplete.Empty>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.Empty
-      ref={ref}
-      data-slot="autocomplete-empty"
-      className={cn("px-2 py-4 text-center text-sm text-neutral-500", className)}
-      {...props}
-    />
-  ),
-);
-Empty.displayName = "Autocomplete.Empty";
-
-const Status = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BaseAutocomplete.Status>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Status
-    ref={ref}
-    data-slot="autocomplete-status"
-    className={cn("sr-only", className)}
-    {...props}
-  />
-));
-Status.displayName = "Autocomplete.Status";
-
-const Separator = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BaseAutocomplete.Separator>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Separator
-    ref={ref}
-    data-slot="autocomplete-separator"
-    className={cn("-mx-1 my-1 h-px bg-neutral-200", className)}
-    {...props}
-  />
-));
-Separator.displayName = "Autocomplete.Separator";
-
-const Clear = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<typeof BaseAutocomplete.Clear>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Clear
-    ref={ref}
-    data-slot="autocomplete-clear"
-    className={cn(
-      "inline-flex h-6 w-6 items-center justify-center rounded-md text-neutral-400 transition-colors hover:text-neutral-700",
-      className,
-    )}
-    {...props}
-  />
-));
-Clear.displayName = "Autocomplete.Clear";
-
-const Icon = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof BaseAutocomplete.Icon>>(
-  ({ className, ...props }, ref) => (
-    <BaseAutocomplete.Icon
-      ref={ref}
-      data-slot="autocomplete-icon"
-      className={cn("text-neutral-500", className)}
-      {...props}
-    />
-  ),
-);
-Icon.displayName = "Autocomplete.Icon";
-
-const Value = React.forwardRef<
-  HTMLSpanElement,
-  React.ComponentProps<typeof BaseAutocomplete.Value>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Value
-    ref={ref}
-    data-slot="autocomplete-value"
-    className={cn("text-sm", className)}
-    {...props}
-  />
-));
-Value.displayName = "Autocomplete.Value";
 
 export const Autocomplete = {
   Root,
-  Trigger,
   Input,
-  InputGroup,
-  Popup,
-  Positioner,
+  Content,
   List,
+  VirtualList,
   Item,
-  Arrow,
-  Portal,
   Group,
   GroupLabel,
-  Empty,
-  Status,
   Separator,
-  Clear,
-  Icon,
-  Value,
+  Highlight,
+  /* Base UI parts, unstyled, for custom anatomy */
+  Collection: BaseAutocomplete.Collection,
+  Row: BaseAutocomplete.Row,
+  Portal: BaseAutocomplete.Portal,
+  Positioner: BaseAutocomplete.Positioner,
+  Popup: BaseAutocomplete.Popup,
+  Trigger: BaseAutocomplete.Trigger,
+  Empty: BaseAutocomplete.Empty,
+  Status: BaseAutocomplete.Status,
+  useFilter: BaseAutocomplete.useFilter,
+  useFilteredItems: BaseAutocomplete.useFilteredItems,
 };

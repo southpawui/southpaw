@@ -55,13 +55,29 @@ const IGNORE_RULES = ["landmark-one-main", "page-has-heading-one", "region", "by
  * is already open and non-modal (e.g. Menu showcase stories). A menu opened by
  * the user passes. Only these nodes, and only for this rule, are dropped; any
  * other aria-hidden-focus node, and every other rule, still fails as before.
+ *
+ * Base UI inert outside: while a Combobox/Autocomplete popup is open with its
+ * input outside the popup, Base UI's focus manager is always modal
+ * (`focusManagerModal = !inputInsidePopup || modal`, not configurable) and
+ * marks everything else `aria-hidden` + `data-base-ui-inert`. Showcase stories
+ * that render a popup already open next to other fields therefore trip this
+ * rule. In use it's harmless: Tab from the open input closes the popup and the
+ * hiding is removed before focus moves on (checked in Chromium, GEO-934).
+ * Same scope as the focus guards: only `data-base-ui-inert` nodes, only for
+ * `aria-hidden-focus`.
  */
 type AxeRuleResult = { id: string; nodes: { html: string }[] };
+const BASE_UI_HIDDEN_MARKERS = ["data-base-ui-focus-guard", "data-base-ui-inert"];
 function dropFocusGuards<T extends AxeRuleResult>(results: T[]): T[] {
   return results
     .map((r) =>
       r.id === "aria-hidden-focus"
-        ? { ...r, nodes: r.nodes.filter((n) => !n.html.includes("data-base-ui-focus-guard")) }
+        ? {
+            ...r,
+            nodes: r.nodes.filter(
+              (n) => !BASE_UI_HIDDEN_MARKERS.some((marker) => n.html.includes(marker)),
+            ),
+          }
         : r,
     )
     .filter((r) => r.id !== "aria-hidden-focus" || r.nodes.length > 0);
