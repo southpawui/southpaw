@@ -24,6 +24,9 @@
   --sp-fg-muted: var(--sp-neutral-500);
   --sp-fg-on-brand: var(--sp-neutral-0);
   --sp-fg-on-danger: var(--sp-neutral-0);
+  --sp-fg-on-success: var(--sp-neutral-0);
+  --sp-fg-on-info: var(--sp-neutral-0);
+  --sp-fg-on-warning: var(--sp-neutral-0);
 
   /* ---- Borders ---- */
   --sp-border-default: var(--sp-neutral-100); /* decorative, hairlines */
@@ -39,6 +42,11 @@
   --sp-danger: var(--sp-danger-700);
   --sp-success: var(--sp-success-700);
   --sp-success-subtle: var(--sp-success-50);
+  --sp-info-subtle: var(--sp-info-50);
+  --sp-warning-subtle: var(--sp-warning-50);
+  --sp-danger-subtle: var(--sp-danger-50);
+  --sp-info: var(--sp-info-700);
+  --sp-warning: var(--sp-warning-700);
 
   /* ---- Focus (two-tone ring) ---- */
   --sp-focus-outer: var(--sp-neutral-900);
@@ -65,6 +73,9 @@
   --sp-fg-muted: var(--sp-neutral-200);
   --sp-fg-on-brand: var(--sp-neutral-950);
   --sp-fg-on-danger: var(--sp-neutral-950);
+  --sp-fg-on-success: var(--sp-neutral-950);
+  --sp-fg-on-info: var(--sp-neutral-950);
+  --sp-fg-on-warning: var(--sp-neutral-950);
 
   /* ---- Borders ---- */
   --sp-border-default: var(--sp-neutral-600);
@@ -76,6 +87,11 @@
   --sp-danger: var(--sp-danger-300);
   --sp-success: var(--sp-success-300);
   --sp-success-subtle: var(--sp-success-900);
+  --sp-info-subtle: var(--sp-info-950);
+  --sp-warning-subtle: var(--sp-warning-950);
+  --sp-danger-subtle: var(--sp-danger-950);
+  --sp-info: var(--sp-info-300);
+  --sp-warning: var(--sp-warning-300);
 
   /* ---- Focus ---- */
   --sp-focus-outer: var(--sp-neutral-25);
@@ -101,6 +117,9 @@
   --sp-fg-muted: #1a1a1a;
   --sp-fg-on-brand: #ffffff;
   --sp-fg-on-danger: #ffffff;
+  --sp-fg-on-success: #ffffff;
+  --sp-fg-on-info: #ffffff;
+  --sp-fg-on-warning: #ffffff;
 
   /* ---- Borders (all high contrast) ---- */
   --sp-border-default: #000000;
@@ -112,6 +131,11 @@
   --sp-danger: #aa0000;
   --sp-success: #005500;
   --sp-success-subtle: #d4edda;
+  --sp-info-subtle: #e6eefb;
+  --sp-warning-subtle: #fff1db;
+  --sp-danger-subtle: #fbe3e3;
+  --sp-info: #00449e;
+  --sp-warning: #7a4100; /* 8.1:1 on white */
 
   /* ---- Focus ---- */
   --sp-focus-outer: #000000;
