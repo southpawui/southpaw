@@ -371,8 +371,12 @@ describe("Combobox", () => {
     await typeInto("a");
     await screen.findByRole("listbox");
     const trigger = document.querySelector("[data-slot=combobox-trigger]")!;
-    expect(trigger).toHaveAttribute("data-list-open");
-    expect(input().closest("[data-slot=combobox-control]")).toHaveAttribute("data-list-open");
+    // Open styling keys off aria-expanded (GEO-970), which a tooltip never sets.
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(trigger.className).toContain("aria-expanded:shadow-[inset_0_0_0_1.5px_currentColor]");
+    expect(input().closest("[data-slot=combobox-control]")!.className).toContain(
+      "has-[[aria-expanded=true]]:border-accent",
+    );
   });
 
   it("chip moves are announced in a live region outside the field", () => {

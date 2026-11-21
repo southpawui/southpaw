@@ -115,7 +115,7 @@ const focusRing =
 const topLevelItem = cn(
   "text-fg-muted inline-flex cursor-pointer items-center whitespace-nowrap rounded-[var(--radius-DEFAULT)] font-medium",
   "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
-  "hover:text-fg-default data-[popup-open]:text-fg-default [&[aria-current]]:text-fg-default",
+  "hover:text-fg-default aria-expanded:text-fg-default [&[aria-current]]:text-fg-default",
   "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
   focusRing,
 );
@@ -125,7 +125,7 @@ const topLevelItem = cn(
  * current item keeps a stronger "selected" fill. No line.
  */
 const fillHighlight =
-  "hover:bg-state-hover active:bg-state-pressed data-[popup-open]:bg-state-hover [&[aria-current]]:bg-state-selected [&[aria-current]]:font-semibold forced-colors:[&[aria-current]]:outline forced-colors:[&[aria-current]]:outline-1";
+  "hover:bg-state-hover active:bg-state-pressed aria-expanded:bg-state-hover [&[aria-current]]:bg-state-selected [&[aria-current]]:font-semibold forced-colors:[&[aria-current]]:outline forced-colors:[&[aria-current]]:outline-1";
 
 export type NavigationMenuHighlight = "line" | "fill";
 
@@ -616,7 +616,8 @@ const DesktopList = React.forwardRef<HTMLUListElement, NavigationMenuListProps>(
     const lis = (Array.from(ul.children) as HTMLElement[]).filter((li) => !li.hidden);
     const target =
       (hoverLi && !hoverLi.hidden ? hoverLi : null) ??
-      lis.find((li) => li.querySelector(":scope > [data-popup-open]")) ??
+      // aria-expanded, not data-popup-open: a Tooltip on a trigger also sets that (GEO-970).
+      lis.find((li) => li.querySelector(":scope > [aria-expanded=true]")) ??
       lis.find((li) => li.querySelector(":scope > [aria-current]")) ??
       lis.find((li) => li.hasAttribute("data-more") && li.hasAttribute("data-current")) ??
       null;
@@ -646,7 +647,7 @@ const DesktopList = React.forwardRef<HTMLUListElement, NavigationMenuListProps>(
     mo.observe(ul, {
       attributes: true,
       subtree: true,
-      attributeFilter: ["data-popup-open", "aria-current", "hidden"],
+      attributeFilter: ["aria-expanded", "aria-current", "hidden"],
     });
     const ro =
       typeof ResizeObserver === "undefined"

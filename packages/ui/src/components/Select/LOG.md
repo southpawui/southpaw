@@ -31,3 +31,10 @@ Styled Select with token system.
 - Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
 - Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
 - Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Open styling keys off `aria-expanded`, not `data-popup-open` (GEO-970 Part A)
+
+- **Why:** Base UI sets `data-popup-open` on a **Tooltip** trigger while its tooltip shows. A tooltip on a disclosure trigger therefore faked the open look. Combobox had worked around it with its own `data-list-open`.
+- **One convention now:** a trigger's open state is styled from `aria-expanded="true"`. Disclosures set it (Menu, Select, NavigationMenu and Combobox, checked in Chromium); Tooltip triggers never do.
+- The trigger's accent border and the icon rotation use `aria-expanded` (`aria-expanded:border-accent`, `[[aria-expanded=true]_&]:rotate-180`). Checked: the border goes from control to accent only when open.
+- `pnpm verify` passes all checks.

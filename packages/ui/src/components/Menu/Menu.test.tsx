@@ -634,16 +634,14 @@ describe("Menu", () => {
       </Harness>,
     );
     const trigger = screen.getByRole("button", { name: "Open" });
-    // Styling hangs off data-popup-open, which Base UI sets with aria-expanded
-    expect(trigger.className).toContain(
-      "data-[popup-open]:shadow-[inset_0_0_0_1.5px_currentColor]",
-    );
-    expect(trigger.className).toContain("forced-colors:data-[popup-open]:outline-[Highlight]");
-    expect(trigger).not.toHaveAttribute("data-popup-open");
+    // Styling hangs off aria-expanded, not data-popup-open: a Tooltip trigger sets that too
+    // while its tooltip shows, which faked the open look (GEO-970).
+    expect(trigger.className).toContain("aria-expanded:shadow-[inset_0_0_0_1.5px_currentColor]");
+    expect(trigger.className).toContain("forced-colors:aria-expanded:outline-[Highlight]");
+    expect(trigger.className).not.toContain("data-[popup-open]");
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     await user.click(trigger);
     await screen.findByRole("menu");
-    expect(trigger).toHaveAttribute("data-popup-open");
     expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 

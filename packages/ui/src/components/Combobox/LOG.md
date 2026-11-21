@@ -225,3 +225,11 @@ See the coordinator message of 2026-11-16 and the Linear comment on GEO-934 for 
 - Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
 - Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
 - Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Open styling keys off `aria-expanded`, not `data-popup-open` (GEO-970 Part A)
+
+- **Why:** Base UI sets `data-popup-open` on a **Tooltip** trigger while its tooltip shows. A tooltip on a disclosure trigger therefore faked the open look. Combobox had worked around it with its own `data-list-open`.
+- **One convention now:** a trigger's open state is styled from `aria-expanded="true"`. Disclosures set it (Menu, Select, NavigationMenu and Combobox, checked in Chromium); Tooltip triggers never do.
+- **Removed** the private `data-list-open` attribute (3 places). The control uses `has-[[aria-expanded=true]]:border-accent` (its input or trigger is expanded), and the trigger's open look and chevron use `aria-expanded:` / `group-aria-expanded/cb-trigger:`.
+- Checked in Chromium, hovering the chevron until its tooltip shows (list closed): `data-popup-open` is set and `aria-expanded=false`, there's no inset ring, and the border is only the hover border. With the list open, the inset ring and accent border appear.
+- `pnpm verify` passes all checks.

@@ -54,11 +54,10 @@ describe("Menubar", () => {
     const user = userEvent.setup();
     render(<Bar />);
     const file = screen.getByRole("menuitem", { name: "File" });
-    expect(file.className).toContain("data-[popup-open]:shadow-[inset_0_0_0_1.5px_currentColor]");
+    expect(file.className).toContain("aria-expanded:shadow-[inset_0_0_0_1.5px_currentColor]");
     await user.click(file);
     await screen.findByTestId("popup-File");
     expect(file).toHaveAttribute("aria-expanded", "true");
-    expect(file).toHaveAttribute("data-popup-open");
   });
 
   it("reuses Menu's parts", () => {

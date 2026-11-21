@@ -34,7 +34,8 @@ const Trigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
           "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
           "hover:border-fg-muted",
           "focus-visible:sp-focus-ring",
-          "data-[popup-open]:border-accent",
+          // Open: keyed to aria-expanded, not data-popup-open (a Tooltip trigger sets that too; GEO-970).
+          "aria-expanded:border-accent",
           "data-[invalid]:!border-danger",
           valid && "!border-success",
           "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
@@ -116,7 +117,7 @@ const SelectIcon = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof
       className={mergeClassName(
         cn(
           "text-fg-muted transition-transform duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-          "[[data-popup-open]_&]:rotate-180",
+          "[[aria-expanded=true]_&]:rotate-180",
         ),
         className,
       )}

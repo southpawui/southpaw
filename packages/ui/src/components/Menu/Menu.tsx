@@ -533,9 +533,10 @@ const Viewport = BaseMenu.Viewport;
 
 /**
  * Open state of a menu trigger, shared by every Menu trigger. Keyed to
- * `data-popup-open`, which Base UI sets together with `aria-expanded="true"`,
- * so the trigger only looks pressed when the accessibility tree says it is
- * expanded.
+ * `aria-expanded="true"` (GEO-970): Base UI also sets `data-popup-open` on a
+ * Tooltip trigger while its tooltip shows, so a tooltip on a menu trigger used
+ * to fake the open look. Only a disclosure sets `aria-expanded`, so the trigger
+ * looks pressed exactly when the accessibility tree says it is expanded.
  * - A pressed overlay as a background-image layer, so it darkens any Button
  *   variant (ghost, outline, solid) without replacing its colour.
  * - An inset ring in the trigger's own text colour: a non-colour cue that
@@ -543,9 +544,9 @@ const Viewport = BaseMenu.Viewport;
  * - Forced colours drop backgrounds and box-shadows: a Highlight outline.
  */
 export const menuTriggerOpenClasses = cn(
-  "data-[popup-open]:bg-[linear-gradient(var(--sp-state-pressed),var(--sp-state-pressed))]",
-  "data-[popup-open]:shadow-[inset_0_0_0_1.5px_currentColor]",
-  "forced-colors:data-[popup-open]:outline-2 forced-colors:data-[popup-open]:-outline-offset-2 forced-colors:data-[popup-open]:outline-solid forced-colors:data-[popup-open]:outline-[Highlight]",
+  "aria-expanded:bg-[linear-gradient(var(--sp-state-pressed),var(--sp-state-pressed))]",
+  "aria-expanded:shadow-[inset_0_0_0_1.5px_currentColor]",
+  "forced-colors:aria-expanded:outline-2 forced-colors:aria-expanded:-outline-offset-2 forced-colors:aria-expanded:outline-solid forced-colors:aria-expanded:outline-[Highlight]",
 );
 
 const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BaseMenu.Trigger>>(
