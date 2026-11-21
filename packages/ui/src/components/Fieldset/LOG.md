@@ -48,3 +48,11 @@
 - Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
 - Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
 - Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Fieldset.Error is no longer a live region (fired on page load) (GEO-957, GEO-970 Part A)
+
+- **Bug (GEO-939):** Fieldset.Error was `role="alert"`, so screen readers announced it on page load whenever a page rendered with an error.
+- **Fix:** no live region. The error registers its id through context, and the `<fieldset>` gets `aria-describedby` pointing at it, merged with any consumer `aria-describedby`. The error is read when focus enters the group; the ErrorSummary is what announces.
+- **Why:** this follows GOV.UK and Primer ("live regions should not be used for form validation"), and matches Base UI's Field.Error, which has no role either.
+- **Several Errors:** the registry is a list (each shown Error adds its id and removes it when hidden or unmounted), so two Fieldset.Errors both describe the fieldset and hiding one keeps the other. Found in the sign-off /improve pass.
+- **Tests (rewritten):** no `role`; the fieldset's description is the error; a consumer `aria-describedby` is kept; two Errors both describe it and hiding one keeps the other; an empty Error isn't rendered and doesn't describe the fieldset. `pnpm verify fieldset` passes all checks.

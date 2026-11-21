@@ -260,6 +260,7 @@ export const Themes: Story = {
                 <RadioOption value="free" label="Free" />
                 <RadioOption value="pro" label="Pro" />
               </RadioGroup.Root>
+              <Field.Error>Select a plan</Field.Error>
             </Field.Root>
             <Field.Root disabled>
               <Field.Label>Disabled</Field.Label>

@@ -46,3 +46,11 @@ Added `direction` prop: `"row"` for inline checkbox/radio + label, `"column"` (d
 - Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
 - Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
 - Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Field.Error renders when only Root `invalid` is set (GEO-957, GEO-970 Part A)
+
+- **Bug:** Base UI's Field.Error renders only for real constraint validity or `match`. A `<Field.Root invalid>` from app or server validation gave a red field with **no message** (WCAG 3.3.1).
+- **Fix:** Field.Root provides `FieldInvalidContext`, and Field.Error defaults `match` to `true` when the Root is `invalid` **and** the Error has content. An explicit `match` and the constraint-validity behaviour are unchanged, and an empty Error stays hidden.
+- **Audit (Playwright):** every story with an invalid Field across 13 components now shows its message (23 stories, for example Input Themes 3/3 and Combobox Themes 6/6). Story gaps were fixed in Checkbox, RadioGroup, Switch, NumberField and OTPField.
+- **Tests:** Root `invalid` renders the message; it stays hidden without `invalid`; an explicit `match` still wins.
+- **Verify:** `pnpm verify field` fails only on the pre-existing Input.Phone duplicate IDs.

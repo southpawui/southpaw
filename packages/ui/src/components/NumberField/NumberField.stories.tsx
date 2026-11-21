@@ -29,7 +29,7 @@ function Demo({ label, description, error, invalid, group, ...root }: DemoProps)
         <NumberField.Group {...group} />
       </NumberField.Root>
       {description && <Field.Description>{description}</Field.Description>}
-      {error && <Field.Error match>{error}</Field.Error>}
+      {error && <Field.Error>{error}</Field.Error>}
     </Field.Root>
   );
 }
@@ -191,7 +191,13 @@ export const Themes: Story = {
             <Demo label="Split" controls="split" defaultValue={2} />
             <Demo label="None" controls="none" defaultValue={2} />
             <Demo label="Stacked (lg)" controls="stacked" size="lg" defaultValue={2} />
-            <Demo label="Split, error" controls="split" defaultValue={2} invalid />
+            <Demo
+              label="Split, error"
+              controls="split"
+              defaultValue={2}
+              invalid
+              error="Quantity must be 5 or more"
+            />
             <Demo label="Split, disabled" controls="split" defaultValue={2} disabled />
           </div>
           <div className="flex flex-col gap-4">

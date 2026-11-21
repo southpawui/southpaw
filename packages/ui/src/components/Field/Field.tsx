@@ -4,6 +4,13 @@ import { WarningCircle } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
 
+/**
+ * Whether the nearest Field.Root was given `invalid` (e.g. app or server validation). Base UI's
+ * Field.Error only renders for real constraint validity or `match`, so a Root `invalid` alone
+ * gave a red field with no message (GEO-957). Field.Error reads this to default `match`.
+ */
+const FieldInvalidContext = React.createContext(false);
+
 /* ----- Root ----- */
 interface FieldRootProps extends React.ComponentProps<typeof BaseField.Root> {
   /** Layout orientation. Horizontal stacks vertically on mobile automatically. */
@@ -12,20 +19,22 @@ interface FieldRootProps extends React.ComponentProps<typeof BaseField.Root> {
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(
   ({ className, orientation = "vertical", ...props }, ref) => (
-    <BaseField.Root
-      ref={ref}
-      data-slot="field"
-      data-orientation={orientation}
-      className={mergeClassName(
-        cn(
-          "flex gap-1.5",
-          orientation === "vertical" && "w-full flex-col",
-          orientation === "horizontal" && "flex-col sm:flex-row sm:items-start sm:gap-4",
-        ),
-        className,
-      )}
-      {...props}
-    />
+    <FieldInvalidContext.Provider value={Boolean(props.invalid)}>
+      <BaseField.Root
+        ref={ref}
+        data-slot="field"
+        data-orientation={orientation}
+        className={mergeClassName(
+          cn(
+            "flex gap-1.5",
+            orientation === "vertical" && "w-full flex-col",
+            orientation === "horizontal" && "flex-col sm:flex-row sm:items-start sm:gap-4",
+          ),
+          className,
+        )}
+        {...props}
+      />
+    </FieldInvalidContext.Provider>
   ),
 );
 Root.displayName = "Field.Root";
@@ -125,16 +134,22 @@ const ErrorIcon = () => (
 );
 
 const Error = React.forwardRef<HTMLDivElement, FieldErrorProps>(
-  ({ className, hideIcon = false, errors, children, ...props }, ref) => {
+  ({ className, hideIcon = false, errors, children, match: matchProp, ...props }, ref) => {
     // Determine content: errors array takes precedence over children
     const hasMultiple = errors && errors.length > 1;
     const singleError = errors?.[0] ?? children;
+    // GEO-957: a Root `invalid` (app/server validation) shows the message. An explicit `match`
+    // and Base UI's constraint-validity behaviour are unchanged; an empty Error stays hidden.
+    const rootInvalid = React.useContext(FieldInvalidContext);
+    const hasContent = Boolean(errors?.length) || (children != null && children !== false);
+    const match = matchProp ?? (rootInvalid && hasContent ? true : undefined);
 
     return (
       <BaseField.Error
         ref={ref}
         data-slot="field-error"
         className={mergeClassName(cn("text-danger flex gap-1.5 text-sm"), className)}
+        match={match}
         {...props}
       >
         {!hideIcon && <ErrorIcon />}

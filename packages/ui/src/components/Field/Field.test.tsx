@@ -151,6 +151,39 @@ describe("Field.Description", () => {
 });
 
 describe("Field.Error", () => {
+  it("renders when only Field.Root invalid is set (GEO-957 regression)", () => {
+    render(
+      <Field.Root invalid>
+        <Field.Label>Email</Field.Label>
+        <Input />
+        <Field.Error>Enter an email address</Field.Error>
+      </Field.Root>,
+    );
+    expect(screen.getByText("Enter an email address")).toBeInTheDocument();
+  });
+
+  it("stays hidden when the Root isn't invalid and nothing failed validation", () => {
+    render(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input />
+        <Field.Error>Enter an email address</Field.Error>
+      </Field.Root>,
+    );
+    expect(screen.queryByText("Enter an email address")).not.toBeInTheDocument();
+  });
+
+  it("an explicit match still wins over the Root invalid default", () => {
+    render(
+      <Field.Root invalid>
+        <Field.Label>Email</Field.Label>
+        <Input />
+        <Field.Error match="typeMismatch">Wrong format</Field.Error>
+      </Field.Root>,
+    );
+    expect(screen.queryByText("Wrong format")).not.toBeInTheDocument();
+  });
+
   // Base UI's Field.Error conditionally renders based on native validation.
   // Use match={true} to force it visible for testing our wrapper.
   it("renders single error from children", () => {

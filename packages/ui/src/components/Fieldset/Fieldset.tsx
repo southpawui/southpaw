@@ -8,21 +8,50 @@ import { mergeClassName } from "../../lib/merge-class-name";
  * Root
  * ============================================================ */
 
+/**
+ * Lets Fieldset.Error register its id so the <fieldset> is described by it (GEO-957 / GEO-939).
+ * The error used to be a role="alert" live region, which screen readers announced on page load
+ * whenever the page rendered with an error. Validation messages aren't live regions (GOV.UK,
+ * Primer; Base UI's Field.Error has no role either): the ErrorSummary announces, and the
+ * group's description is read when focus enters it.
+ */
+/** Each shown Fieldset.Error adds its id, and removes it when hidden or unmounted. */
+type FieldsetErrorRegistry = { add: (id: string) => void; remove: (id: string) => void };
+const FieldsetErrorContext = React.createContext<FieldsetErrorRegistry | null>(null);
+
 const Root = React.forwardRef<HTMLFieldSetElement, React.ComponentProps<typeof BaseFieldset.Root>>(
-  ({ className, ...props }, ref) => (
-    <BaseFieldset.Root
-      ref={ref}
-      data-slot="fieldset"
-      className={cn(
-        "border-border-default rounded-lg border p-6",
-        // No container opacity when disabled (GEO-962): the controls and Field.Labels inside dim
-        // themselves (native :disabled / Base UI data-disabled from this Fieldset), so dimming the
-        // container too left them at ~0.14. Only the legend and description dim here.
-        className,
-      )}
-      {...props}
-    />
-  ),
+  ({ className, children, ...props }, ref) => {
+    // A list, so several Fieldset.Errors (or one remounting) don't clear each other.
+    const [errorIds, setErrorIds] = React.useState<string[]>([]);
+    const registry = React.useMemo<FieldsetErrorRegistry>(
+      () => ({
+        add: (id) => setErrorIds((ids) => (ids.includes(id) ? ids : [...ids, id])),
+        remove: (id) => setErrorIds((ids) => ids.filter((x) => x !== id)),
+      }),
+      [],
+    );
+    const describedBy =
+      [props["aria-describedby"], ...errorIds].filter(Boolean).join(" ") || undefined;
+    return (
+      <FieldsetErrorContext.Provider value={registry}>
+        <BaseFieldset.Root
+          ref={ref}
+          data-slot="fieldset"
+          className={cn(
+            "border-border-default rounded-lg border p-6",
+            // No container opacity when disabled (GEO-962): the controls and Field.Labels inside dim
+            // themselves (native :disabled / Base UI data-disabled from this Fieldset), so dimming the
+            // container too left them at ~0.14. Only the legend and description dim here.
+            className,
+          )}
+          {...props}
+          aria-describedby={describedBy}
+        >
+          {children}
+        </BaseFieldset.Root>
+      </FieldsetErrorContext.Provider>
+    );
+  },
 );
 Root.displayName = "Fieldset.Root";
 
@@ -83,15 +112,24 @@ interface FieldsetErrorProps extends React.ComponentPropsWithRef<"p"> {
 }
 
 const Error = React.forwardRef<HTMLParagraphElement, FieldsetErrorProps>(
-  ({ className, errors, children, ...props }, ref) => {
+  ({ className, errors, children, id: idProp, ...props }, ref) => {
     const content = errors?.length ? errors : children ? [children] : [];
-    if (!content.length) return null;
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
+    const register = React.useContext(FieldsetErrorContext);
+    const shown = content.length > 0;
+    React.useEffect(() => {
+      if (!register || !shown) return;
+      register.add(id);
+      return () => register.remove(id);
+    }, [register, shown, id]);
+    if (!shown) return null;
 
     return (
       <div
         ref={ref}
+        id={id}
         data-slot="fieldset-error"
-        role="alert"
         className={mergeClassName(
           cn("text-danger mt-2 flex items-start gap-1.5 text-sm"),
           className,
