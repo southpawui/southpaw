@@ -769,7 +769,7 @@ const StatesGrid = () => (
       warning
       defaultValue="Durian"
       defaultInputValue="Durian"
-      description="Out of season. (Amber arrives with --sp-warning at the restack.)"
+      description="Out of season."
     />
     <StateField label="Error" invalid error="Choose a fruit from the list." />
     <StateField label="Disabled" disabled defaultValue="Mango" defaultInputValue="Mango" />
@@ -777,11 +777,7 @@ const StatesGrid = () => (
     <StateField label="Loading" loading />
     <StateField label="Required" required input={{ required: true }} />
     <MultiStateField label="Multiple, valid" valid description="Looks good." />
-    <MultiStateField
-      label="Multiple, warning"
-      warning
-      description="Rust is new to the team. (Amber arrives with --sp-warning at the restack.)"
-    />
+    <MultiStateField label="Multiple, warning" warning description="Rust is new to the team." />
     <MultiStateField label="Multiple, error" invalid error="Choose at most one language." />
     <MultiStateField label="Multiple, read-only" readOnly />
     <MultiStateField label="Multiple, disabled" disabled />

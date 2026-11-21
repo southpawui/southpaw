@@ -49,7 +49,7 @@ function StateSet({ className, ...extra }: Partial<OTPFieldRootProps> & { classN
       <Demo label="Valid" groups={[3, 3]} defaultValue="482913" valid {...extra} />
       <Demo
         label="Warning"
-        description="Pending the --sp-warning token (PR #44). Falls back to a dark border until the restack."
+        description="This code expires in under a minute."
         groups={[3, 3]}
         defaultValue="482913"
         warning

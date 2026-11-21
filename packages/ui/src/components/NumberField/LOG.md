@@ -1,5 +1,13 @@
 # NumberField — Change Log
 
+## 2026-11-21 — Warning state now uses the `--sp-warning` token (GEO-970)
+
+The warning border was written as `border-[var(--sp-warning,var(--sp-fg-default))]`, which fell back to a dark border while the token was still on another branch (PR #44). The token is on the base now, so the state uses the `border-warning` utility and the fallback is gone. The test now checks for `border-warning`, and the warning story's "pending the token" note is replaced with real hint text. Checked with Playwright: the border is `#b45309` in light, `#fcd34d` in dark and `#7a4100` in high contrast, the same as the token.
+
+## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
+
+`sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the group's `forced-colors:has-[input:focus-visible]:outline-*` fallback is gone. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
+
 ## 2026-11-16 — Sign-off (GEO-929)
 
 George signed off ("looks good"), relayed by the coordinator. I ran `/improve` scoped to this folder; the plans are in the gitignored `plans/` folder. It found three issues, all fixed here, each with a regression test:

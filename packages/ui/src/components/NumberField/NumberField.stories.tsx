@@ -56,7 +56,7 @@ function StateSet({
       <Demo label="Valid" controls={controls} defaultValue={3} valid />
       <Demo
         label="Warning"
-        description="Pending the --sp-warning token (PR #44). Falls back to a dark border until the restack."
+        description="Unusually high. Check the value before you continue."
         controls={controls}
         defaultValue={98}
         warning

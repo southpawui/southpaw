@@ -513,12 +513,7 @@ const StatesGrid = () => (
     <StateField label="Default" />
     <StateField label="Filled" defaultValue="react" />
     <StateField label="Valid" valid defaultValue="react" description="Looks good." />
-    <StateField
-      label="Warning"
-      warning
-      defaultValue="reactt"
-      description="Did you mean “react”? (Amber arrives with --sp-warning at the restack.)"
-    />
+    <StateField label="Warning" warning defaultValue="reactt" description="Did you mean “react”?" />
     <StateField label="Error" invalid error="Enter a tag." />
     <StateField label="Disabled" disabled defaultValue="react" />
     <StateField label="Read-only" readOnly defaultValue="react" />

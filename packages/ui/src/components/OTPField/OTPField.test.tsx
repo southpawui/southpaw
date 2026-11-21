@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OTPField, defaultSlotLabel, type OTPFieldRootProps } from "./OTPField";
 import { Field } from "../Field/Field";
+import { Form } from "../Form/Form";
 
 function Labelled({ invalid, ...root }: OTPFieldRootProps & { invalid?: boolean }) {
   return (
@@ -183,8 +184,27 @@ describe("OTPField", () => {
       const { container } = render(<Labelled length={3} valid warning />);
       expect(root(container)).toHaveAttribute("data-warning");
       expect(root(container)).not.toHaveAttribute("data-success");
-      expect(slots(container)[0].className).toContain("--sp-warning");
+      expect(slots(container)[0].className).toContain("border-warning");
       expect(slots(container)[0].className).not.toContain("border-success");
+    });
+
+    it("marks slots aria-invalid when the field fails validation on submit", async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <Form aria-label="Verify">
+          <Field.Root name="code">
+            <Field.Label>Code</Field.Label>
+            <OTPField.Root length={3} required />
+          </Field.Root>
+          <button type="submit">Verify</button>
+        </Form>,
+      );
+      expect(slots(container)[0]).not.toHaveAttribute("aria-invalid");
+      await user.click(screen.getByRole("button", { name: "Verify" }));
+      for (const slot of slots(container)) {
+        expect(slot).toHaveAttribute("data-invalid");
+        expect(slot).toHaveAttribute("aria-invalid", "true");
+      }
     });
 
     it("marks slots aria-invalid from Field", () => {

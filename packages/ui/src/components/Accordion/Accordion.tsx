@@ -655,8 +655,6 @@ const Trigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>((prop
         "text-fg-default flex w-full cursor-pointer items-center text-start font-medium",
         "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
         "focus-visible:sp-focus-ring outline-none",
-        // box-shadow rings are dropped in forced colours: fall back to an outline
-        "forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
         "aria-disabled:cursor-default aria-disabled:hover:bg-transparent aria-disabled:active:bg-transparent",
         collapsibleStyles.triggerSize[root.size],

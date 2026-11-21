@@ -11,6 +11,7 @@
 @import "./semantic.css";
 @import "./density.css";
 @import "./motion.css";
+@import "./keyframes.css";
 @import "./compat.css";
 @import "./theme.css";
 @import "./focus-ring.css";

@@ -298,15 +298,26 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "placeholder:text-fg-muted focus:placeholder:text-transparent",
               !hasState && "enabled:not-read-only:hover:border-fg-muted",
               ctx.valid && !ctx.warning && "border-success",
-              ctx.warning && "border-[var(--sp-warning,var(--sp-fg-default))]",
+              ctx.warning && "border-warning",
               "aria-invalid:!border-danger",
               "focus-visible:sp-focus-ring",
-              // GEO-950: box-shadow rings vanish in forced colours — draw a system outline instead.
-              "forced-colors:focus-visible:outline-solid forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-2 forced-colors:focus-visible:outline-[Highlight]",
               "disabled:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-[var(--sp-state-disabled-opacity)]",
               "read-only:bg-surface-sunken read-only:border-border-default",
             ),
             className,
+          )}
+          // Base UI sets aria-invalid only from Field.Root's `invalid` prop. A field that
+          // fails validation (e.g. on Form submit) gets data-invalid but not aria-invalid,
+          // so screen readers miss it and the error border doesn't apply. Mirror the
+          // field's validity onto each slot.
+          render={(inputProps, state) => (
+            <input
+              {...inputProps}
+              aria-invalid={
+                inputProps["aria-invalid"] ??
+                (state.valid === false && !state.disabled ? true : undefined)
+              }
+            />
           )}
           {...props}
         />

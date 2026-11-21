@@ -60,8 +60,9 @@ const Tab = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Base
         "hover:text-fg-default",
         // Focus
         "focus-visible:sp-focus-ring",
-        // Selected — uses accent, shows weight change
-        "data-[selected]:text-accent data-[selected]:font-semibold",
+        // Selected: accent and a weight change. Base UI 1.9 marks the selected tab
+        // with data-active (not data-selected).
+        "data-[active]:text-accent data-[active]:font-semibold",
         // Disabled
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
         className,

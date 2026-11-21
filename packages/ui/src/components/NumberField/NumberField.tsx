@@ -222,11 +222,8 @@ const Group = React.forwardRef<HTMLDivElement, NumberFieldGroupProps>(
               "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
               "hover:border-fg-muted",
               "has-[input:focus-visible]:sp-focus-ring",
-              // GEO-950: box-shadow rings vanish in forced colours — draw a system outline instead.
-              "forced-colors:has-[input:focus-visible]:outline-solid forced-colors:has-[input:focus-visible]:outline-2 forced-colors:has-[input:focus-visible]:outline-offset-2 forced-colors:has-[input:focus-visible]:outline-[Highlight]",
               ctx.valid && !ctx.warning && "border-success hover:border-success",
-              ctx.warning &&
-                "border-[var(--sp-warning,var(--sp-fg-default))] hover:border-[var(--sp-warning,var(--sp-fg-default))]",
+              ctx.warning && "border-warning hover:border-warning",
               "data-[invalid]:!border-danger",
               "data-[disabled]:bg-surface-sunken data-[disabled]:border-border-control data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
               // Also disabled by an ancestor <fieldset disabled> (e.g. a disabled ButtonGroup): Base UI
