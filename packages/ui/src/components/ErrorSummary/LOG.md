@@ -1,5 +1,9 @@
 # Error Summary — Change Log
 
+## 2026-11-21 — Ignore VisuallyHidden text when reading labels (GEO-968)
+
+`visibleText()` builds error messages from a field's visible label. It now also strips `[data-slot="visually-hidden"]` as well as `.sr-only`. VisuallyHidden's `focusable` mode has no bare `.sr-only` class, so its text leaked into messages, for example "Enter postcode (shown on focus)". The new test fails without this change. This was VisuallyHidden decision 9.
+
 ## 2026-11-21 — Demo form adds NumberField and OTPField (GEO-970)
 
 The Default demo now includes the two form controls that weren't on the branch when ErrorSummary was built:

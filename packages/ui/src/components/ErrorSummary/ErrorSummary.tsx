@@ -679,7 +679,10 @@ function labelText(node: HTMLElement, control: HTMLElement | null) {
 /** Text a sighted user reads: no aria-hidden marks, no visually hidden prefixes. */
 function visibleText(el: Element) {
   const clone = el.cloneNode(true) as Element;
-  clone.querySelectorAll('[aria-hidden="true"], .sr-only').forEach((n) => n.remove());
+  // VisuallyHidden's `focusable` mode has no bare .sr-only class, so match its slot too
+  clone
+    .querySelectorAll('[aria-hidden="true"], .sr-only, [data-slot="visually-hidden"]')
+    .forEach((n) => n.remove());
   return clone.textContent?.replace(/\s+/g, " ").trim() ?? "";
 }
 

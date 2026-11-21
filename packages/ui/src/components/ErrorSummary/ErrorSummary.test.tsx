@@ -17,6 +17,7 @@ import { Input } from "../Input/Input";
 import { RadioGroup } from "../RadioGroup/RadioGroup";
 import { Select } from "../Select/Select";
 import { Combobox } from "../Combobox/Combobox";
+import { VisuallyHidden } from "../VisuallyHidden/VisuallyHidden";
 import { renderToString } from "react-dom/server";
 
 const summary = () => document.querySelector<HTMLElement>("[data-slot=error-summary]")!;
@@ -410,6 +411,25 @@ describe("ErrorSummary sign-off regressions", () => {
     );
     await user.click(screen.getByRole("button", { name: "Go" }));
     expect(await screen.findByRole("link", { name: "Enter search" })).toBeInTheDocument();
+  });
+
+  it("leaves VisuallyHidden text (including focusable) out of the label in messages", async () => {
+    const user = userEvent.setup();
+    render(
+      <Form>
+        <ErrorSummary.Root updateTitle={false} focusTarget="none" />
+        <Field.Root name="postcode">
+          <Field.Label>
+            Postcode<VisuallyHidden> for delivery</VisuallyHidden>
+            <VisuallyHidden focusable> (shown on focus)</VisuallyHidden>
+          </Field.Label>
+          <Input required />
+        </Field.Root>
+        <button type="submit">Go</button>
+      </Form>,
+    );
+    await user.click(screen.getByRole("button", { name: "Go" }));
+    expect(await screen.findByRole("link", { name: "Enter postcode" })).toBeInTheDocument();
   });
 
   it("a Combobox gets Select wording", async () => {
