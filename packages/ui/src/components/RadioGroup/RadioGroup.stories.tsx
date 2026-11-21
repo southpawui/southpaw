@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { RadioGroup } from "./RadioGroup";
 import { Field } from "../Field/Field";
+import { cn } from "../../lib/cn";
 
 const meta: Meta = {
   title: "Components/RadioGroup",
@@ -141,12 +142,12 @@ function ChoiceCard({
       render={
         // eslint-disable-next-line jsx-a11y/label-has-associated-control -- Field.Item wires the association at runtime via Base UI
         <label
-          className={
-            "border-border-control flex cursor-pointer items-start gap-3 rounded-lg border-2 p-4 " +
-            "transition-[border-color,background-color] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]" +
-            "hover:border-fg-muted" +
-            "has-[[data-checked]]:border-accent has-[[data-checked]]:bg-accent/5"
-          }
+          className={cn(
+            "border-border-control flex cursor-pointer items-start gap-3 rounded-lg border-2 p-4",
+            "transition-[border-color,background-color] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+            "hover:border-fg-muted",
+            "has-[[data-checked]]:border-accent has-[[data-checked]]:bg-accent/5",
+          )}
         />
       }
     >
