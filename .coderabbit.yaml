@@ -1,4 +1,5 @@
-language: en
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-GB
 reviews:
   profile: assertive
   request_changes_workflow: true
@@ -6,23 +7,70 @@ reviews:
   poem: false
   review_status: true
   collapse_walkthrough: false
-  path_instructions:
-    - path: "packages/tokens/**"
-      instructions: |
-        Review token naming for consistency with the three-tier system:
-        primitive (--sp-*), semantic (--sp-color-*), component (--sp-button-*).
-        Flag any raw colour values that should be tokens.
-    - path: "packages/ui/**"
-      instructions: |
-        Ensure components use semantic tokens, not primitive values.
-        Check for proper data-slot attributes on all sub-elements.
-        Verify accessibility: ARIA attributes, keyboard handling, focus management.
-        Flag any runtime CSS-in-JS — only Tailwind classes and CSS variables are allowed.
-    - path: "apps/docs/**"
-      instructions: |
-        Check that doc pages follow the component template structure from BRIEF.md section 8.
   auto_review:
     enabled: true
     drafts: false
+    # Stacked PRs target the previous branch, not main. Without this, only
+    # the trunk PR (phase-* → main) would ever be reviewed.
+    base_branches:
+      - "^phase-.*"
+      - "^geo-\\d+-.*"
+  path_filters:
+    # Generated output: never review.
+    - "!apps/docs/public/r/**"
+    - "!apps/docs/registry/__index__.ts"
+    - "!apps/docs/registry/__components__.tsx"
+    - "!**/*.tsbuildinfo"
+    - "!pnpm-lock.yaml"
+    - "!e2e/__screenshots__/**"
+  path_instructions:
+    - path: "packages/tokens/**"
+      instructions: |
+        Two-tier token system: primitives and semantic. There is no component tier.
+        All library-owned variables use the --sp-* prefix.
+        Theme switching is data-theme="light|dark|high-contrast" plus forced-colors;
+        density is data-density="compact|default|comfortable" on a 4px grid.
+        Flag raw colour values that should be tokens. Flag new tokens for things
+        Tailwind already handles well ("only tokenise what Tailwind doesn't").
+        Check every new colour token is defined for light, dark AND high-contrast.
+    - path: "packages/ui/src/components/**"
+      instructions: |
+        Every component wraps a Base UI (@base-ui/react 1.9) primitive.
+        Flag raw interactive HTML (<button>, <input>, <select>, <dialog>, <a> with
+        handlers, etc.); use Base UI primitives or an existing Southpaw component.
+        The only approved exception is NativeSelect.
+        Every sub-element needs a data-slot attribute.
+        Use semantic tokens only, never primitive values or raw colours.
+        Brand colour is for CTAs only; accent is for UI controls.
+        Disabled items must have no hover state.
+        Every icon-only button needs a Tooltip.
+        className must be merged with mergeClassName (it can be a function from
+        Base UI); flag plain cn(className) where className may be a function.
+        Open/expanded styling should key off aria-expanded, not data-popup-open.
+        Check ARIA, keyboard handling, focus management and RTL.
+        No runtime CSS-in-JS: Tailwind classes and CSS variables only.
+        Each changed component must have its LOG.md updated in the same PR.
+    - path: "packages/ui/src/**/*.test.tsx"
+      instructions: |
+        Vitest + Testing Library. Prefer role/name queries over test IDs.
+        Flag tests that assert implementation details instead of behaviour.
+    - path: "packages/ui/src/**/*.stories.tsx"
+      instructions: |
+        Stories must include Default, States, Density and Themes. States and
+        Themes must show ALL states (default, valid, error, disabled) and ALL
+        variants, sizes and colour options. Wrap examples in sm:max-w-md or
+        sm:max-w-lg. Flag duplicate IDs across stories.
+    - path: "packages/registry/**"
+      instructions: |
+        The registry is the single source for docs demos and the install CLI.
+        Output must follow the shadcn registry-item schema. Installed files mirror
+        packages/ui so relative imports keep working.
+    - path: "apps/docs/**"
+      instructions: |
+        Next.js 16 + Fumadocs. Demos come from packages/registry/examples, never
+        inline copies. Component pages follow the template: what it is + live
+        example, when to use / not use, anatomy, variants, states, content
+        guidance, accessibility (keyboard map, ARIA, known issues), API reference.
+        Flag hard-coded colours; the docs theme uses --sp-* tokens.
 chat:
   auto_reply: true
