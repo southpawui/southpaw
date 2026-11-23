@@ -44,6 +44,7 @@
   --color-skeleton-highlight: var(--sp-skeleton-highlight);
   --color-skeleton-outline: var(--sp-skeleton-outline);
   --color-indicator-ring: var(--sp-indicator-ring);
+  --color-backdrop-loading: var(--sp-backdrop-loading);
 
   /* ---- Borders ---- */
   --color-border-default: var(--sp-border-default);

@@ -126,3 +126,13 @@
     scale: 1.2;
   }
 }
+
+/* ---- LoadingOverlay (GEO-965) ---- */
+
+/* The overlay fades in. Runs on --sp-duration-fast, so it's instant under
+ * reduced motion. (Fade-out is a transition while it stays mounted.) */
+@keyframes sp-loading-overlay-in {
+  from {
+    opacity: 0;
+  }
+}
