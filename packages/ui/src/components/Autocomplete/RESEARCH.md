@@ -1,39 +1,35 @@
 # Autocomplete — Competitive Research
 
-Researched: 2026-11-08
+Researched: 2026-11-08 (thin first pass). Redone 2026-11-16 across all 9 libraries (GEO-934).
 
-## Feature comparison
+**The full analysis lives in [Combobox/RESEARCH.md](../Combobox/RESEARCH.md).** Combobox and Autocomplete share their anatomy, styling and most behaviour, so they are researched and built together.
 
-| Feature                   | shadcn | Mantine | Chakra | MUI | Spectrum | React Select | Ours |
-| ------------------------- | ------ | ------- | ------ | --- | -------- | ------------ | ---- |
-| Searchable/filterable     | Yes    | Yes     | Yes    | Yes | Yes      | Yes          | Yes  |
-| Async data loading        | No     | No      | No     | Yes | Yes      | Yes          | No   |
-| Multi-select              | No     | Yes     | Yes    | Yes | Yes      | Yes          | No   |
-| Grouped options           | Yes    | Yes     | No     | Yes | Yes      | Yes          | Yes  |
-| Free-solo (custom values) | No     | No      | No     | Yes | No       | Yes          | No   |
-| Clear button              | Yes    | Yes     | Yes    | Yes | Yes      | Yes          | Yes  |
-| Empty state message       | Yes    | Yes     | Yes    | Yes | Yes      | Yes          | Yes  |
-| Debounced search          | No     | No      | No     | No  | Yes      | Yes          | No   |
-| Virtual scrolling         | No     | Yes     | No     | Yes | No       | Yes          | No   |
+## How Autocomplete differs from Combobox
 
-## Must-add features
+Base UI's guidance, which matches GOV.UK, Carbon and React Aria:
 
-- **Async data loading** with loading state (MUI, Spectrum, React Select)
-- **Multi-select** mode (MUI, Mantine — multiple libraries offer this)
-- **Free-solo mode** — allow custom values not in list (MUI)
-- **Virtual scrolling** for large lists (MUI, React Select — 2+ libraries)
-- **Debounced search** for async use cases (Spectrum)
+- **Combobox** restricts the value to the list. It is a filterable Select. Typed text that matches nothing is reverted.
+- **Autocomplete** is a text input whose value is whatever the user types. The list only suggests. Use it for search boxes, free-text fields with suggestions, and command palettes.
 
-## Accessibility
+The library equivalents are:
 
-- Input has `role="combobox"`, `aria-expanded`, `aria-controls`
-- Listbox: `role="listbox"` on popup, `role="option"` on items
-- Keyboard: Arrow Up/Down to navigate, Enter to select, Escape to close
-- Empty state: announce "No results" to screen readers
-- `aria-selected` on highlighted/selected item
+| Library      | Restricted (Combobox)            | Free text (Autocomplete)                        |
+| ------------ | -------------------------------- | ----------------------------------------------- |
+| shadcn       | Combobox                         | Base UI Autocomplete                            |
+| Mantine      | Select (searchable), MultiSelect | Autocomplete, TagsInput                         |
+| Chakra / Ark | Combobox                         | Combobox `allowCustomValue`                     |
+| MUI          | Autocomplete                     | Autocomplete `freeSolo`                         |
+| Ant          | Select `showSearch`              | AutoComplete                                    |
+| GOV.UK       | accessible-autocomplete          | accessible-autocomplete `confirmOnBlur={false}` |
+| Carbon       | ComboBox                         | ComboBox `allowCustomValue`                     |
+| React Aria   | ComboBox                         | ComboBox `allowsCustomValue`, Autocomplete      |
+| Primer       | SelectPanel                      | Autocomplete                                    |
 
-## Sources
+## Autocomplete-specific features
 
-- [MUI Autocomplete](https://mui.com/material-ui/react-autocomplete/)
-- [Spectrum ComboBox](https://react-spectrum.adobe.com/react-spectrum/ComboBox.html)
-- [React Select](https://react-select.com/)
+- **Inline completion**: the rest of the highlighted suggestion is filled in and selected in the input (MUI `autoComplete`, Chakra `inputBehavior="autocomplete"`, Carbon `typeahead`, Ant `backfill`). Base UI: `mode="both"` / `"inline"`.
+- **Command palette**: a filter input paired with a list inside a dialog (React Aria Autocomplete, Base UI example).
+- **Grid of suggestions** (Base UI `grid`), for emoji or icon pickers.
+- **Fuzzy matching** (Base UI example), and **limit results** (Mantine, Chakra, MUI).
+- **Async search** with loading and error states (MUI, Ant, Mantine, Primer).
+- **Submit on Enter** while the list is open (Chakra `alwaysSubmitOnEnter`), for search forms.
