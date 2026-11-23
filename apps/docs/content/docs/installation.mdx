@@ -1,0 +1,60 @@
+---
+title: Installation
+description: Add Southpaw UI components to a React project with Tailwind v4.
+---
+
+## Requirements
+
+- React 19
+- Tailwind CSS v4
+- A [shadcn-compatible project](https://ui.shadcn.com/docs/installation) (a `components.json` file and an `@/` path alias)
+
+## Add a component
+
+Each component page has an **Installation** section with the exact command. For example:
+
+```bash
+pnpm dlx shadcn@latest add http://localhost:3001/r/dialog.json
+```
+
+The CLI copies the component into `components/southpaw/`, adds the shared `cn` helper and the design tokens, and installs the npm dependencies.
+
+<Callout title="Registry address">
+  The docs don't have a public domain yet, so commands point at a local docs server on port 3001.
+</Callout>
+
+## Import the tokens
+
+Import the tokens once, after Tailwind, in your global CSS:
+
+```css
+@import "tailwindcss";
+@import "./components/southpaw/tokens/index.css";
+```
+
+## Isolate your app root
+
+Dialogs, selects and other popups render in a portal at the end of `<body>`. Give your app's root element its own stacking context so they always appear above it, whatever z-index your header or sidebar uses:
+
+```tsx
+<body>
+  <div className="isolate">{children}</div>
+</body>
+```
+
+This is [Base UI's recommended setup](https://base-ui.com/react/overview/quick-start).
+
+## Set a theme and density
+
+Southpaw reads two attributes, normally on `<html>`. Either works on any element, so you can theme or densify part of a page.
+
+```html
+<html data-theme="light" data-density="default"></html>
+```
+
+| Attribute      | Values                              |
+| -------------- | ----------------------------------- |
+| `data-theme`   | `light`, `dark`, `high-contrast`    |
+| `data-density` | `compact`, `default`, `comfortable` |
+
+Windows High Contrast (`forced-colors: active`) is handled automatically.

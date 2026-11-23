@@ -1,5 +1,17 @@
 # Dialog — Change Log
 
+## 2026-11-21 — JSDoc for the docs API reference (GEO-894)
+
+### What changed
+
+- Comment-only JSDoc above every part (Root, Trigger, Portal, Backdrop, Popup, Header, Body, Footer, Title, Description, Close, CloseButton) and the `Dialog` compound.
+- `size` JSDoc now gives each width and `@default "md"`.
+- No code changes.
+
+### Why
+
+- The docs site's API reference (`<AutoTypeTable>`, fumadocs-typescript) reads prop descriptions from JSDoc. George approved comment-only JSDoc here (2026-11-21). Comments sit above declarations so they don't collide with GEO-970 Part A's wrapper edits.
+
 ## 2026-11-11 — Full enhancement
 
 ### What changed

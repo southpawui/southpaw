@@ -3,7 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./examples/*": "./examples/*.tsx"
+  },
   "scripts": {
     "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@southpawui/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@phosphor-icons/react": "^2.1.10"
   }
 }
