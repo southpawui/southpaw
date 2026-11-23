@@ -40,6 +40,9 @@
   --color-link: var(--sp-link);
   --color-link-hover: var(--sp-link-hover);
   --color-link-visited: var(--sp-link-visited);
+  --color-skeleton: var(--sp-skeleton);
+  --color-skeleton-highlight: var(--sp-skeleton-highlight);
+  --color-skeleton-outline: var(--sp-skeleton-outline);
 
   /* ---- Borders ---- */
   --color-border-default: var(--sp-border-default);
