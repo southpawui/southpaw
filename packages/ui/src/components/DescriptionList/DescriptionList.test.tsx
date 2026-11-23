@@ -693,3 +693,76 @@ describe("signoff regressions", () => {
     ).toMatch(/1 Jan.+31 Dec 2026/);
   });
 });
+
+describe("Item loading (Skeleton)", () => {
+  it("keeps the term, turns the value into a skeleton, and says Loading", () => {
+    render(
+      <DL.Root>
+        <DL.Item loading>
+          <DL.Term>Balance</DL.Term>
+          <DL.Details />
+          <DL.Actions>
+            <DL.Action href="#b">Change</DL.Action>
+          </DL.Actions>
+        </DL.Item>
+      </DL.Root>,
+    );
+    expect(document.querySelector("dt")).toHaveTextContent("Balance");
+    const dd = document.querySelector("[data-slot=description-list-details]")!;
+    expect(dd).toHaveAttribute("aria-busy", "true");
+    expect(dd).toHaveAttribute("data-loading");
+    expect(dd.querySelector("[data-slot=skeleton]")).toHaveAttribute("aria-hidden", "true");
+    expect(dd).toHaveTextContent("Loading");
+    // Loading isn't empty
+    expect(screen.queryByText("Not provided")).not.toBeInTheDocument();
+    // Actions are hidden and inert until it loads
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    const skeleton = document.querySelector(
+      "[data-slot=description-list-actions] [data-slot=skeleton]",
+    );
+    expect(skeleton).toHaveAttribute("inert");
+  });
+
+  it("a value that's already there keeps its size under the skeleton", () => {
+    render(
+      <DL.Item loading>
+        <DL.Term>Name</DL.Term>
+        <DL.Details>Sarah Philips</DL.Details>
+      </DL.Item>,
+    );
+    const skeleton = document.querySelector(
+      "[data-slot=description-list-details] [data-slot=skeleton]",
+    )!;
+    expect(skeleton).toHaveTextContent("Sarah Philips");
+    expect(skeleton).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("hideEmpty never hides a loading row; it renders normally once loaded", () => {
+    const { rerender } = render(
+      <DL.Root hideEmpty>
+        <DL.Item loading>
+          <DL.Term>Balance</DL.Term>
+          <DL.Details />
+        </DL.Item>
+      </DL.Root>,
+    );
+    expect(screen.getByText("Balance")).toBeInTheDocument();
+    rerender(
+      <DL.Root hideEmpty>
+        <DL.Item>
+          <DL.Term>Balance</DL.Term>
+          <DL.Details value={1200} />
+        </DL.Item>
+      </DL.Root>,
+    );
+    expect(document.querySelector("[data-slot=skeleton]")).toBeNull();
+    expect(document.querySelector("dd")).not.toHaveAttribute("aria-busy");
+  });
+
+  it("the loading text is translatable, and the items shorthand takes loading", () => {
+    render(
+      <DL.Root labels={{ loading: "Yn llwytho" }} items={[{ term: "Balans", loading: true }]} />,
+    );
+    expect(document.querySelector("dd")).toHaveTextContent("Yn llwytho");
+  });
+});

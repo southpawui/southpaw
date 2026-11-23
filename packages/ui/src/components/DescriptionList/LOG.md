@@ -1,5 +1,23 @@
 # DescriptionList — Change Log
 
+## 2026-11-23 — Item `loading` (GEO-966, GEO-963)
+
+This is the follow-up George approved ("sure", decision 2) for after the restack onto Skeleton. The base is `geo-964-indicator` @ d117eda, which contains Skeleton.
+
+- **`Item loading`** (and `loading` in the `items` shorthand):
+  - The Term stays visible, because the label is known before the value.
+  - Details become a Skeleton text bar, about 60% wide and at most 16rem. If a value is already there, it's wrapped in a Skeleton, so its size is kept and it's hidden and inert.
+  - The `dd` is `aria-busy`, and it contains a visually hidden "Loading" (`labels.loading`, translatable), so reading the list says "Balance, Loading" rather than nothing.
+  - Actions are wrapped in a Skeleton (hidden, inert, same size): there's nothing to change until the value has loaded.
+- **A loading row is never empty:** no "Not provided", and `hideEmpty` doesn't hide it.
+- **Announcements:** Skeleton is silent by design. A list that loads as a whole is wrapped in `Skeleton.Group` for `aria-busy` and one "Loading …" / "… loaded" announcement. The Loading story shows this, with a toggle.
+- 4 new tests (48 for DescriptionList).
+
+**Considered and rejected**
+
+- **A Root-level `loading`:** the ticket names Item `loading`, and `Skeleton.Group` already covers the whole-list case (announcement, `aria-busy`, and a default for any Skeleton inside). Adding it would be a public API George hasn't seen.
+- **Skeletons for the Term too:** the label doesn't depend on the data, and keeping it tells people what's loading.
+
 ## 2026-11-23 — Sign-off (GEO-966)
 
 George signed off DescriptionList: "copy: tooltip, fix 1 and 2". The copy feedback stays as a tooltip, not a toast.

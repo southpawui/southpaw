@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { DescriptionList, SummaryCard } from "./DescriptionList";
 import { Badge } from "../Badge/Badge";
 import { Link } from "../Link/Link";
+import { Skeleton } from "../Skeleton/Skeleton";
 import { cn } from "../../lib/cn";
 
 const DL = DescriptionList;
@@ -559,6 +560,52 @@ export const ItemsShorthand: Story = {
       />
     </Frame>
   ),
+};
+
+/**
+ * `Item loading` keeps the term and turns the value and actions into skeletons.
+ * Wrap the list in `Skeleton.Group` for `aria-busy` and one “Loading” announcement.
+ */
+export const Loading: Story = {
+  render: function LoadingStory() {
+    const [loading, setLoading] = React.useState(true);
+    return (
+      <Frame className="flex flex-col gap-4">
+        <Skeleton.Group loading={loading} label="Loading account" loadedLabel="Account loaded">
+          <DL.Root>
+            <DL.Item loading={loading}>
+              <DL.Term>Name</DL.Term>
+              <DL.Details>{loading ? null : "Sarah Philips"}</DL.Details>
+              <DL.Actions>
+                <DL.Action href="#n">Change</DL.Action>
+              </DL.Actions>
+            </DL.Item>
+            <DL.Item loading={loading}>
+              <DL.Term>Balance</DL.Term>
+              <DL.Details
+                value={loading ? null : 1204.5}
+                format={{ style: "currency", currency: "GBP" }}
+              />
+            </DL.Item>
+            <DL.Item>
+              <DL.Term>Account number</DL.Term>
+              <DL.Details>12345678</DL.Details>
+            </DL.Item>
+          </DL.Root>
+        </Skeleton.Group>
+        <Link
+          href="#toggle"
+          standalone
+          onClick={(e) => {
+            e.preventDefault();
+            setLoading((l) => !l);
+          }}
+        >
+          {loading ? "Finish loading" : "Load again"}
+        </Link>
+      </Frame>
+    );
+  },
 };
 
 /* ============================================================

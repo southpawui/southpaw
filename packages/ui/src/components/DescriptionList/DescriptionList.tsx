@@ -3,6 +3,7 @@ import { InfoIcon } from "@phosphor-icons/react";
 import { Button } from "../Button/Button";
 import { Card } from "../Card/Card";
 import { Link, type LinkProps } from "../Link/Link";
+import { Skeleton } from "../Skeleton/Skeleton";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { VisuallyHidden } from "../VisuallyHidden/VisuallyHidden";
 import { cn } from "../../lib/cn";
@@ -54,6 +55,8 @@ export interface DescriptionListLabels {
   copyFailed: string;
   /** Name of the info button next to a term: `info("Email")` → "More about Email". */
   info: (term?: string) => string;
+  /** Hidden text in a value that's still loading, so reading the list says so. */
+  loading: string;
 }
 
 export const defaultDescriptionListLabels: DescriptionListLabels = {
@@ -62,6 +65,7 @@ export const defaultDescriptionListLabels: DescriptionListLabels = {
   copied: "Copied",
   copyFailed: "Copy failed",
   info: (term) => (term ? `More about ${term}` : "More information"),
+  loading: "Loading",
 };
 
 /* ----- Contexts ----- */
@@ -86,6 +90,8 @@ interface ItemContextValue {
   /** The term as text, for hidden context on actions and buttons. */
   term?: string;
   setDomTerm: (term: string | undefined) => void;
+  /** The value is still loading: Details and Actions show skeletons. */
+  loading: boolean;
 }
 
 const ItemContext = React.createContext<ItemContextValue | null>(null);
@@ -306,6 +312,7 @@ export interface DescriptionListItemData {
   span?: ItemProps["span"];
   divider?: boolean;
   hideEmpty?: boolean;
+  loading?: boolean;
 }
 
 export interface DescriptionListRootProps extends React.ComponentPropsWithRef<"dl"> {
@@ -470,7 +477,7 @@ Root.displayName = "DescriptionList.Root";
 function ItemFromData({ item }: { item: DescriptionListItemData }) {
   const details = Array.isArray(item.details) ? item.details : [item.details];
   return (
-    <Item span={item.span} divider={item.divider} hideEmpty={item.hideEmpty}>
+    <Item span={item.span} divider={item.divider} hideEmpty={item.hideEmpty} loading={item.loading}>
       <Term info={item.info}>{item.term}</Term>
       {details.map((d, i) => (
         <Details
@@ -508,11 +515,26 @@ export interface ItemProps extends React.ComponentPropsWithRef<"div"> {
    * `hideEmpty`. Only direct `Details` children are checked.
    */
   hideEmpty?: boolean;
+  /**
+   * The value is still loading (GEO-963 Skeleton): the term stays, the value and
+   * actions become skeletons, and the value says "Loading" to screen readers. A
+   * loading row is never empty. Wrap the list in `Skeleton.Group` for the live
+   * "Loading" announcement and `aria-busy`.
+   */
+  loading?: boolean;
 }
 
 const Item = React.forwardRef<HTMLDivElement, ItemProps>(
   (
-    { span, divider = true, hideEmpty: hideEmptyProp, className, children, ...props },
+    {
+      span,
+      divider = true,
+      hideEmpty: hideEmptyProp,
+      loading = false,
+      className,
+      children,
+      ...props
+    },
     forwardedRef,
   ) => {
     const rootCtx = React.useContext(RootContext);
@@ -538,7 +560,7 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(
       }
     });
     const hideEmpty = hideEmptyProp ?? root.hideEmpty;
-    const hidden = hideEmpty && detailsCount > 0 && filledCount === 0;
+    const hidden = hideEmpty && !loading && detailsCount > 0 && filledCount === 0;
     // …or, for a Term nested in something else, reported by the Term after it renders.
     const [domTerm, setDomTerm] = React.useState<string | undefined>(undefined);
     const term = scanned ?? domTerm;
@@ -564,7 +586,10 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(
       }
     });
 
-    const ctx = React.useMemo<ItemContextValue>(() => ({ term, setDomTerm }), [term]);
+    const ctx = React.useMemo<ItemContextValue>(
+      () => ({ term, setDomTerm, loading }),
+      [term, loading],
+    );
 
     const spanClasses =
       span === "full"
@@ -602,6 +627,7 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(
           ref={setRef as React.Ref<HTMLDListElement>}
           data-slot="description-list-item"
           data-standalone=""
+          data-loading={loading ? "" : undefined}
           className={cn("text-fg-default", TEXT_SIZE.md, classes)}
           {...(props as React.ComponentPropsWithoutRef<"dl">)}
         >
@@ -613,6 +639,7 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(
       <div
         ref={setRef as React.Ref<HTMLDivElement>}
         data-slot="description-list-item"
+        data-loading={loading ? "" : undefined}
         className={classes}
         {...props}
       >
@@ -720,6 +747,28 @@ const Details = React.forwardRef<HTMLElement, DetailsProps>(
         : null;
     const isEmpty = content === null;
 
+    if (item?.loading) {
+      return (
+        <dd
+          ref={ref}
+          data-slot="description-list-details"
+          data-loading=""
+          aria-busy="true"
+          className={mergeClassName(cn("m-0 min-w-0", p.details), className)}
+          {...props}
+        >
+          {isEmpty ? (
+            // No value yet: one text bar, about a short value's width
+            <Skeleton shape="text" className="w-3/5 max-w-64" />
+          ) : (
+            // A value that's already there keeps its size under the skeleton
+            <Skeleton shape="text">{content}</Skeleton>
+          )}
+          <VisuallyHidden>{root.labels.loading}</VisuallyHidden>
+        </dd>
+      );
+    }
+
     return (
       <dd
         ref={ref}
@@ -802,15 +851,19 @@ function ActionGroup({ children, className }: { children: React.ReactNode; class
 const Actions = React.forwardRef<HTMLElement, React.ComponentPropsWithRef<"dd">>(
   ({ className, children, ...props }, ref) => {
     const root = React.useContext(RootContext) ?? fallbackRoot;
+    const item = React.useContext(ItemContext);
     const p = PLACEMENT[root.orientation];
+    const actions = <ActionGroup>{children}</ActionGroup>;
     return (
       <dd
         ref={ref}
         data-slot="description-list-actions"
+        data-loading={item?.loading ? "" : undefined}
         className={mergeClassName(cn("m-0 min-w-0", p.actions), className)}
         {...props}
       >
-        <ActionGroup>{children}</ActionGroup>
+        {/* Nothing to change until the value has loaded: hidden, inert, same size */}
+        {item?.loading ? <Skeleton>{actions}</Skeleton> : actions}
       </dd>
     );
   },
