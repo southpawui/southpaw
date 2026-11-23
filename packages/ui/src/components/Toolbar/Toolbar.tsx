@@ -2,6 +2,9 @@ import * as React from "react";
 import { Toolbar as BaseToolbar } from "@base-ui/react/toolbar";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
+import { ArrowSquareOutIcon } from "@phosphor-icons/react";
+import { defaultLinkLabels, focusRingClasses, getLinkBehaviour } from "../../lib/link";
+import { VisuallyHidden } from "../VisuallyHidden/VisuallyHidden";
 
 const Root = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseToolbar.Root>>(
   ({ className, ...props }, ref) => (
@@ -48,19 +51,36 @@ const Button = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof B
 Button.displayName = "Toolbar.Button";
 
 const Link = React.forwardRef<HTMLAnchorElement, React.ComponentProps<typeof BaseToolbar.Link>>(
-  ({ className, ...props }, ref) => (
-    <BaseToolbar.Link
-      ref={ref}
-      data-slot="toolbar-link"
-      className={mergeClassName(
-        cn(
-          "inline-flex h-8 items-center justify-center rounded-md px-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900",
-        ),
-        className,
-      )}
-      {...props}
-    />
-  ),
+  ({ className, target, rel, children, ...props }, ref) => {
+    // Shared with Link (GEO-967): new-tab icon, hidden "(opens in new tab)" and rel
+    const { newTab, rel: mergedRel } = getLinkBehaviour({ target, rel });
+    return (
+      <BaseToolbar.Link
+        ref={ref}
+        data-slot="toolbar-link"
+        target={target}
+        rel={mergedRel}
+        className={cn(
+          "inline-flex h-8 items-center justify-center gap-1.5 rounded-md px-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100",
+          // The shared ring, without Link's small radius: the button keeps rounded-md
+          focusRingClasses,
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        {newTab && (
+          <>
+            <ArrowSquareOutIcon
+              aria-hidden="true"
+              className="size-[1em] shrink-0 rtl:-scale-x-100"
+            />
+            <VisuallyHidden>{defaultLinkLabels.newTab}</VisuallyHidden>
+          </>
+        )}
+      </BaseToolbar.Link>
+    );
+  },
 );
 Link.displayName = "Toolbar.Link";
 

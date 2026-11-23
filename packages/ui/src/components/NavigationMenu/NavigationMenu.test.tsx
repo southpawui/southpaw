@@ -404,4 +404,78 @@ describe("NavigationMenu", () => {
       expect(screen.getByRole("navigation")).toHaveAttribute("data-orientation", "vertical");
     });
   });
+
+  describe("built on Link (GEO-967)", () => {
+    const RouterLink = React.forwardRef<
+      HTMLAnchorElement,
+      React.ComponentPropsWithRef<"a"> & { to: string }
+    >(({ to, children, ...props }, ref) => (
+      <a ref={ref} {...props} href={to} data-router="">
+        {children}
+      </a>
+    ));
+    RouterLink.displayName = "RouterLink";
+
+    it("a new-tab link gets the icon, hidden text and rel", () => {
+      render(
+        <Nav>
+          <NavigationMenu.Item>
+            <NavigationMenu.Link href="https://example.org" target="_blank">
+              Blog
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+        </Nav>,
+      );
+      const link = screen.getByRole("link", { name: /Blog\s*\(opens in new tab\)/ });
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      expect(link).toHaveAttribute("data-slot", "navigation-menu-link");
+      expect(link.querySelector("svg[aria-hidden=true]")).not.toBeNull();
+      // Navigation rows: no underline, no visited colour
+      expect(link).toHaveClass("no-underline");
+      expect(link.className).not.toContain("visited:");
+    });
+
+    it("passes a router link through on desktop (element and function render)", () => {
+      render(
+        <Nav>
+          <NavigationMenu.Item>
+            <NavigationMenu.Link render={<RouterLink to="/events" />}>Events</NavigationMenu.Link>
+          </NavigationMenu.Item>
+          <NavigationMenu.Item>
+            <NavigationMenu.Link render={(props) => <RouterLink {...props} to="/help" />}>
+              Help
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+        </Nav>,
+      );
+      for (const [name, href] of [
+        ["Events", "/events"],
+        ["Help", "/help"],
+      ]) {
+        const link = screen.getByRole("link", { name });
+        expect(link).toHaveAttribute("data-router");
+        expect(link).toHaveAttribute("href", href);
+      }
+    });
+
+    it("the drawer honours a function render too (it used to ignore it)", async () => {
+      const user = userEvent.setup();
+      render(
+        <Nav collapseBelow="always">
+          <NavigationMenu.Item>
+            <NavigationMenu.Link render={(props) => <RouterLink {...props} to="/help" />}>
+              Help
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+        </Nav>,
+      );
+      await user.click(button("Menu"));
+      const dialog = await screen.findByRole("dialog");
+      const link = within(dialog).getByRole("link", { name: "Help" });
+      expect(link).toHaveAttribute("data-router");
+      expect(link).toHaveAttribute("href", "/help");
+      await user.click(link);
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    });
+  });
 });

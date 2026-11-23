@@ -453,8 +453,22 @@ describe("Menu", () => {
     expect(docs).toHaveAttribute("data-slot", "menu-link-item");
     const gh = screen.getByRole("menuitem", { name: "GitHub" });
     expect(gh).toHaveAttribute("rel", "noopener noreferrer");
-    expect(gh).toHaveAccessibleDescription("Opens in a new tab");
+    expect(gh).toHaveAccessibleDescription("(opens in new tab)");
     expect(gh.querySelector("[data-slot=menu-item-external-icon]")).not.toBeNull();
+  });
+
+  it("a new-tab LinkItem keeps the consumer's rel and adds noopener noreferrer", async () => {
+    await open(
+      <Harness>
+        <Menu.LinkItem href="https://github.com" target="_blank" rel="external">
+          GitHub
+        </Menu.LinkItem>
+      </Harness>,
+    );
+    expect(screen.getByRole("menuitem", { name: "GitHub" })).toHaveAttribute(
+      "rel",
+      "external noopener noreferrer",
+    );
   });
 
   it("renders a submenu trigger with a chevron that flips in RTL", async () => {

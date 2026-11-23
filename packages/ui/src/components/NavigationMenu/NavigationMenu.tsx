@@ -1,8 +1,9 @@
 import * as React from "react";
 import { NavigationMenu as BaseNavigationMenu } from "@base-ui/react/navigation-menu";
-import { useRender } from "@base-ui/react/use-render";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
+import { focusRingClasses } from "../../lib/link";
+import { Link as NavLink, type LinkProps } from "../Link/Link";
 import { Accordion } from "../Accordion/Accordion";
 import { Button } from "../Button/Button";
 import { CollapsibleChevron } from "../Collapsible/Collapsible";
@@ -108,7 +109,17 @@ const triggerSize: Record<NavigationMenuSize, string> = {
   lg: "min-h-[var(--sp-control-height-lg)] gap-2 px-4 text-base",
 };
 
-const focusRing = "focus-visible:sp-focus-ring outline-none";
+// The shared link focus ring (GEO-967); rows keep their own radius
+const focusRing = focusRingClasses;
+
+/** Navigation rows are Links in the text colour: no underline, visited colour or print URL. */
+const navLinkOptions = {
+  variant: "inherit",
+  standalone: true,
+  underline: "none",
+  visited: false,
+  printUrl: false,
+} as const;
 
 /** Top-level trigger and link: same box so the row lines up. */
 const topLevelItem = cn(
@@ -1115,7 +1126,9 @@ const Link = React.forwardRef<HTMLAnchorElement, NavigationMenuLinkProps>((props
       // Links in a panel close it (as the drawer and More list do), so single-page
       // apps don't leave the panel open after navigating
       closeOnClick={closeOnClick ?? inContent}
-      render={render}
+      // Base UI → Link → the consumer's router link (element or function render).
+      // Link adds the new-tab icon, hidden text and rel.
+      render={<NavLink {...navLinkOptions} render={render as LinkProps["render"]} />}
       onClick={onClick}
       className={cn(
         inContent
@@ -1146,23 +1159,22 @@ const StackedLink = React.forwardRef<
   }
 >(({ render, ariaCurrent, onClick, ...props }, ref) => {
   const stacked = React.useContext(StackedContext);
-  const element = useRender({
-    defaultTagName: "a",
-    // Element render (e.g. a router <Link />); function renders apply on desktop only
-    render: typeof render === "function" ? undefined : (render as React.ReactElement | undefined),
-    ref,
-    props: {
-      ...props,
-      "data-slot": "navigation-menu-link",
-      "aria-current": ariaCurrent,
-      onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
+  return (
+    <NavLink
+      {...navLinkOptions}
+      {...props}
+      ref={ref}
+      // Element or function render (e.g. a router link), as on desktop
+      render={render as LinkProps["render"]}
+      data-slot="navigation-menu-link"
+      aria-current={ariaCurrent}
+      onClick={(event: React.MouseEvent<HTMLAnchorElement>) => {
         onClick?.(event);
         const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
         if (!event.defaultPrevented && !modified) stacked?.close();
-      },
-    },
-  });
-  return element;
+      }}
+    />
+  );
 });
 StackedLink.displayName = "NavigationMenu.StackedLink";
 

@@ -1,5 +1,14 @@
 # Menu — Change Log
 
+## 2026-11-22 — LinkItem uses the shared link behaviour (GEO-967)
+
+`Menu.LinkItem` now takes its new-tab behaviour from `lib/link`:
+
+- The description says "(opens in new tab)", the wording George chose for the whole library. It used to say "Opens in a new tab".
+- `noopener noreferrer` is merged into the consumer's `rel`. Before, the consumer's `rel` was replaced.
+- There's a new test for the merge, and the existing description test is updated.
+- `pnpm verify menu` passes. Its inconclusives are the ones already explained below: `aria-valid-attr-value` is the `aria-controls` on open triggers, and color-contrast is on the showcase rows. This change adds none.
+
 ## 2026-11-18 — Signed off with Menubar (GEO-927)
 
 - George signed off the accent bar, the active item without a bar, the disabled-item pointer/keyboard split and the DisabledItems story. They're committed as their own `feat(menu):` commit before Menubar's.

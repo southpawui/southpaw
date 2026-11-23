@@ -1,5 +1,17 @@
 # Error Summary — Change Log
 
+## 2026-11-22 — Error links are built on Link (GEO-967)
+
+`ErrorSummary.Item` used to render its own `<a>` with its own classes. It now renders `Link`:
+
+- `variant="inherit"`, since the list item is `text-danger font-medium`;
+- `visited={false}` and `printUrl={false}`, because these are hash links;
+- `render` and `data-slot="error-summary-link"` pass through.
+
+Clicks behave as before. Link adds no click behaviour of its own, so ErrorSummary still handles `preventDefault`, the label scroll and the field focus.
+
+It gains GOV.UK's underline weights (thicker on hover), the shared focus ring, and a ref to the anchor. All 36 tests pass. The stories match their earlier baselines to within 0.04%.
+
 ## 2026-11-21 — Ignore VisuallyHidden text when reading labels (GEO-968)
 
 `visibleText()` builds error messages from a field's visible label. It now also strips `[data-slot="visually-hidden"]` as well as `.sr-only`. VisuallyHidden's `focusable` mode has no bare `.sr-only` class, so its text leaked into messages, for example "Enter postcode (shown on focus)". The new test fails without this change. This was VisuallyHidden decision 9.

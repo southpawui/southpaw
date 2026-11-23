@@ -48,6 +48,11 @@
   --sp-info: var(--sp-info-700);
   --sp-warning: var(--sp-warning-700);
 
+  /* ---- Links (GEO-967). Solid colours only: :visited ignores alpha. ---- */
+  --sp-link: var(--sp-info-700); /* #0b57d0, 6.39:1 on base */
+  --sp-link-hover: #083f99; /* 9.63:1 */
+  --sp-link-visited: #6b2fb3; /* 7.83:1 */
+
   /* ---- Focus (two-tone ring) ---- */
   --sp-focus-outer: var(--sp-neutral-900);
   --sp-focus-inner: var(--sp-neutral-0);
@@ -93,6 +98,11 @@
   --sp-info: var(--sp-info-300);
   --sp-warning: var(--sp-warning-300);
 
+  /* ---- Links ---- */
+  --sp-link: var(--sp-info-300); /* #a8c7fa */
+  --sp-link-hover: #d0e0ff;
+  --sp-link-visited: #c8a8ff;
+
   /* ---- Focus ---- */
   --sp-focus-outer: var(--sp-neutral-25);
   --sp-focus-inner: var(--sp-neutral-950);
@@ -137,6 +147,11 @@
   --sp-info: #00449e;
   --sp-warning: #7a4100; /* 8.1:1 on white */
 
+  /* ---- Links ---- */
+  --sp-link: #00449e;
+  --sp-link-hover: #002f6c;
+  --sp-link-visited: #4c2c92;
+
   /* ---- Focus ---- */
   --sp-focus-outer: #000000;
   --sp-focus-inner: #ffffff;
@@ -153,6 +168,9 @@
     --sp-brand: LinkText;
     --sp-accent: Highlight;
     --sp-danger: LinkText;
+    --sp-link: LinkText;
+    --sp-link-hover: LinkText;
+    --sp-link-visited: VisitedText;
     --sp-focus-outer: Highlight;
     --sp-focus-inner: Canvas;
     --sp-border-control: ButtonText;

@@ -1,5 +1,14 @@
 # NavigationMenu — Change Log
 
+## 2026-11-22 — Links built on Link (GEO-967)
+
+- **Desktop:** Base UI's `NavigationMenu.Link` now renders our `Link` through its `render`. A consumer's `render` goes into Link's own `render`, so the chain is Base UI → Link → router link. Base UI keeps roving focus, `closeOnClick` and `aria-current`.
+- **Drawer and More list:** `StackedLink` renders `Link` too. It now honours a **function** `render`; before, it silently fell back to a plain `<a>`.
+- **Link options:** `inherit`, `standalone`, `underline="none"`, no visited colour, no print URL. The row classes come last in `cn()`, so the rows look the same as before. The stories match their earlier baselines to within 12 pixels.
+- **New tab:** links with `target="_blank"` now get the icon, hidden "(opens in new tab)" text and `rel="noopener noreferrer"`. NavigationMenu had none of these before.
+- **Focus ring:** comes from `lib/link` (`focusRingClasses`). Rows keep their own radius.
+- **Tests:** 3 new ones, for new tab, a router link on desktop (element and function) and a function `render` in the drawer. The new-tab and drawer tests fail against the old code. 28 tests pass in total.
+
 ## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
 
 `sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the `forced-colors:` outline classes in `focusRing` are gone. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
