@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -22,19 +23,21 @@ const Root = React.forwardRef<HTMLDivElement, CardRootProps>(
       data-variant={variant}
       data-direction={direction}
       data-interactive={interactive ? "" : undefined}
-      className={cn(
-        // flex-col for vertical layout + footer mt-auto; overridden by sm:grid when horizontal
-        "flex flex-col overflow-clip rounded-[var(--radius-lg)]",
-        // Variants
-        variant === "elevated" && "bg-surface-raised border-border-default border shadow-sm",
-        variant === "outline" && "bg-surface-base border-border-default border",
-        variant === "filled" && "bg-surface-alternate border border-transparent",
-        // Direction — horizontal: stacks on mobile, side-by-side at sm+
-        direction === "horizontal" &&
-          "sm:grid sm:grid-cols-[auto_1fr] sm:items-stretch sm:*:col-start-2 sm:[&>[data-slot=card-image]]:col-start-1 sm:[&>[data-slot=card-image]]:[grid-row:1/span_99]",
-        // Interactive
-        interactive &&
-          "hover:border-fg-muted origin-center cursor-pointer transition-[border-color,box-shadow,transform] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] active:scale-[var(--sp-scale-press)]",
+      className={mergeClassName(
+        cn(
+          // flex-col for vertical layout + footer mt-auto; overridden by sm:grid when horizontal
+          "flex flex-col overflow-clip rounded-[var(--radius-lg)]",
+          // Variants
+          variant === "elevated" && "bg-surface-raised border-border-default border shadow-sm",
+          variant === "outline" && "bg-surface-base border-border-default border",
+          variant === "filled" && "bg-surface-alternate border border-transparent",
+          // Direction — horizontal: stacks on mobile, side-by-side at sm+
+          direction === "horizontal" &&
+            "sm:grid sm:grid-cols-[auto_1fr] sm:items-stretch sm:*:col-start-2 sm:[&>[data-slot=card-image]]:col-start-1 sm:[&>[data-slot=card-image]]:[grid-row:1/span_99]",
+          // Interactive
+          interactive &&
+            "hover:border-fg-muted origin-center cursor-pointer transition-[border-color,box-shadow,transform] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] active:scale-[var(--sp-scale-press)]",
+        ),
         className,
       )}
       {...props}
@@ -52,11 +55,13 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="card-header"
-      className={cn(
-        // Always grid — shadcn pattern
-        "grid auto-rows-min gap-1.5 p-6 pb-0",
-        // When HeaderAction present: two-column layout
-        "has-[[data-slot=card-header-action]]:grid-cols-[1fr_auto]",
+      className={mergeClassName(
+        cn(
+          // Always grid — shadcn pattern
+          "grid auto-rows-min gap-1.5 p-6 pb-0",
+          // When HeaderAction present: two-column layout
+          "has-[[data-slot=card-header-action]]:grid-cols-[1fr_auto]",
+        ),
         className,
       )}
       {...props}
@@ -74,8 +79,10 @@ const Icon = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"span
     <span
       ref={ref}
       data-slot="card-icon"
-      className={cn(
-        "text-fg-muted bg-surface-alternate flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-lg",
+      className={mergeClassName(
+        cn(
+          "text-fg-muted bg-surface-alternate flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-lg",
+        ),
         className,
       )}
       aria-hidden="true"
@@ -94,8 +101,10 @@ const HeaderAction = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRe
     <div
       ref={ref}
       data-slot="card-header-action"
-      className={cn(
-        "col-start-2 row-span-2 row-start-1 flex shrink-0 items-center gap-1 self-start justify-self-end",
+      className={mergeClassName(
+        cn(
+          "col-start-2 row-span-2 row-start-1 flex shrink-0 items-center gap-1 self-start justify-self-end",
+        ),
         className,
       )}
       {...props}
@@ -113,7 +122,10 @@ const Eyebrow = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"s
     <span
       ref={ref}
       data-slot="card-eyebrow"
-      className={cn("text-fg-muted text-xs font-medium uppercase tracking-wide", className)}
+      className={mergeClassName(
+        cn("text-fg-muted text-xs font-medium uppercase tracking-wide"),
+        className,
+      )}
       {...props}
     />
   ),
@@ -129,7 +141,7 @@ const Title = React.forwardRef<HTMLHeadingElement, React.ComponentPropsWithRef<"
     <h3
       ref={ref}
       data-slot="card-title"
-      className={cn("text-fg-default text-lg font-semibold", className)}
+      className={mergeClassName(cn("text-fg-default text-lg font-semibold"), className)}
       {...props}
     >
       {children}
@@ -147,7 +159,7 @@ const Description = React.forwardRef<HTMLParagraphElement, React.ComponentPropsW
     <p
       ref={ref}
       data-slot="card-description"
-      className={cn("text-fg-muted text-sm", className)}
+      className={mergeClassName(cn("text-fg-muted text-sm"), className)}
       {...props}
     />
   ),
@@ -160,7 +172,12 @@ Description.displayName = "Card.Description";
 
 const Content = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="card-content" className={cn("p-6", className)} {...props} />
+    <div
+      ref={ref}
+      data-slot="card-content"
+      className={mergeClassName(cn("p-6"), className)}
+      {...props}
+    />
   ),
 );
 Content.displayName = "Card.Content";
@@ -174,12 +191,14 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="card-footer"
-      className={cn(
-        "mt-auto flex flex-wrap items-center gap-2 p-6 pt-0",
-        "[&>[data-slot=button]]:w-full sm:[&>[data-slot=button]]:w-auto",
-        "sm:gap-3",
-        // Restore top padding when no Card.Content sibling exists
-        "[:not(:has(>[data-slot=card-content]))>&]:pt-6",
+      className={mergeClassName(
+        cn(
+          "mt-auto flex flex-wrap items-center gap-2 p-6 pt-0",
+          "[&>[data-slot=button]]:w-full sm:[&>[data-slot=button]]:w-auto",
+          "sm:gap-3",
+          // Restore top padding when no Card.Content sibling exists
+          "[:not(:has(>[data-slot=card-content]))>&]:pt-6",
+        ),
         className,
       )}
       {...props}
@@ -197,10 +216,12 @@ const Action = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"sp
     <span
       ref={ref}
       data-slot="card-action"
-      className={cn(
-        "text-fg-muted inline-flex items-center gap-1.5 text-sm font-medium",
-        "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-        "[[data-slot=card]:hover_&]:text-fg-default",
+      className={mergeClassName(
+        cn(
+          "text-fg-muted inline-flex items-center gap-1.5 text-sm font-medium",
+          "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+          "[[data-slot=card]:hover_&]:text-fg-default",
+        ),
         className,
       )}
       {...props}
@@ -229,13 +250,15 @@ const CardImage = React.forwardRef<HTMLDivElement, CardImageProps>(
     <div
       ref={ref}
       data-slot="card-image"
-      className={cn(
-        "relative overflow-clip",
-        // Vertical: full width
-        "[[data-direction=vertical]_&]:w-full",
-        // Horizontal: full width + fixed height on mobile, fixed width at sm+
-        "[[data-direction=horizontal]_&]:h-48 [[data-direction=horizontal]_&]:w-full",
-        "[[data-direction=horizontal]_&]:sm:h-auto [[data-direction=horizontal]_&]:sm:w-48",
+      className={mergeClassName(
+        cn(
+          "relative overflow-clip",
+          // Vertical: full width
+          "[[data-direction=vertical]_&]:w-full",
+          // Horizontal: full width + fixed height on mobile, fixed width at sm+
+          "[[data-direction=horizontal]_&]:h-48 [[data-direction=horizontal]_&]:w-full",
+          "[[data-direction=horizontal]_&]:sm:h-auto [[data-direction=horizontal]_&]:sm:w-48",
+        ),
         className,
       )}
       {...props}

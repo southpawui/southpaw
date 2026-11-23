@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Meter as BaseMeter } from "@base-ui/react/meter";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -63,7 +64,7 @@ const Root = React.forwardRef<HTMLDivElement, MeterRootProps>(
         value={value}
         min={min}
         max={max}
-        className={cn("flex w-full flex-col gap-1", className)}
+        className={mergeClassName(cn("flex w-full flex-col gap-1"), className)}
         {...props}
       />
     );
@@ -90,9 +91,8 @@ const Track = React.forwardRef<HTMLDivElement, MeterTrackProps>(
     <BaseMeter.Track
       ref={ref}
       data-slot="meter-track"
-      className={cn(
-        "bg-surface-sunken relative w-full overflow-hidden rounded-full",
-        trackSizes[size],
+      className={mergeClassName(
+        cn("bg-surface-sunken relative w-full overflow-hidden rounded-full", trackSizes[size]),
         className,
       )}
       {...props}
@@ -112,14 +112,16 @@ const Indicator = React.forwardRef<
   <BaseMeter.Indicator
     ref={ref}
     data-slot="meter-indicator"
-    className={cn(
-      "h-full rounded-full",
-      "transition-[width,background-color] duration-[var(--sp-duration-slow)] ease-[var(--sp-easing-default)]",
-      // Colour from parent Root's data-state
-      "[[data-state=default]_&]:bg-accent",
-      "[[data-state=success]_&]:bg-success",
-      "[[data-state=warning]_&]:bg-[oklch(0.7_0.15_85)]",
-      "[[data-state=danger]_&]:bg-danger",
+    className={mergeClassName(
+      cn(
+        "h-full rounded-full",
+        "transition-[width,background-color] duration-[var(--sp-duration-slow)] ease-[var(--sp-easing-default)]",
+        // Colour from parent Root's data-state
+        "[[data-state=default]_&]:bg-accent",
+        "[[data-state=success]_&]:bg-success",
+        "[[data-state=warning]_&]:bg-[oklch(0.7_0.15_85)]",
+        "[[data-state=danger]_&]:bg-danger",
+      ),
       className,
     )}
     {...props}
@@ -136,7 +138,7 @@ const Label = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
     <BaseMeter.Label
       ref={ref}
       data-slot="meter-label"
-      className={cn("text-fg-default text-sm font-medium", className)}
+      className={mergeClassName(cn("text-fg-default text-sm font-medium"), className)}
       {...props}
     />
   ),
@@ -152,7 +154,7 @@ const Value = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
     <BaseMeter.Value
       ref={ref}
       data-slot="meter-value"
-      className={cn("text-fg-muted text-sm tabular-nums", className)}
+      className={mergeClassName(cn("text-fg-muted text-sm tabular-nums"), className)}
       {...props}
     />
   ),

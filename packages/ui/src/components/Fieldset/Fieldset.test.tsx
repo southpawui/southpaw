@@ -36,16 +36,51 @@ describe("Fieldset", () => {
     expect(screen.getByText("Helper text")).toHaveAttribute("data-slot", "fieldset-description");
   });
 
-  it("renders Error with role=alert and icon", () => {
+  it("renders Error with its icon and describes the fieldset (no live region, GEO-957)", () => {
     render(
-      <Fieldset.Root>
+      <Fieldset.Root data-testid="fs">
         <Fieldset.Legend>Group</Fieldset.Legend>
         <Fieldset.Error>Something went wrong.</Fieldset.Error>
       </Fieldset.Root>,
     );
-    const error = screen.getByRole("alert");
-    expect(error).toHaveAttribute("data-slot", "fieldset-error");
-    expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
+    const error = screen.getByText("Something went wrong.").closest("[data-slot=fieldset-error]")!;
+    expect(error).not.toHaveAttribute("role");
+    // Not announced on page load; read when focus enters the group.
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByTestId("fs")).toHaveAttribute("aria-describedby", error.id);
+    expect(screen.getByTestId("fs")).toHaveAccessibleDescription(/Something went wrong\./);
+  });
+
+  it("keeps a consumer aria-describedby alongside the error", () => {
+    render(
+      <Fieldset.Root data-testid="fs" aria-describedby="hint">
+        <Fieldset.Legend>Group</Fieldset.Legend>
+        <p id="hint">Pick one</p>
+        <Fieldset.Error>Required.</Fieldset.Error>
+      </Fieldset.Root>,
+    );
+    const ids = screen.getByTestId("fs").getAttribute("aria-describedby")!.split(" ");
+    expect(ids[0]).toBe("hint");
+    expect(ids).toHaveLength(2);
+  });
+
+  it("two Errors both describe the fieldset; hiding one keeps the other", () => {
+    const { rerender } = render(
+      <Fieldset.Root data-testid="fs">
+        <Fieldset.Legend>Group</Fieldset.Legend>
+        <Fieldset.Error id="e1">First.</Fieldset.Error>
+        <Fieldset.Error id="e2">Second.</Fieldset.Error>
+      </Fieldset.Root>,
+    );
+    expect(screen.getByTestId("fs").getAttribute("aria-describedby")).toBe("e1 e2");
+    rerender(
+      <Fieldset.Root data-testid="fs">
+        <Fieldset.Legend>Group</Fieldset.Legend>
+        <Fieldset.Error id="e1" />
+        <Fieldset.Error id="e2">Second.</Fieldset.Error>
+      </Fieldset.Root>,
+    );
+    expect(screen.getByTestId("fs").getAttribute("aria-describedby")).toBe("e2");
   });
 
   it("renders multiple errors as a list", () => {
@@ -57,17 +92,18 @@ describe("Fieldset", () => {
     );
     expect(screen.getByText("Error one.")).toBeInTheDocument();
     expect(screen.getByText("Error two.")).toBeInTheDocument();
-    expect(screen.getByRole("alert").querySelector("ul")).toBeInTheDocument();
+    expect(screen.getByText("Error one.").closest("ul")).toBeInTheDocument();
   });
 
-  it("does not render Error when empty", () => {
+  it("does not render Error when empty, and the fieldset isn't described", () => {
     render(
-      <Fieldset.Root>
+      <Fieldset.Root data-testid="fs">
         <Fieldset.Legend>Group</Fieldset.Legend>
         <Fieldset.Error />
       </Fieldset.Root>,
     );
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(document.querySelector("[data-slot=fieldset-error]")).toBeNull();
+    expect(screen.getByTestId("fs")).not.toHaveAttribute("aria-describedby");
   });
 
   it("supports disabled state", () => {

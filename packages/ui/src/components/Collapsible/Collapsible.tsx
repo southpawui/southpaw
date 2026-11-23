@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible";
 import { cn } from "../../lib/cn";
+import { mergeClassName, resolveClassName } from "../../lib/merge-class-name";
 
 // Bundlers statically replace `process.env.NODE_ENV`; declared locally so the
 // package doesn't need @types/node.
@@ -176,9 +177,11 @@ const Root = React.forwardRef<HTMLDivElement, CollapsibleRootProps>((props, ref)
         open={open}
         onOpenChange={handleOpenChange}
         disabled={disabled}
-        className={cn(
-          orientation === "vertical" ? "w-full" : "flex items-stretch",
-          rootVariantClasses[variant],
+        className={mergeClassName(
+          cn(
+            orientation === "vertical" ? "w-full" : "flex items-stretch",
+            rootVariantClasses[variant],
+          ),
           className,
         )}
         style={
@@ -204,7 +207,7 @@ function Chevron({ className }: { className?: string }) {
       fill="none"
       aria-hidden="true"
       focusable="false"
-      className={cn("size-4 shrink-0", className)}
+      className={mergeClassName(cn("size-4 shrink-0"), className)}
     >
       <path
         d="M4 6l4 4 4-4"
@@ -339,17 +342,19 @@ const Trigger = React.forwardRef<HTMLButtonElement, CollapsibleTriggerProps>((pr
       id={triggerId}
       data-slot="collapsible-trigger"
       aria-label={stateLabel}
-      className={cn(
-        "text-fg-default flex cursor-pointer items-center font-medium",
-        "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
-        "focus-visible:sp-focus-ring outline-none",
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
-        "forced-colors:border forced-colors:border-[ButtonText]",
-        iconOnly
-          ? cn("shrink-0 justify-center", triggerIconOnlySize[ctx.size])
-          : cn("w-full text-start", triggerSizeClasses[ctx.size]),
-        triggerVariantClasses[ctx.variant],
-        iconOnly && ctx.variant === "ghost" && "!px-0",
+      className={mergeClassName(
+        cn(
+          "text-fg-default flex cursor-pointer items-center font-medium",
+          "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
+          "focus-visible:sp-focus-ring outline-none",
+          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
+          "forced-colors:border forced-colors:border-[ButtonText]",
+          iconOnly
+            ? cn("shrink-0 justify-center", triggerIconOnlySize[ctx.size])
+            : cn("w-full text-start", triggerSizeClasses[ctx.size]),
+          triggerVariantClasses[ctx.variant],
+          iconOnly && ctx.variant === "ghost" && "!px-0",
+        ),
         className,
       )}
       {...rest}
@@ -395,18 +400,20 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
       <div
         ref={ref}
         data-slot="collapsible-header"
-        className={cn(
-          "flex w-full items-center",
-          ctx.variant === "bordered"
-            ? // Flush: the trailing action (or icon-only trigger) fills the row's end
-              // cell edge to edge, matching the container's inner radius
-              cn(
-                "items-stretch gap-0",
-                headerEndCellSize[ctx.size],
-                "[&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:h-auto [&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:shrink-0",
-                "[&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:rounded-none [&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:rounded-e-[var(--sp-nested-radius)]",
-              )
-            : "gap-2",
+        className={mergeClassName(
+          cn(
+            "flex w-full items-center",
+            ctx.variant === "bordered"
+              ? // Flush: the trailing action (or icon-only trigger) fills the row's end
+                // cell edge to edge, matching the container's inner radius
+                cn(
+                  "items-stretch gap-0",
+                  headerEndCellSize[ctx.size],
+                  "[&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:h-auto [&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:shrink-0",
+                  "[&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:rounded-none [&>:last-child:not(:has([data-slot=collapsible-trigger-label]))]:rounded-e-[var(--sp-nested-radius)]",
+                )
+              : "gap-2",
+          ),
           className,
         )}
         {...props}
@@ -532,15 +539,17 @@ const DisclosurePanel = React.forwardRef<HTMLDivElement, DisclosurePanelProps>((
       hiddenUntilFound={hiddenUntilFound}
       role={role}
       aria-labelledby={role ? ctx.labelTriggerId : undefined}
-      className={cn(
-        "overflow-hidden",
-        horizontal
-          ? cn(
-              "h-auto w-[var(--collapsible-panel-width)] transition-[width,opacity] data-[ending-style]:w-0 data-[starting-style]:w-0",
-            )
-          : "h-[var(--collapsible-panel-height)] transition-[height,opacity] data-[ending-style]:h-0 data-[starting-style]:h-0",
-        motion,
-        ctx.animateOpacity && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          "overflow-hidden",
+          horizontal
+            ? cn(
+                "h-auto w-[var(--collapsible-panel-width)] transition-[width,opacity] data-[ending-style]:w-0 data-[starting-style]:w-0",
+              )
+            : "h-[var(--collapsible-panel-height)] transition-[height,opacity] data-[ending-style]:h-0 data-[starting-style]:h-0",
+          motion,
+          ctx.animateOpacity && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...rest}
@@ -674,7 +683,12 @@ const ShowMorePanel = React.forwardRef<HTMLDivElement, ShowMorePanelProps>((prop
         motion,
         faded &&
           "[mask-image:linear-gradient(to_bottom,#000_calc(100%-var(--sp-collapsible-fade-size,3rem)),transparent)]",
-        className,
+        // A plain <div>, not a Base UI part: resolve a state-function className here (GEO-958).
+        resolveClassName(className, {
+          open: ctx.open,
+          disabled: ctx.disabled,
+          transitionStatus: undefined,
+        }),
       )}
       style={{ height, ...(style as React.CSSProperties) }}
       {...(rest as React.ComponentPropsWithoutRef<"div">)}
@@ -717,11 +731,13 @@ const ShowMore = React.forwardRef<HTMLButtonElement, CollapsibleShowMoreProps>((
       id={`${ctx.panelId}-show-more`}
       data-slot="collapsible-show-more"
       aria-controls={ctx.panelId}
-      className={cn(
-        // relative: sits above the clipped preview in stacking order
-        "text-fg-default relative mt-1 inline-flex cursor-pointer items-center gap-1 rounded-sm text-sm font-medium",
-        "focus-visible:sp-focus-ring outline-none hover:underline",
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+      className={mergeClassName(
+        cn(
+          // relative: sits above the clipped preview in stacking order
+          "text-fg-default relative mt-1 inline-flex cursor-pointer items-center gap-1 rounded-sm text-sm font-medium",
+          "focus-visible:sp-focus-ring outline-none hover:underline",
+          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+        ),
         className,
       )}
       {...rest}

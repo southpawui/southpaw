@@ -2,6 +2,14 @@ import * as React from "react";
 import { Field as BaseField } from "@base-ui/react/field";
 import { WarningCircle } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
+
+/**
+ * Whether the nearest Field.Root was given `invalid` (e.g. app or server validation). Base UI's
+ * Field.Error only renders for real constraint validity or `match`, so a Root `invalid` alone
+ * gave a red field with no message (GEO-957). Field.Error reads this to default `match`.
+ */
+const FieldInvalidContext = React.createContext(false);
 
 /* ----- Root ----- */
 interface FieldRootProps extends React.ComponentProps<typeof BaseField.Root> {
@@ -11,18 +19,22 @@ interface FieldRootProps extends React.ComponentProps<typeof BaseField.Root> {
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(
   ({ className, orientation = "vertical", ...props }, ref) => (
-    <BaseField.Root
-      ref={ref}
-      data-slot="field"
-      data-orientation={orientation}
-      className={cn(
-        "flex gap-1.5",
-        orientation === "vertical" && "w-full flex-col",
-        orientation === "horizontal" && "flex-col sm:flex-row sm:items-start sm:gap-4",
-        className,
-      )}
-      {...props}
-    />
+    <FieldInvalidContext.Provider value={Boolean(props.invalid)}>
+      <BaseField.Root
+        ref={ref}
+        data-slot="field"
+        data-orientation={orientation}
+        className={mergeClassName(
+          cn(
+            "flex gap-1.5",
+            orientation === "vertical" && "w-full flex-col",
+            orientation === "horizontal" && "flex-col sm:flex-row sm:items-start sm:gap-4",
+          ),
+          className,
+        )}
+        {...props}
+      />
+    </FieldInvalidContext.Provider>
   ),
 );
 Root.displayName = "Field.Root";
@@ -33,7 +45,7 @@ const Content = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"di
     <div
       ref={ref}
       data-slot="field-content"
-      className={cn("flex flex-1 flex-col gap-1.5", className)}
+      className={mergeClassName(cn("flex flex-1 flex-col gap-1.5"), className)}
       {...props}
     />
   ),
@@ -53,13 +65,15 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
     <BaseField.Label
       ref={ref}
       data-slot="field-label"
-      className={cn(
-        "text-fg-default text-sm font-medium",
-        // Dim with its control when the field is disabled (Base UI sets data-disabled from
-        // Field.Root, Field.Item, or an ancestor Fieldset / disabled ButtonGroup).
-        "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
-        // In horizontal layout, align with control height on sm+
-        "[[data-orientation=horizontal]>&]:sm:mt-2.5 [[data-orientation=horizontal]>&]:sm:w-[var(--sp-field-label-width,8rem)] [[data-orientation=horizontal]>&]:sm:shrink-0",
+      className={mergeClassName(
+        cn(
+          "text-fg-default text-sm font-medium",
+          // Dim with its control when the field is disabled (Base UI sets data-disabled from
+          // Field.Root, Field.Item, or an ancestor Fieldset / disabled ButtonGroup).
+          "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+          // In horizontal layout, align with control height on sm+
+          "[[data-orientation=horizontal]>&]:sm:mt-2.5 [[data-orientation=horizontal]>&]:sm:w-[var(--sp-field-label-width,8rem)] [[data-orientation=horizontal]>&]:sm:shrink-0",
+        ),
         className,
       )}
       {...props}
@@ -88,7 +102,7 @@ const Description = React.forwardRef<
   <BaseField.Description
     ref={ref}
     data-slot="field-description"
-    className={cn("text-fg-muted text-sm", className)}
+    className={mergeClassName(cn("text-fg-muted text-sm"), className)}
     {...props}
   />
 ));
@@ -119,17 +133,23 @@ const ErrorIcon = () => (
   />
 );
 
-const Error = React.forwardRef<HTMLSpanElement, FieldErrorProps>(
-  ({ className, hideIcon = false, errors, children, ...props }, ref) => {
+const Error = React.forwardRef<HTMLDivElement, FieldErrorProps>(
+  ({ className, hideIcon = false, errors, children, match: matchProp, ...props }, ref) => {
     // Determine content: errors array takes precedence over children
     const hasMultiple = errors && errors.length > 1;
     const singleError = errors?.[0] ?? children;
+    // GEO-957: a Root `invalid` (app/server validation) shows the message. An explicit `match`
+    // and Base UI's constraint-validity behaviour are unchanged; an empty Error stays hidden.
+    const rootInvalid = React.useContext(FieldInvalidContext);
+    const hasContent = Boolean(errors?.length) || (children != null && children !== false);
+    const match = matchProp ?? (rootInvalid && hasContent ? true : undefined);
 
     return (
       <BaseField.Error
         ref={ref}
         data-slot="field-error"
-        className={cn("text-danger flex gap-1.5 text-sm", className)}
+        className={mergeClassName(cn("text-danger flex gap-1.5 text-sm"), className)}
+        match={match}
         {...props}
       >
         {!hideIcon && <ErrorIcon />}
@@ -162,7 +182,7 @@ const Separator = React.forwardRef<HTMLDivElement, FieldSeparatorProps>(
     <div
       ref={ref}
       data-slot="field-separator"
-      className={cn("flex items-center gap-3 py-2", className)}
+      className={mergeClassName(cn("flex items-center gap-3 py-2"), className)}
       {...props}
     >
       <div className="bg-border-default h-px flex-1" />
@@ -192,9 +212,8 @@ const CharacterCount = React.forwardRef<HTMLSpanElement, FieldCharacterCountProp
         data-slot="field-character-count"
         aria-live="polite"
         aria-atomic="true"
-        className={cn(
-          "text-xs tabular-nums",
-          isOver ? "text-danger font-medium" : "text-fg-muted",
+        className={mergeClassName(
+          cn("text-xs tabular-nums", isOver ? "text-danger font-medium" : "text-fg-muted"),
           className,
         )}
         {...props}
@@ -220,13 +239,15 @@ const Group = React.forwardRef<HTMLDivElement, FieldGroupProps>(
       ref={ref}
       data-slot="field-group"
       role="group"
-      className={cn(
-        "flex",
-        direction === "column" && "flex-col",
-        direction === "column" && spacing === "tight" && "gap-3",
-        direction === "column" && spacing === "default" && "gap-4",
-        direction === "column" && spacing === "loose" && "gap-6",
-        direction === "row" && "items-center gap-[var(--sp-control-gap)]",
+      className={mergeClassName(
+        cn(
+          "flex",
+          direction === "column" && "flex-col",
+          direction === "column" && spacing === "tight" && "gap-3",
+          direction === "column" && spacing === "default" && "gap-4",
+          direction === "column" && spacing === "loose" && "gap-6",
+          direction === "row" && "items-center gap-[var(--sp-control-gap)]",
+        ),
         className,
       )}
       {...props}

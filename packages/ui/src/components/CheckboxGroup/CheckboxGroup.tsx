@@ -1,6 +1,7 @@
 import * as React from "react";
 import { CheckboxGroup as BaseCheckboxGroup } from "@base-ui/react/checkbox-group";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -11,7 +12,7 @@ const Root = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseCh
     <BaseCheckboxGroup
       ref={ref}
       data-slot="checkbox-group"
-      className={cn("flex flex-col gap-[var(--sp-control-gap)]", className)}
+      className={mergeClassName(cn("flex flex-col gap-[var(--sp-control-gap)]"), className)}
       // Base UI's CheckboxGroup (unlike RadioGroup) doesn't expose aria-disabled, so a disabled
       // group — set directly, from Field.Root, or from an ancestor Fieldset — wasn't announced
       // as disabled, and its (dimmed) group label failed axe contrast.

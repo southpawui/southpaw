@@ -146,4 +146,44 @@ describe("Dialog", () => {
     await user.click(screen.getByText("Open"));
     expect(screen.getByTestId("popup")).toHaveAttribute("data-size", "md");
   });
+
+  it.each(["sm", "md", "lg"] as const)(
+    "size=%s keeps the phone inset alongside its max-width (GEO-970 regression)",
+    async (size) => {
+      const user = userEvent.setup();
+      render(
+        <Dialog.Root>
+          <Dialog.Trigger>Open</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Popup data-testid="popup" size={size}>
+              <Dialog.Title>Sized</Dialog.Title>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>,
+      );
+      await user.click(screen.getByText("Open"));
+      const cls = screen.getByTestId("popup").className;
+      // tailwind-merge used to drop a max-w-[calc(100vw-2rem)] in favour of max-w-{size}.
+      expect(cls).toContain("w-[calc(100%-2rem)]");
+      expect(cls).toContain(`max-w-${size}`);
+    },
+  );
+
+  it("size=full is edge to edge (no inset)", async () => {
+    const user = userEvent.setup();
+    render(
+      <Dialog.Root>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup data-testid="popup" size="full">
+            <Dialog.Title>Full</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>,
+    );
+    await user.click(screen.getByText("Open"));
+    const cls = screen.getByTestId("popup").className;
+    expect(cls).toContain("w-screen");
+    expect(cls).not.toContain("w-[calc(100%-2rem)]");
+  });
 });

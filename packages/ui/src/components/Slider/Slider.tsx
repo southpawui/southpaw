@@ -4,6 +4,7 @@ import { MinusIcon, PlusIcon } from "@phosphor-icons/react";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { Button } from "../Button/Button";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Types
@@ -518,15 +519,17 @@ function RootInner<V extends number | number[]>(
         data-size={size}
         data-valid={valid ? "" : undefined}
         data-readonly={readOnly ? "" : undefined}
-        className={cn(
-          "group/slider flex flex-col gap-[var(--sp-control-gap)]",
-          orientation === "vertical" ? "h-56 w-fit" : "w-full",
-          sizeVars[size],
-          // Colour roles: accent fill (UI control), success when valid, danger when invalid.
-          "[--sp-slider-fill:var(--sp-accent)]",
-          valid && "[--sp-slider-fill:var(--sp-success)]",
-          "data-[invalid]:[--sp-slider-fill:var(--sp-danger)]",
-          readOnly && "[--sp-slider-fill:var(--sp-fg-muted)]",
+        className={mergeClassName(
+          cn(
+            "group/slider flex flex-col gap-[var(--sp-control-gap)]",
+            orientation === "vertical" ? "h-56 w-fit" : "w-full",
+            sizeVars[size],
+            // Colour roles: accent fill (UI control), success when valid, danger when invalid.
+            "[--sp-slider-fill:var(--sp-accent)]",
+            valid && "[--sp-slider-fill:var(--sp-success)]",
+            "data-[invalid]:[--sp-slider-fill:var(--sp-danger)]",
+            readOnly && "[--sp-slider-fill:var(--sp-fg-muted)]",
+          ),
           className,
         )}
         {...props}
@@ -571,7 +574,7 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="slider-header"
-      className={cn("flex items-baseline justify-between gap-2", className)}
+      className={mergeClassName(cn("flex items-baseline justify-between gap-2"), className)}
       {...props}
     />
   ),
@@ -583,7 +586,10 @@ const Label = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
     <BaseSlider.Label
       ref={ref}
       data-slot="slider-label"
-      className={cn("text-fg-default data-[disabled]:text-fg-muted text-sm font-medium", className)}
+      className={mergeClassName(
+        cn("text-fg-default data-[disabled]:text-fg-muted text-sm font-medium"),
+        className,
+      )}
       {...props}
     />
   ),
@@ -597,7 +603,7 @@ const Value = React.forwardRef<HTMLOutputElement, React.ComponentProps<typeof Ba
       <BaseSlider.Value
         ref={ref}
         data-slot="slider-value"
-        className={cn("text-fg-muted text-sm tabular-nums", className)}
+        className={mergeClassName(cn("text-fg-muted text-sm tabular-nums"), className)}
         {...props}
       >
         {children ?? ((_, values) => values.map((v, i) => ctx.display(v, i)).join(" – "))}
@@ -619,9 +625,11 @@ const Body = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">
       <div
         ref={ref}
         data-slot="slider-body"
-        className={cn(
-          "flex",
-          orientation === "vertical" ? "min-h-0 flex-1 flex-row gap-2" : "flex-col gap-1",
+        className={mergeClassName(
+          cn(
+            "flex",
+            orientation === "vertical" ? "min-h-0 flex-1 flex-row gap-2" : "flex-col gap-1",
+          ),
           className,
         )}
         {...props}
@@ -658,16 +666,18 @@ const Control = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Bas
             if (index != null) ctx.setActiveIndex(Number(index));
           }
         }}
-        className={cn(
-          "relative flex touch-none select-none",
-          // Half a thumb of room at each end so thumbs never clip.
-          vertical
-            ? "h-full flex-col items-center py-[calc(var(--sp-slider-thumb)/2)]"
-            : "w-full items-center px-[calc(var(--sp-slider-thumb)/2)]",
-          "min-h-[var(--sp-slider-thumb)] min-w-[var(--sp-slider-thumb)]",
-          ctx.readOnly ? "cursor-default" : "cursor-pointer",
-          // Dim the control only; text keeps AA contrast (axe can't tell it's disabled).
-          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+        className={mergeClassName(
+          cn(
+            "relative flex touch-none select-none",
+            // Half a thumb of room at each end so thumbs never clip.
+            vertical
+              ? "h-full flex-col items-center py-[calc(var(--sp-slider-thumb)/2)]"
+              : "w-full items-center px-[calc(var(--sp-slider-thumb)/2)]",
+            "min-h-[var(--sp-slider-thumb)] min-w-[var(--sp-slider-thumb)]",
+            ctx.readOnly ? "cursor-default" : "cursor-pointer",
+            // Dim the control only; text keeps AA contrast (axe can't tell it's disabled).
+            "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+          ),
           className,
         )}
         {...props}
@@ -707,13 +717,15 @@ const Track = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
             ctx.addHandle(ctx.valueFromPointer(e.clientX, e.clientY));
           }
         }}
-        className={cn(
-          "relative rounded-full",
-          vertical
-            ? "h-full w-[var(--sp-slider-track-size)]"
-            : "h-[var(--sp-slider-track-size)] w-full",
-          "bg-surface-sunken shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--sp-border-control)_50%,transparent)]",
-          "forced-colors:border forced-colors:border-[CanvasText] forced-colors:shadow-none",
+        className={mergeClassName(
+          cn(
+            "relative rounded-full",
+            vertical
+              ? "h-full w-[var(--sp-slider-track-size)]"
+              : "h-[var(--sp-slider-track-size)] w-full",
+            "bg-surface-sunken shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--sp-border-control)_50%,transparent)]",
+            "forced-colors:border forced-colors:border-[CanvasText] forced-colors:shadow-none",
+          ),
           className,
         )}
         {...props}
@@ -800,10 +812,12 @@ const Indicator = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<
                   ? { bottom: `${start}%`, height: `${size}%` }
                   : { insetInlineStart: `${start}%`, width: `${size}%` }
               }
-              className={cn(
-                "absolute rounded-full bg-[var(--sp-slider-fill)]",
-                vertical ? "inset-x-0" : "inset-y-0",
-                canDrag && "cursor-grab active:cursor-grabbing",
+              className={mergeClassName(
+                cn(
+                  "absolute rounded-full bg-[var(--sp-slider-fill)]",
+                  vertical ? "inset-x-0" : "inset-y-0",
+                  canDrag && "cursor-grab active:cursor-grabbing",
+                ),
                 className,
               )}
               {...props}
@@ -836,7 +850,7 @@ const Marks = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<"spa
         ref={ref}
         aria-hidden
         data-slot="slider-marks"
-        className={cn("pointer-events-none absolute inset-0", className)}
+        className={mergeClassName(cn("pointer-events-none absolute inset-0"), className)}
         {...props}
       >
         {visible.map((m) => (
@@ -876,12 +890,14 @@ const MarkLabels = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<
         ref={ref}
         aria-hidden
         data-slot="slider-mark-labels"
-        className={cn(
-          "text-fg-muted relative text-xs",
-          "group-data-[disabled]/slider:opacity-[var(--sp-state-disabled-opacity)]",
-          vertical
-            ? "my-[calc(var(--sp-slider-thumb)/2)] w-12"
-            : "mx-[calc(var(--sp-slider-thumb)/2)] h-5",
+        className={mergeClassName(
+          cn(
+            "text-fg-muted relative text-xs",
+            "group-data-[disabled]/slider:opacity-[var(--sp-state-disabled-opacity)]",
+            vertical
+              ? "my-[calc(var(--sp-slider-thumb)/2)] w-12"
+              : "mx-[calc(var(--sp-slider-thumb)/2)] h-5",
+          ),
           className,
         )}
         {...props}
@@ -931,10 +947,12 @@ const MinMax = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
         ref={ref}
         aria-hidden
         data-slot="slider-min-max"
-        className={cn(
-          "text-fg-muted flex justify-between text-xs tabular-nums",
-          "group-data-[disabled]/slider:opacity-[var(--sp-state-disabled-opacity)]",
-          vertical ? "flex-col-reverse" : "",
+        className={mergeClassName(
+          cn(
+            "text-fg-muted flex justify-between text-xs tabular-nums",
+            "group-data-[disabled]/slider:opacity-[var(--sp-state-disabled-opacity)]",
+            vertical ? "flex-col-reverse" : "",
+          ),
           className,
         )}
         {...props}
@@ -1080,19 +1098,21 @@ const Thumb = React.forwardRef<HTMLDivElement, SliderThumbProps>(
             onPointerLeave?.(e);
             ctx.setHoveredIndex(null);
           }}
-          className={cn(
-            "bg-surface-base block rounded-full border-2 border-[var(--sp-slider-fill)] shadow-sm outline-none",
-            "size-[var(--sp-slider-thumb)]",
-            // ≥ 44px hit area on touch (Apple HIG) without changing the visual size.
-            "pointer-coarse:before:-inset-3 before:absolute before:-inset-1 before:rounded-full before:content-['']",
-            "has-[:focus-visible]:sp-focus-ring",
-            // Emil: press feedback on the thumb.
-            "transition-[scale,box-shadow] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
-            "active:scale-[var(--sp-scale-press)]",
-            ctx.readOnly ? "cursor-default" : "cursor-grab active:cursor-grabbing",
-            "data-[disabled]:cursor-not-allowed data-[disabled]:border-[var(--sp-border-control)]",
-            "data-[removing]:opacity-40",
-            "forced-colors:border-[CanvasText]",
+          className={mergeClassName(
+            cn(
+              "bg-surface-base block rounded-full border-2 border-[var(--sp-slider-fill)] shadow-sm outline-none",
+              "size-[var(--sp-slider-thumb)]",
+              // ≥ 44px hit area on touch (Apple HIG) without changing the visual size.
+              "pointer-coarse:before:-inset-3 before:absolute before:-inset-1 before:rounded-full before:content-['']",
+              "has-[:focus-visible]:sp-focus-ring",
+              // Emil: press feedback on the thumb.
+              "transition-[scale,box-shadow] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
+              "active:scale-[var(--sp-scale-press)]",
+              ctx.readOnly ? "cursor-default" : "cursor-grab active:cursor-grabbing",
+              "data-[disabled]:cursor-not-allowed data-[disabled]:border-[var(--sp-border-control)]",
+              "data-[removing]:opacity-40",
+              "forced-colors:border-[CanvasText]",
+            ),
             className,
           )}
           {...props}

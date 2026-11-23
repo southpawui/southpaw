@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 // Bundlers statically replace `process.env.NODE_ENV`; declared locally so the
 // library doesn't need Node types.
@@ -78,7 +79,7 @@ const Link = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
         ...props,
         href,
         "data-slot": "skip-link",
-        className: cn(linkClasses, className),
+        className: mergeClassName(cn(linkClasses), className),
         children,
         onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
           onClick?.(event);
@@ -136,7 +137,7 @@ const Target = React.forwardRef<HTMLDivElement, SkipLinkTargetProps>(
         ...props,
         id,
         "data-slot": "skip-link-target",
-        className: cn("outline-none", className),
+        className: mergeClassName(cn("outline-none"), className),
         style: scrollMargin != null ? { scrollMarginTop: scrollMargin, ...style } : style,
       },
     }),

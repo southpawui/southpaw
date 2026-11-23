@@ -21,3 +21,20 @@ Styled Select with token system.
 **Read-only state**: Sunken background, non-interactive. Why: matches Input/Textarea read-only pattern. 2+ competitors (Spectrum, Mantine) have this.
 
 **`alignItemWithTrigger={false}` default on Positioner**: Why: Base UI's default positions the popup so the selected item overlays the trigger (native `<select>` feel). This caused positioning issues in our layout. Setting to `false` puts the popup below the trigger (dropdown feel), which is what shadcn and most modern libraries do.
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- Ref types now match what Base UI renders: `Select.Trigger` is `HTMLButtonElement` (it was `HTMLDivElement`, but it renders a `<button>`), and `Select.ItemText` is `HTMLDivElement` (it was `HTMLSpanElement`).
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Open styling keys off `aria-expanded`, not `data-popup-open` (GEO-970 Part A)
+
+- **Why:** Base UI sets `data-popup-open` on a **Tooltip** trigger while its tooltip shows. A tooltip on a disclosure trigger therefore faked the open look. Combobox had worked around it with its own `data-list-open`.
+- **One convention now:** a trigger's open state is styled from `aria-expanded="true"`. Disclosures set it (Menu, Select, NavigationMenu and Combobox, checked in Chromium); Tooltip triggers never do.
+- The trigger's accent border and the icon rotation use `aria-expanded` (`aria-expanded:border-accent`, `[[aria-expanded=true]_&]:rotate-180`). Checked: the border goes from control to accent only when open.
+- `pnpm verify` passes all checks.

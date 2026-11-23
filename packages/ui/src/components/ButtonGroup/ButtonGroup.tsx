@@ -3,22 +3,13 @@ import { useRender } from "@base-ui/react/use-render";
 import { Fieldset as BaseFieldset } from "@base-ui/react/fieldset";
 import { Separator as BaseSeparator } from "@base-ui/react/separator";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { connectedClasses } from "../../lib/connected";
 import { ButtonGroupContext, type ButtonGroupContextValue } from "./context";
 
 function isDev(): boolean {
   const env = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env;
   return env?.NODE_ENV !== "production";
-}
-
-/** Base UI's className may be a function of state; clsx drops functions, so wrap them. */
-type ClassNameProp<State> = string | ((state: State) => string | undefined) | undefined;
-function mergeClassName<State>(
-  base: string,
-  className: ClassNameProp<State>,
-): ClassNameProp<State> {
-  if (typeof className === "function") return (state: State) => cn(base, className(state));
-  return cn(base, className);
 }
 
 type Orientation = "horizontal" | "vertical";
@@ -127,43 +118,48 @@ const Root = React.forwardRef<HTMLFieldSetElement, ButtonGroupRootProps>(
         data-attached={attached ? "" : undefined}
         aria-disabled={disabled || undefined}
         {...(props as React.ComponentProps<typeof BaseFieldset.Root>)}
-        className={cn(
-          // A <fieldset>: reset its default chrome (min-inline-size: min-content would stop wrapping).
-          "m-0 flex min-w-0 max-w-full border-0 p-0",
-          // Toggles fit their content on their own (w-fit); inside a group the group's layout
-          // decides, as for Buttons (stretch when vertical/stacked, grow when `grow`). Icon-only
-          // toggles keep their square.
-          "[&>[data-slot=toggle]:not([data-icon-only])]:w-auto",
-          // ---- Attached (connected) ----
-          attached && connectedClasses(orientation),
-          attached && horizontal && cn("items-stretch", justify[align]),
-          attached && !horizontal && "w-fit",
-          // Solid buttons have no border: draw a divider so the boundary between actions
-          // is visible (WCAG 1.4.11). Drawn from the button's own text colour at 50%, which always
-          // contrasts with its fill (the surface colour vanished on inverse buttons).
-          attached &&
-            horizontal &&
-            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_1px_0_0_color-mix(in_srgb,currentColor_50%,transparent)]",
-          attached &&
-            !horizontal &&
-            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_50%,transparent)]",
-          // Inputs and Select triggers fill the remaining space in an attached row (shadcn, Ant).
-          attached &&
-            horizontal &&
-            "[&>[data-slot=input-group]]:min-w-0 [&>[data-slot=input-group]]:flex-1 [&>[data-slot=select-trigger]]:w-auto [&>[data-slot=select-trigger]]:min-w-0",
-          // ---- Spaced ----
-          !attached && "gap-[var(--sp-control-gap)]",
-          !attached &&
-            horizontal &&
-            !stacks &&
-            cn("flex-row flex-wrap items-center", justify[align]),
-          // GOV.UK: stack full width on small screens, row from `sm` up.
-          stacks &&
-            cn("flex-col items-stretch sm:flex-row sm:flex-wrap sm:items-center", smJustify[align]),
-          !attached && !horizontal && cn("flex-col", grow ? "items-stretch" : itemsAlign[align]),
-          // ---- Grow ----
-          grow && horizontal && "[&>:not([role=separator])]:flex-1",
-          grow && !horizontal && "w-full [&>:not([role=separator])]:w-full",
+        className={mergeClassName(
+          cn(
+            // A <fieldset>: reset its default chrome (min-inline-size: min-content would stop wrapping).
+            "m-0 flex min-w-0 max-w-full border-0 p-0",
+            // Toggles fit their content on their own (w-fit); inside a group the group's layout
+            // decides, as for Buttons (stretch when vertical/stacked, grow when `grow`). Icon-only
+            // toggles keep their square.
+            "[&>[data-slot=toggle]:not([data-icon-only])]:w-auto",
+            // ---- Attached (connected) ----
+            attached && connectedClasses(orientation),
+            attached && horizontal && cn("items-stretch", justify[align]),
+            attached && !horizontal && "w-fit",
+            // Solid buttons have no border: draw a divider so the boundary between actions
+            // is visible (WCAG 1.4.11). Drawn from the button's own text colour at 50%, which always
+            // contrasts with its fill (the surface colour vanished on inverse buttons).
+            attached &&
+              horizontal &&
+              "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_1px_0_0_color-mix(in_srgb,currentColor_50%,transparent)]",
+            attached &&
+              !horizontal &&
+              "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[data-base-ui-focus-guard]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_50%,transparent)]",
+            // Inputs and Select triggers fill the remaining space in an attached row (shadcn, Ant).
+            attached &&
+              horizontal &&
+              "[&>[data-slot=input-group]]:min-w-0 [&>[data-slot=input-group]]:flex-1 [&>[data-slot=select-trigger]]:w-auto [&>[data-slot=select-trigger]]:min-w-0",
+            // ---- Spaced ----
+            !attached && "gap-[var(--sp-control-gap)]",
+            !attached &&
+              horizontal &&
+              !stacks &&
+              cn("flex-row flex-wrap items-center", justify[align]),
+            // GOV.UK: stack full width on small screens, row from `sm` up.
+            stacks &&
+              cn(
+                "flex-col items-stretch sm:flex-row sm:flex-wrap sm:items-center",
+                smJustify[align],
+              ),
+            !attached && !horizontal && cn("flex-col", grow ? "items-stretch" : itemsAlign[align]),
+            // ---- Grow ----
+            grow && horizontal && "[&>:not([role=separator])]:flex-1",
+            grow && !horizontal && "w-full [&>:not([role=separator])]:w-full",
+          ),
           className,
         )}
       >
@@ -232,11 +228,13 @@ const Text = React.forwardRef<HTMLSpanElement, ButtonGroupTextProps>(
       props: {
         "data-slot": "button-group-text",
         ...props,
-        className: cn(
-          "bg-surface-sunken text-fg-default border-border-control inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 text-sm font-medium",
-          "rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-          "[&>svg]:size-[var(--sp-control-icon)]",
-          textHeight[group?.size ?? "md"],
+        className: mergeClassName(
+          cn(
+            "bg-surface-sunken text-fg-default border-border-control inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-2 text-sm font-medium",
+            "rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+            "[&>svg]:size-[var(--sp-control-icon)]",
+            textHeight[group?.size ?? "md"],
+          ),
           className,
         ),
       },

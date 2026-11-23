@@ -158,3 +158,11 @@ Research: see RESEARCH.md (all 9 libraries + Base UI source + Sonner/Emil). Bran
     | ------------- | -------------------------- |
     | Body text     | 7.5:1                      |
     | Icon / border | 4.5:1 (light-mode warning) |
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- `Toast.Action`, `Toast.Close` and `Toast.CloseButton` render our Button through a **render function** `(renderProps, state) => <Button …/>`. The consumer's `className` resolves with the part's own state; before, it was put straight on the Button, where a function was dropped.
+- Checked in Chromium: the Undo action is an outline button 32px tall, the × button is 32×32 and named "Dismiss notification", and clicking the action dismisses the toast.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

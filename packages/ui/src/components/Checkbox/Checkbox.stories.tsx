@@ -229,6 +229,7 @@ export const Themes: Story = {
                 <Checkbox.Root />
                 <Field.Content>
                   <Field.Label className="cursor-pointer">Error</Field.Label>
+                  <Field.Error>Select to confirm you agree</Field.Error>
                 </Field.Content>
               </Field.Group>
             </Field.Root>

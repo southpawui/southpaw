@@ -30,7 +30,7 @@ function Demo({ label, description, error, invalid, ...root }: DemoProps) {
       <Field.Label>{label}</Field.Label>
       <OTPField.Root {...root} />
       {description && <Field.Description>{description}</Field.Description>}
-      {error && <Field.Error match>{error}</Field.Error>}
+      {error && <Field.Error>{error}</Field.Error>}
     </Field.Root>
   );
 }
@@ -198,7 +198,14 @@ export const Themes: Story = {
           <div className="flex flex-col gap-5">
             <Heading>Attached</Heading>
             <Demo label="Attached" attached groups={[3, 3]} defaultValue="4829" />
-            <Demo label="Attached, error" attached groups={[3, 3]} defaultValue="48" invalid />
+            <Demo
+              label="Attached, error"
+              attached
+              groups={[3, 3]}
+              defaultValue="48"
+              invalid
+              error="Enter the 6-digit code"
+            />
             <Demo label="Attached, valid" attached groups={[3, 3]} defaultValue="482913" valid />
           </div>
           <div className="flex flex-col gap-5">

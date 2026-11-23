@@ -2,6 +2,7 @@ import * as React from "react";
 import { Field as BaseField } from "@base-ui/react/field";
 import { CheckIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Textarea
@@ -21,28 +22,30 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div
         data-slot="textarea-group"
-        className={cn(
-          "relative flex",
-          !autosize &&
-            { none: "", vertical: "resize-y", horizontal: "resize-x", both: "resize" }[resize],
-          "overflow-hidden",
-          "bg-surface-base w-full rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-          "border-border-control border-2",
-          "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-          "hover:has-[:not(:disabled,:read-only)]:border-fg-muted",
-          "has-[:focus-visible]:sp-focus-ring",
-          "has-[[data-invalid]]:!border-danger",
-          valid && "!border-success",
-          "has-[:disabled]:bg-surface-sunken has-[:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
-          "has-[textarea:read-only]:bg-surface-sunken has-[textarea:read-only]:border-border-default",
+        className={mergeClassName(
+          cn(
+            "relative flex",
+            !autosize &&
+              { none: "", vertical: "resize-y", horizontal: "resize-x", both: "resize" }[resize],
+            "overflow-hidden",
+            "bg-surface-base w-full rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+            "border-border-control border-2",
+            "transition-[border-color,box-shadow] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+            "hover:has-[:not(:disabled,:read-only)]:border-fg-muted",
+            "has-[:focus-visible]:sp-focus-ring",
+            "has-[[data-invalid]]:!border-danger",
+            valid && "!border-success",
+            "has-[:disabled]:bg-surface-sunken has-[:disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+            "has-[textarea:read-only]:bg-surface-sunken has-[textarea:read-only]:border-border-default",
+          ),
           className,
         )}
       >
         <BaseField.Control
           ref={ref}
-          render={<textarea />}
+          // `rows` belongs to the rendered <textarea>; Field.Control's props are input-typed.
+          render={<textarea rows={rows ?? 3} />}
           data-slot="textarea"
-          rows={rows ?? 3}
           className={cn(
             "text-fg-default placeholder:text-fg-muted w-full bg-transparent text-sm outline-none",
             "px-3 py-2 [[data-density=comfortable]_&]:px-4 [[data-density=comfortable]_&]:py-3 [[data-density=compact]_&]:px-2 [[data-density=compact]_&]:py-1.5",
@@ -52,7 +55,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             !autosize &&
               "min-h-20 [[data-density=comfortable]_&]:min-h-24 [[data-density=compact]_&]:min-h-16",
           )}
-          {...props}
+          // Field.Control is typed for <input>; it renders our <textarea>, so its props apply.
+          {...(props as React.ComponentProps<typeof BaseField.Control>)}
         />
         {valid && (
           <span

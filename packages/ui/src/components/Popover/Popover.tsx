@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root (pass-through)
@@ -16,7 +17,12 @@ const Trigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof BasePopover.Trigger>
 >(({ className, ...props }, ref) => (
-  <BasePopover.Trigger ref={ref} data-slot="popover-trigger" className={cn(className)} {...props} />
+  <BasePopover.Trigger
+    ref={ref}
+    data-slot="popover-trigger"
+    className={mergeClassName(cn(""), className)}
+    {...props}
+  />
 ));
 Trigger.displayName = "Popover.Trigger";
 
@@ -37,7 +43,7 @@ const Positioner = React.forwardRef<
   <BasePopover.Positioner
     ref={ref}
     data-slot="popover-positioner"
-    className={cn("outline-none", className)}
+    className={mergeClassName(cn("outline-none"), className)}
     {...props}
   />
 ));
@@ -52,13 +58,15 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseP
     <BasePopover.Popup
       ref={ref}
       data-slot="popover-popup"
-      className={cn(
-        "bg-surface-overlay border-border-default w-72 rounded-[var(--radius-DEFAULT)] border p-4 shadow-lg outline-none",
-        // Animation — scale from transform origin (set by Base UI positioner)
-        "origin-[var(--transform-origin)]",
-        "transition-[transform,scale,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
-        "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
-        "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          "bg-surface-overlay border-border-default w-72 rounded-[var(--radius-DEFAULT)] border p-4 shadow-lg outline-none",
+          // Animation — scale from transform origin (set by Base UI positioner)
+          "origin-[var(--transform-origin)]",
+          "transition-[transform,scale,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
+          "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+          "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -76,8 +84,10 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseP
     <BasePopover.Arrow
       ref={ref}
       data-slot="popover-arrow"
-      className={cn(
-        "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
+      className={mergeClassName(
+        cn(
+          "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
+        ),
         className,
       )}
       {...props}
@@ -106,7 +116,7 @@ const Title = React.forwardRef<HTMLHeadingElement, React.ComponentProps<typeof B
     <BasePopover.Title
       ref={ref}
       data-slot="popover-title"
-      className={cn("text-fg-default text-base font-semibold", className)}
+      className={mergeClassName(cn("text-fg-default text-base font-semibold"), className)}
       {...props}
     />
   ),
@@ -124,7 +134,7 @@ const Description = React.forwardRef<
   <BasePopover.Description
     ref={ref}
     data-slot="popover-description"
-    className={cn("text-fg-muted mt-1 text-sm", className)}
+    className={mergeClassName(cn("text-fg-muted mt-1 text-sm"), className)}
     {...props}
   />
 ));
@@ -136,7 +146,12 @@ Description.displayName = "Popover.Description";
 
 const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BasePopover.Close>>(
   ({ className, ...props }, ref) => (
-    <BasePopover.Close ref={ref} data-slot="popover-close" className={cn(className)} {...props} />
+    <BasePopover.Close
+      ref={ref}
+      data-slot="popover-close"
+      className={mergeClassName(cn(""), className)}
+      {...props}
+    />
   ),
 );
 Close.displayName = "Popover.Close";

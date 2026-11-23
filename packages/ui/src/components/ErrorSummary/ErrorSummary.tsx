@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { WarningCircle } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import {
   getErrorMessage,
   lowerFirst,
@@ -276,11 +277,13 @@ const Root = React.forwardRef<HTMLDivElement, ErrorSummaryRootProps>(
           ref={ref}
           data-slot="error-summary"
           hidden={!visible}
-          className={cn(
-            "border-danger bg-surface-base text-fg-default rounded-md border border-s-4",
-            "p-[calc(var(--sp-control-gap)*2)] outline-none",
-            // Focus moves here by script after a click, which :focus-visible misses
-            "focus:sp-focus-ring",
+          className={mergeClassName(
+            cn(
+              "border-danger bg-surface-base text-fg-default rounded-md border border-s-4",
+              "p-[calc(var(--sp-control-gap)*2)] outline-none",
+              // Focus moves here by script after a click, which :focus-visible misses
+              "focus:sp-focus-ring",
+            ),
             className,
           )}
           {...props}
@@ -316,7 +319,10 @@ const Title = React.forwardRef<HTMLHeadingElement, React.ComponentPropsWithRef<"
         ref={ref}
         id={ctx.titleId}
         data-slot="error-summary-title"
-        className={cn("text-fg-default flex items-start gap-2 text-base font-semibold", className)}
+        className={mergeClassName(
+          cn("text-fg-default flex items-start gap-2 text-base font-semibold"),
+          className,
+        )}
         {...props}
       >
         <WarningCircle
@@ -336,7 +342,7 @@ const Description = React.forwardRef<HTMLParagraphElement, React.ComponentPropsW
     <p
       ref={ref}
       data-slot="error-summary-description"
-      className={cn("text-fg-default ps-7 text-sm", className)}
+      className={mergeClassName(cn("text-fg-default ps-7 text-sm"), className)}
       {...props}
     />
   ),
@@ -371,7 +377,7 @@ const List = React.forwardRef<HTMLUListElement, ErrorSummaryListProps>(
       <ul
         ref={ref}
         data-slot="error-summary-list"
-        className={cn("flex flex-col gap-1 ps-7 text-sm", className)}
+        className={mergeClassName(cn("flex flex-col gap-1 ps-7 text-sm"), className)}
         {...props}
       >
         {content}
@@ -428,7 +434,7 @@ const Item = React.forwardRef<HTMLLIElement, ErrorSummaryItemProps>(
       <li
         ref={ref}
         data-slot="error-summary-item"
-        className={cn(!linked && "text-danger font-medium", className)}
+        className={mergeClassName(cn(!linked && "text-danger font-medium"), className)}
         {...props}
       >
         {linked ? link : children}

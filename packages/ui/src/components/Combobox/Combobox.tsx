@@ -4,6 +4,7 @@ import * as React from "react";
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 import type { Virtualizer } from "@tanstack/react-virtual";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import {
   ComboboxContext,
   RETRY,
@@ -676,7 +677,7 @@ const Label = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseC
     <BaseCombobox.Label
       ref={ref}
       data-slot="combobox-label"
-      className={cn("text-fg-default text-sm font-medium", className)}
+      className={mergeClassName(cn("text-fg-default text-sm font-medium"), className)}
       {...props}
     />
   ),

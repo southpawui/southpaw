@@ -226,7 +226,9 @@ describe("Tooltip", () => {
 
   it("forwards the trigger ref and keeps it stable across re-renders", () => {
     const calls: Array<HTMLButtonElement | null> = [];
-    const ref = (node: HTMLButtonElement | null) => calls.push(node);
+    const ref = (node: HTMLButtonElement | null) => {
+      calls.push(node);
+    };
     function Harness({ n }: { n: number }) {
       return (
         <Tooltip.Root>

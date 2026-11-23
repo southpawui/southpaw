@@ -2,6 +2,7 @@ import * as React from "react";
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 import { Separator as BaseSeparator } from "@base-ui/react/separator";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { connectedClasses } from "../../lib/connected";
 import { ButtonGroupContext, type ButtonGroupContextValue } from "../ButtonGroup/context";
 import { Toggle } from "../Toggle/Toggle";
@@ -227,43 +228,45 @@ const Root = React.forwardRef<HTMLDivElement, ToggleGroupRootProps>(
         orientation={orientation}
         disabled={disabled}
         {...props}
-        className={cn(
-          "relative max-w-full",
-          grow ? "flex w-full" : "inline-flex",
-          // Toggles fit their content on their own; inside the group its layout decides.
-          // Icon-only items keep their square.
-          "[&>[data-slot=toggle]:not([data-icon-only])]:w-auto",
-          // ---- Attached ----
-          attached && connectedClasses(orientation),
-          attached && horizontal && "items-stretch",
-          attached && !horizontal && !grow && "w-fit",
-          attached &&
-            horizontal &&
-            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_1px_0_0_color-mix(in_srgb,currentColor_50%,transparent)]",
-          attached &&
-            !horizontal &&
-            "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_50%,transparent)]",
-          // ---- Spaced ----
-          !attached && "gap-[var(--sp-control-gap)]",
-          !attached && horizontal && "flex-row flex-wrap items-center",
-          !attached && !horizontal && "flex-col items-stretch",
-          // ---- Grow ----
-          grow && horizontal && "[&>:not([role=separator])]:flex-1",
-          grow && !horizontal && "[&>:not([role=separator])]:w-full",
-          // ---- Hide labels on small screens (labels stay as the accessible name) ----
-          hideLabelsBelow === "sm" && "max-sm:[&_[data-slot=toggle-label]]:sr-only",
-          hideLabelsBelow === "md" && "max-md:[&_[data-slot=toggle-label]]:sr-only",
-          // ---- Sliding indicator: the root's ::before, under the pressed item ----
-          sliding && [
-            "before:pointer-events-none before:absolute before:left-0 before:top-0 before:content-['']",
-            "before:h-[var(--sp-tg-h)] before:w-[var(--sp-tg-w)] before:translate-x-[var(--sp-tg-x)] before:translate-y-[var(--sp-tg-y)] before:rounded-[var(--sp-tg-r)]",
-            "before:opacity-0 data-[indicator]:before:opacity-100",
-            "data-[indicator=ready]:before:transition-[translate,width,height,opacity] data-[indicator=ready]:before:duration-[var(--sp-duration-normal)] data-[indicator=ready]:before:ease-[var(--sp-easing-default)] motion-reduce:before:!transition-none",
-            "forced-colors:before:hidden",
-            indicatorFill[resolvedVariant === "solid" ? "solid" : "tint"][resolvedColor],
-            // The indicator is the pressed fill, so the pressed item itself goes transparent.
-            "[&>[data-slot=toggle][data-pressed]]:!bg-transparent forced-colors:[&>[data-slot=toggle][data-pressed]]:!bg-[Highlight]",
-          ],
+        className={mergeClassName(
+          cn(
+            "relative max-w-full",
+            grow ? "flex w-full" : "inline-flex",
+            // Toggles fit their content on their own; inside the group its layout decides.
+            // Icon-only items keep their square.
+            "[&>[data-slot=toggle]:not([data-icon-only])]:w-auto",
+            // ---- Attached ----
+            attached && connectedClasses(orientation),
+            attached && horizontal && "items-stretch",
+            attached && !horizontal && !grow && "w-fit",
+            attached &&
+              horizontal &&
+              "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_1px_0_0_color-mix(in_srgb,currentColor_50%,transparent)]",
+            attached &&
+              !horizontal &&
+              "[&>:is([data-variant=solid]+[data-variant=solid],[data-variant=solid]+[type=hidden]+[data-variant=solid])]:shadow-[inset_0_1px_0_color-mix(in_srgb,currentColor_50%,transparent)]",
+            // ---- Spaced ----
+            !attached && "gap-[var(--sp-control-gap)]",
+            !attached && horizontal && "flex-row flex-wrap items-center",
+            !attached && !horizontal && "flex-col items-stretch",
+            // ---- Grow ----
+            grow && horizontal && "[&>:not([role=separator])]:flex-1",
+            grow && !horizontal && "[&>:not([role=separator])]:w-full",
+            // ---- Hide labels on small screens (labels stay as the accessible name) ----
+            hideLabelsBelow === "sm" && "max-sm:[&_[data-slot=toggle-label]]:sr-only",
+            hideLabelsBelow === "md" && "max-md:[&_[data-slot=toggle-label]]:sr-only",
+            // ---- Sliding indicator: the root's ::before, under the pressed item ----
+            sliding && [
+              "before:pointer-events-none before:absolute before:left-0 before:top-0 before:content-['']",
+              "before:h-[var(--sp-tg-h)] before:w-[var(--sp-tg-w)] before:translate-x-[var(--sp-tg-x)] before:translate-y-[var(--sp-tg-y)] before:rounded-[var(--sp-tg-r)]",
+              "before:opacity-0 data-[indicator]:before:opacity-100",
+              "data-[indicator=ready]:before:transition-[translate,width,height,opacity] data-[indicator=ready]:before:duration-[var(--sp-duration-normal)] data-[indicator=ready]:before:ease-[var(--sp-easing-default)] motion-reduce:before:!transition-none",
+              "forced-colors:before:hidden",
+              indicatorFill[resolvedVariant === "solid" ? "solid" : "tint"][resolvedColor],
+              // The indicator is the pressed fill, so the pressed item itself goes transparent.
+              "[&>[data-slot=toggle][data-pressed]]:!bg-transparent forced-colors:[&>[data-slot=toggle][data-pressed]]:!bg-[Highlight]",
+            ],
+          ),
           className,
         )}
       >
@@ -326,11 +329,13 @@ const Separator = React.forwardRef<
       ref={ref}
       data-slot="toggle-group-separator"
       orientation={resolved}
-      className={cn(
-        "bg-border-control shrink-0 self-stretch forced-colors:bg-[CanvasText]",
-        resolved === "vertical" ? "w-px" : "h-px w-full",
-        // Spaced groups: keep the line short of the items (like ButtonGroup.Separator).
-        !group?.attached && (resolved === "vertical" ? "my-1.5" : "mx-1.5"),
+      className={mergeClassName(
+        cn(
+          "bg-border-control shrink-0 self-stretch forced-colors:bg-[CanvasText]",
+          resolved === "vertical" ? "w-px" : "h-px w-full",
+          // Spaced groups: keep the line short of the items (like ButtonGroup.Separator).
+          !group?.attached && (resolved === "vertical" ? "my-1.5" : "mx-1.5"),
+        ),
         className,
       )}
       {...props}

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { PreviewCard as BasePreviewCard } from "@base-ui/react/preview-card";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Defaults
@@ -362,14 +363,16 @@ const Trigger = React.forwardRef<HTMLAnchorElement, TriggerProps>(
         delay={delay}
         closeDelay={closeDelay}
         data-slot="preview-card-trigger"
-        className={cn(
-          "text-fg-default rounded-[2px] underline decoration-1 underline-offset-4",
-          "decoration-[color-mix(in_oklab,var(--sp-fg-default)_40%,transparent)]",
-          "transition-[text-decoration-color] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-          "hover:decoration-current data-[popup-open]:decoration-current",
-          "focus-visible:sp-focus-ring outline-none",
-          "forced-colors:decoration-[LinkText]",
-          touchEnabled && "[-webkit-touch-callout:none]",
+        className={mergeClassName(
+          cn(
+            "text-fg-default rounded-[2px] underline decoration-1 underline-offset-4",
+            "decoration-[color-mix(in_oklab,var(--sp-fg-default)_40%,transparent)]",
+            "transition-[text-decoration-color] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+            "hover:decoration-current data-[popup-open]:decoration-current",
+            "focus-visible:sp-focus-ring outline-none",
+            "forced-colors:decoration-[LinkText]",
+            touchEnabled && "[-webkit-touch-callout:none]",
+          ),
           className,
         )}
         {...touchHandlers}
@@ -400,10 +403,12 @@ const Positioner = React.forwardRef<
     data-slot="preview-card-positioner"
     sideOffset={sideOffset}
     collisionPadding={collisionPadding}
-    className={cn(
-      "z-50 outline-none",
-      // Mantine hideDetached — hide when the trigger scrolls out of view.
-      "data-[anchor-hidden]:invisible",
+    className={mergeClassName(
+      cn(
+        "z-50 outline-none",
+        // Mantine hideDetached — hide when the trigger scrolls out of view.
+        "data-[anchor-hidden]:invisible",
+      ),
       className,
     )}
     {...props}
@@ -438,19 +443,21 @@ const Popup = React.forwardRef<HTMLDivElement, PreviewCardPopupProps>(
         data-size={size}
         data-density={ctx?.density}
         data-instant={ctx?.instant ? "" : undefined}
-        className={cn(
-          "bg-surface-overlay border-border-default text-fg-default rounded-[var(--radius-DEFAULT)] border shadow-lg outline-none",
-          "max-w-[var(--available-width)]",
-          sizeClasses[size],
-          "flex flex-col gap-[var(--sp-control-gap)] p-[calc(var(--sp-control-gap)*2)]",
-          "forced-colors:border-[CanvasText]",
-          // Motion (Emil): small popover 200ms in, faster out, scale from the trigger, ease-out.
-          "origin-[var(--transform-origin)]",
-          "transition-[transform,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
-          "data-[ending-style]:duration-[var(--sp-duration-fast)]",
-          "data-[starting-style]:scale-[var(--sp-scale-press)] data-[starting-style]:opacity-0",
-          "data-[ending-style]:scale-[var(--sp-scale-press)] data-[ending-style]:opacity-0",
-          "data-[instant]:duration-0",
+        className={mergeClassName(
+          cn(
+            "bg-surface-overlay border-border-default text-fg-default rounded-[var(--radius-DEFAULT)] border shadow-lg outline-none",
+            "max-w-[var(--available-width)]",
+            sizeClasses[size],
+            "flex flex-col gap-[var(--sp-control-gap)] p-[calc(var(--sp-control-gap)*2)]",
+            "forced-colors:border-[CanvasText]",
+            // Motion (Emil): small popover 200ms in, faster out, scale from the trigger, ease-out.
+            "origin-[var(--transform-origin)]",
+            "transition-[transform,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
+            "data-[ending-style]:duration-[var(--sp-duration-fast)]",
+            "data-[starting-style]:scale-[var(--sp-scale-press)] data-[starting-style]:opacity-0",
+            "data-[ending-style]:scale-[var(--sp-scale-press)] data-[ending-style]:opacity-0",
+            "data-[instant]:duration-0",
+          ),
           className,
         )}
         {...props}
@@ -471,13 +478,15 @@ const Viewport = React.forwardRef<
   <BasePreviewCard.Viewport
     ref={ref}
     data-slot="preview-card-viewport"
-    className={cn(
-      "relative",
-      "[&_[data-previous]]:absolute [&_[data-previous]]:inset-0",
-      "[&_[data-current]]:transition-opacity [&_[data-previous]]:transition-opacity",
-      "[&_[data-current]]:duration-[var(--sp-duration-fast)] [&_[data-previous]]:duration-[var(--sp-duration-fast)]",
-      "[&_[data-current][data-starting-style]]:opacity-0 [&_[data-previous][data-ending-style]]:opacity-0",
-      "data-[instant]:[&_*]:duration-0",
+    className={mergeClassName(
+      cn(
+        "relative",
+        "[&_[data-previous]]:absolute [&_[data-previous]]:inset-0",
+        "[&_[data-current]]:transition-opacity [&_[data-previous]]:transition-opacity",
+        "[&_[data-current]]:duration-[var(--sp-duration-fast)] [&_[data-previous]]:duration-[var(--sp-duration-fast)]",
+        "[&_[data-current][data-starting-style]]:opacity-0 [&_[data-previous][data-ending-style]]:opacity-0",
+        "data-[instant]:[&_*]:duration-0",
+      ),
       className,
     )}
     {...props}
@@ -494,10 +503,12 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseP
     <BasePreviewCard.Arrow
       ref={ref}
       data-slot="preview-card-arrow"
-      className={cn(
-        "forced-colors:hidden",
-        "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
-        "data-[side=inline-end]:left-[-5px] data-[side=inline-start]:right-[-5px]",
+      className={mergeClassName(
+        cn(
+          "forced-colors:hidden",
+          "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
+          "data-[side=inline-end]:left-[-5px] data-[side=inline-start]:right-[-5px]",
+        ),
         className,
       )}
       {...props}
@@ -584,9 +595,11 @@ const Media = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div"
     <div
       ref={ref}
       data-slot="preview-card-media"
-      className={cn(
-        "bg-surface-sunken aspect-video overflow-hidden rounded-[calc(var(--radius-DEFAULT)-4px)]",
-        "[&>img]:size-full [&>img]:object-cover",
+      className={mergeClassName(
+        cn(
+          "bg-surface-sunken aspect-video overflow-hidden rounded-[calc(var(--radius-DEFAULT)-4px)]",
+          "[&>img]:size-full [&>img]:object-cover",
+        ),
         className,
       )}
       {...props}
@@ -600,7 +613,7 @@ const Title = React.forwardRef<HTMLParagraphElement, React.ComponentPropsWithRef
     <p
       ref={ref}
       data-slot="preview-card-title"
-      className={cn("text-fg-default text-sm font-semibold", className)}
+      className={mergeClassName(cn("text-fg-default text-sm font-semibold"), className)}
       {...props}
     />
   ),
@@ -612,7 +625,7 @@ const Description = React.forwardRef<HTMLParagraphElement, React.ComponentPropsW
     <p
       ref={ref}
       data-slot="preview-card-description"
-      className={cn("text-fg-muted text-sm", className)}
+      className={mergeClassName(cn("text-fg-muted text-sm"), className)}
       {...props}
     />
   ),

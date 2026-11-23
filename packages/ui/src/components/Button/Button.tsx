@@ -2,6 +2,7 @@ import * as React from "react";
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Spinner } from "../Spinner/Spinner";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { ButtonGroupContext } from "../ButtonGroup/context";
 
 export interface ButtonProps extends Omit<React.ComponentProps<typeof BaseButton>, "color"> {
@@ -114,53 +115,58 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         // and swallows activation (GEO-932: Primer `inactive`).
         focusableWhenDisabled={isInactive || undefined}
         data-inactive={isInactive ? "" : undefined}
-        className={cn(
-          // Base
-          "inline-flex cursor-pointer items-center justify-center font-medium",
-          // Gap between icon/spinner and text (only when both present)
-          !isIconOnly && hasIcon && "gap-2",
-          // Shape — uses nested radius when container sets it, otherwise default
-          "rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
-          // Motion (Emil's easing)
-          "transition-[color,background-color,border-color,box-shadow,transform]",
-          "duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-          // Press feedback (Emil's scale) — not when loading
-          !loading && !isInactive && "active:scale-[var(--sp-scale-press)]",
-          // Focus — two-tone ring
-          "focus-visible:sp-focus-ring",
-          // Disabled / loading
-          "disabled:pointer-events-none disabled:opacity-[var(--sp-state-disabled-opacity)]",
-          // Loading keeps full opacity (unlike disabled)
-          loading && "pointer-events-none opacity-80",
-          // Inactive: the disabled look, but pointer events stay on so a Tooltip can open.
-          isInactive && "cursor-not-allowed opacity-[var(--sp-state-disabled-opacity)]",
+        className={mergeClassName(
+          cn(
+            // Base
+            "inline-flex cursor-pointer items-center justify-center font-medium",
+            // Gap between icon/spinner and text (only when both present)
+            !isIconOnly && hasIcon && "gap-2",
+            // Shape — uses nested radius when container sets it, otherwise default
+            "rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))]",
+            // Motion (Emil's easing)
+            "transition-[color,background-color,border-color,box-shadow,transform]",
+            "duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+            // Press feedback (Emil's scale) — not when loading
+            !loading && !isInactive && "active:scale-[var(--sp-scale-press)]",
+            // Focus — two-tone ring
+            "focus-visible:sp-focus-ring",
+            // Disabled / loading
+            "disabled:pointer-events-none",
+            // Loading is natively disabled too, but it isn't "unavailable": it keeps a light 90%
+            // fade (busy) instead of the disabled fade. Before GEO-961 the :disabled rule won
+            // (higher specificity), so a loading Button showed at the full disabled fade.
+            loading
+              ? "pointer-events-none opacity-90"
+              : "disabled:opacity-[var(--sp-state-disabled-opacity)]",
+            // Inactive: the disabled look, but pointer events stay on so a Tooltip can open.
+            isInactive && "cursor-not-allowed opacity-[var(--sp-state-disabled-opacity)]",
 
-          // Color × Variant
-          isInactive
-            ? withoutHover(colorVariantClasses[color]?.[variant])
-            : colorVariantClasses[color]?.[variant],
+            // Color × Variant
+            isInactive
+              ? withoutHover(colorVariantClasses[color]?.[variant])
+              : colorVariantClasses[color]?.[variant],
 
-          // Sizes (density-aware) — tighten padding on icon side
-          // Icon-only buttons are square; inside a sized ButtonGroup they match its height.
-          isIconOnly &&
-            group?.size === "sm" &&
-            "h-[var(--sp-control-height-sm)] w-[var(--sp-control-height-sm)]",
-          isIconOnly &&
-            group?.size === "lg" &&
-            "h-[var(--sp-control-height-lg)] w-[var(--sp-control-height-lg)]",
-          isIconOnly &&
-            (group?.size ?? "md") === "md" &&
-            "h-[var(--sp-control-height)] w-[var(--sp-control-height)]",
-          size === "sm" && !hasIcon && "h-[var(--sp-control-height-sm)] px-3 text-sm",
-          size === "sm" && iconStart && "h-[var(--sp-control-height-sm)] pl-2 pr-3 text-sm",
-          size === "sm" && iconEnd && "h-[var(--sp-control-height-sm)] pl-3 pr-2 text-sm",
-          size === "md" && !hasIcon && "h-[var(--sp-control-height)] px-4 text-sm",
-          size === "md" && iconStart && "h-[var(--sp-control-height)] pl-3 pr-4 text-sm",
-          size === "md" && iconEnd && "h-[var(--sp-control-height)] pl-4 pr-3 text-sm",
-          size === "lg" && !hasIcon && "h-[var(--sp-control-height-lg)] px-6 text-base",
-          size === "lg" && iconStart && "h-[var(--sp-control-height-lg)] pl-4 pr-6 text-base",
-          size === "lg" && iconEnd && "h-[var(--sp-control-height-lg)] pl-6 pr-4 text-base",
-
+            // Sizes (density-aware) — tighten padding on icon side
+            // Icon-only buttons are square; inside a sized ButtonGroup they match its height.
+            isIconOnly &&
+              group?.size === "sm" &&
+              "h-[var(--sp-control-height-sm)] w-[var(--sp-control-height-sm)]",
+            isIconOnly &&
+              group?.size === "lg" &&
+              "h-[var(--sp-control-height-lg)] w-[var(--sp-control-height-lg)]",
+            isIconOnly &&
+              (group?.size ?? "md") === "md" &&
+              "h-[var(--sp-control-height)] w-[var(--sp-control-height)]",
+            size === "sm" && !hasIcon && "h-[var(--sp-control-height-sm)] px-3 text-sm",
+            size === "sm" && iconStart && "h-[var(--sp-control-height-sm)] pl-2 pr-3 text-sm",
+            size === "sm" && iconEnd && "h-[var(--sp-control-height-sm)] pl-3 pr-2 text-sm",
+            size === "md" && !hasIcon && "h-[var(--sp-control-height)] px-4 text-sm",
+            size === "md" && iconStart && "h-[var(--sp-control-height)] pl-3 pr-4 text-sm",
+            size === "md" && iconEnd && "h-[var(--sp-control-height)] pl-4 pr-3 text-sm",
+            size === "lg" && !hasIcon && "h-[var(--sp-control-height-lg)] px-6 text-base",
+            size === "lg" && iconStart && "h-[var(--sp-control-height-lg)] pl-4 pr-6 text-base",
+            size === "lg" && iconEnd && "h-[var(--sp-control-height-lg)] pl-6 pr-4 text-base",
+          ),
           className,
         )}
         {...props}

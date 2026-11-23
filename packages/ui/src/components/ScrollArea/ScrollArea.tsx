@@ -2,6 +2,7 @@ import * as React from "react";
 import { ScrollArea as BaseScrollArea } from "@base-ui/react/scroll-area";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 // Bundlers statically replace `process.env.NODE_ENV`; declared locally so the
 // package doesn't need @types/node.
@@ -249,11 +250,13 @@ const Root = React.forwardRef<HTMLDivElement, ScrollAreaRootProps>((props, ref) 
       <BaseScrollArea.Root
         ref={ref}
         data-slot="scroll-area"
-        className={cn(
-          "group/scroll-area relative isolate overflow-hidden",
-          sizeClasses[size],
-          // Focus ring on the Root (outset), so overflow:hidden can't clip it
-          "has-[>[data-slot=scroll-area-viewport]:focus-visible]:sp-focus-ring",
+        className={mergeClassName(
+          cn(
+            "group/scroll-area relative isolate overflow-hidden",
+            sizeClasses[size],
+            // Focus ring on the Root (outset), so overflow:hidden can't clip it
+            "has-[>[data-slot=scroll-area-viewport]:focus-visible]:sp-focus-ring",
+          ),
           className,
         )}
         style={withStyle(style, {
@@ -621,26 +624,30 @@ const Viewport = React.forwardRef<HTMLDivElement, ViewportProps>((ownProps, ownR
     <BaseScrollArea.Viewport
       ref={setRefs}
       data-slot="scroll-area-viewport"
-      className={cn(
-        "size-full rounded-[inherit] outline-none",
-        // Gutter so scrollbars don't cover content
-        (offsetScrollbars === true || offsetScrollbars === "y") && "pe-[var(--sp-scrollbar-size)]",
-        (offsetScrollbars === true || offsetScrollbars === "x") && "pb-[var(--sp-scrollbar-size)]",
-        offsetScrollbars === "present" &&
-          "data-[has-overflow-x]:pb-[var(--sp-scrollbar-size)] data-[has-overflow-y]:pe-[var(--sp-scrollbar-size)]",
-        // Edge fades: masks driven by Base UI's distance-to-edge vars, capped at
-        // --sp-scroll-area-fade-size. Horizontal mask flips in RTL.
-        fadeY && FADE_Y,
-        fadeX && FADE_X,
-        // Keep focused / scrolled-to items out of the fade zone. Browsers honour
-        // scroll-padding for focus navigation and native scrollIntoView too.
-        fadeY && "scroll-py-[var(--sp-scroll-area-fade-size,2rem)]",
-        fadeX && "scroll-px-[var(--sp-scroll-area-fade-size,2rem)]",
-        fadeY && !fadeX && "[mask-image:var(--sp-mask-y)]",
-        fadeX && !fadeY && "[mask-image:var(--sp-mask-x)]",
-        fadeX &&
-          fadeY &&
-          "[mask-composite:intersect] [mask-image:var(--sp-mask-y),var(--sp-mask-x)]",
+      className={mergeClassName(
+        cn(
+          "size-full rounded-[inherit] outline-none",
+          // Gutter so scrollbars don't cover content
+          (offsetScrollbars === true || offsetScrollbars === "y") &&
+            "pe-[var(--sp-scrollbar-size)]",
+          (offsetScrollbars === true || offsetScrollbars === "x") &&
+            "pb-[var(--sp-scrollbar-size)]",
+          offsetScrollbars === "present" &&
+            "data-[has-overflow-x]:pb-[var(--sp-scrollbar-size)] data-[has-overflow-y]:pe-[var(--sp-scrollbar-size)]",
+          // Edge fades: masks driven by Base UI's distance-to-edge vars, capped at
+          // --sp-scroll-area-fade-size. Horizontal mask flips in RTL.
+          fadeY && FADE_Y,
+          fadeX && FADE_X,
+          // Keep focused / scrolled-to items out of the fade zone. Browsers honour
+          // scroll-padding for focus navigation and native scrollIntoView too.
+          fadeY && "scroll-py-[var(--sp-scroll-area-fade-size,2rem)]",
+          fadeX && "scroll-px-[var(--sp-scroll-area-fade-size,2rem)]",
+          fadeY && !fadeX && "[mask-image:var(--sp-mask-y)]",
+          fadeX && !fadeY && "[mask-image:var(--sp-mask-x)]",
+          fadeX &&
+            fadeY &&
+            "[mask-composite:intersect] [mask-image:var(--sp-mask-y),var(--sp-mask-x)]",
+        ),
         className,
       )}
       style={withStyle(style, viewportStyle)}
@@ -672,7 +679,7 @@ const Content = React.forwardRef<
   <BaseScrollArea.Content
     ref={ref}
     data-slot="scroll-area-content"
-    className={cn(className)}
+    className={mergeClassName(cn(""), className)}
     {...props}
   />
 ));
@@ -710,17 +717,19 @@ const Scrollbar = React.forwardRef<
       ref={ref}
       data-slot="scroll-area-scrollbar"
       keepMounted={keepMounted ?? type === "always"}
-      className={cn(
-        "z-[2] flex rounded-full p-0.5",
-        "data-[orientation=vertical]:w-[var(--sp-scrollbar-size)]",
-        "data-[orientation=horizontal]:h-[var(--sp-scrollbar-size)] data-[orientation=horizontal]:flex-col",
-        // Track: persistent for `always` (like native overflow:scroll), else on direct hover
-        type === "always" ? "bg-surface-sunken" : "hover:bg-surface-sunken",
-        // No overflow on this axis (keepMounted): hide the thumb rather than draw a stub
-        "data-[orientation=vertical]:not-data-[has-overflow-y]:*:invisible",
-        "data-[orientation=horizontal]:not-data-[has-overflow-x]:*:invisible",
-        "transition-[opacity,background-color] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
-        visibilityClasses[type],
+      className={mergeClassName(
+        cn(
+          "z-[2] flex rounded-full p-0.5",
+          "data-[orientation=vertical]:w-[var(--sp-scrollbar-size)]",
+          "data-[orientation=horizontal]:h-[var(--sp-scrollbar-size)] data-[orientation=horizontal]:flex-col",
+          // Track: persistent for `always` (like native overflow:scroll), else on direct hover
+          type === "always" ? "bg-surface-sunken" : "hover:bg-surface-sunken",
+          // No overflow on this axis (keepMounted): hide the thumb rather than draw a stub
+          "data-[orientation=vertical]:not-data-[has-overflow-y]:*:invisible",
+          "data-[orientation=horizontal]:not-data-[has-overflow-x]:*:invisible",
+          "transition-[opacity,background-color] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
+          visibilityClasses[type],
+        ),
         className,
       )}
       {...props}
@@ -740,13 +749,15 @@ const Thumb = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseS
     <BaseScrollArea.Thumb
       ref={ref}
       data-slot="scroll-area-thumb"
-      className={cn(
-        // --sp-border-control is ≥3:1 against surfaces (WCAG 1.4.11)
-        "bg-border-control relative flex-1 rounded-full",
-        "hover:bg-fg-muted active:bg-fg-muted data-[scrolling]:bg-fg-muted",
-        "transition-colors duration-[var(--sp-duration-fast)] motion-reduce:transition-none",
-        // Windows High Contrast: custom backgrounds are stripped — use a system colour
-        "forced-colors:bg-[CanvasText] forced-colors:forced-color-adjust-none",
+      className={mergeClassName(
+        cn(
+          // --sp-border-control is ≥3:1 against surfaces (WCAG 1.4.11)
+          "bg-border-control relative flex-1 rounded-full",
+          "hover:bg-fg-muted active:bg-fg-muted data-[scrolling]:bg-fg-muted",
+          "transition-colors duration-[var(--sp-duration-fast)] motion-reduce:transition-none",
+          // Windows High Contrast: custom backgrounds are stripped — use a system colour
+          "forced-colors:bg-[CanvasText] forced-colors:forced-color-adjust-none",
+        ),
         className,
       )}
       {...props}
@@ -764,7 +775,7 @@ const Corner = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Base
     <BaseScrollArea.Corner
       ref={ref}
       data-slot="scroll-area-corner"
-      className={cn("bg-transparent", className)}
+      className={mergeClassName(cn("bg-transparent"), className)}
       {...props}
     />
   ),

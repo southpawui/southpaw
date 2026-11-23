@@ -28,3 +28,9 @@
 - **Circular variant**: MUI, Chakra, Ant (3/8) have this. But circular progress is essentially a different component with different DOM structure (SVG vs div). Better as a separate component if needed.
 - **Striped variant**: Chakra, Ant, Spectrum (3/8). Adds visual noise without clear UX benefit. The indeterminate animation serves the same purpose (indicating activity).
 - **Custom label format**: Some libraries let you format the value display (e.g. "60 of 100"). Base UI's Value component already supports render props for this.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

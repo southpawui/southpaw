@@ -2,6 +2,7 @@ import * as React from "react";
 import { NavigationMenu as BaseNavigationMenu } from "@base-ui/react/navigation-menu";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { Accordion } from "../Accordion/Accordion";
 import { Button } from "../Button/Button";
 import { CollapsibleChevron } from "../Collapsible/Collapsible";
@@ -114,7 +115,7 @@ const focusRing =
 const topLevelItem = cn(
   "text-fg-muted inline-flex cursor-pointer items-center whitespace-nowrap rounded-[var(--radius-DEFAULT)] font-medium",
   "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)] motion-reduce:transition-none",
-  "hover:text-fg-default data-[popup-open]:text-fg-default [&[aria-current]]:text-fg-default",
+  "hover:text-fg-default aria-expanded:text-fg-default [&[aria-current]]:text-fg-default",
   "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-[var(--sp-state-disabled-opacity)] data-[disabled]:hover:bg-transparent",
   focusRing,
 );
@@ -124,7 +125,7 @@ const topLevelItem = cn(
  * current item keeps a stronger "selected" fill. No line.
  */
 const fillHighlight =
-  "hover:bg-state-hover active:bg-state-pressed data-[popup-open]:bg-state-hover [&[aria-current]]:bg-state-selected [&[aria-current]]:font-semibold forced-colors:[&[aria-current]]:outline forced-colors:[&[aria-current]]:outline-1";
+  "hover:bg-state-hover active:bg-state-pressed aria-expanded:bg-state-hover [&[aria-current]]:bg-state-selected [&[aria-current]]:font-semibold forced-colors:[&[aria-current]]:outline forced-colors:[&[aria-current]]:outline-1";
 
 export type NavigationMenuHighlight = "line" | "fill";
 
@@ -332,10 +333,12 @@ const DesktopRoot = React.forwardRef<HTMLElement, NavigationMenuRootProps>((prop
           orientation={ctx.orientation}
           actionsRef={actionsRef}
           onValueChange={handleValueChange}
-          className={cn(
-            !vertical && !nested && "w-full min-w-0",
-            // Keep the nav itself above its backdrop
-            backdrop && !nested && "relative z-50",
+          className={mergeClassName(
+            cn(
+              !vertical && !nested && "w-full min-w-0",
+              // Keep the nav itself above its backdrop
+              backdrop && !nested && "relative z-50",
+            ),
             className,
           )}
           {...rest}
@@ -613,7 +616,8 @@ const DesktopList = React.forwardRef<HTMLUListElement, NavigationMenuListProps>(
     const lis = (Array.from(ul.children) as HTMLElement[]).filter((li) => !li.hidden);
     const target =
       (hoverLi && !hoverLi.hidden ? hoverLi : null) ??
-      lis.find((li) => li.querySelector(":scope > [data-popup-open]")) ??
+      // aria-expanded, not data-popup-open: a Tooltip on a trigger also sets that (GEO-970).
+      lis.find((li) => li.querySelector(":scope > [aria-expanded=true]")) ??
       lis.find((li) => li.querySelector(":scope > [aria-current]")) ??
       lis.find((li) => li.hasAttribute("data-more") && li.hasAttribute("data-current")) ??
       null;
@@ -643,7 +647,7 @@ const DesktopList = React.forwardRef<HTMLUListElement, NavigationMenuListProps>(
     mo.observe(ul, {
       attributes: true,
       subtree: true,
-      attributeFilter: ["data-popup-open", "aria-current", "hidden"],
+      attributeFilter: ["aria-expanded", "aria-current", "hidden"],
     });
     const ro =
       typeof ResizeObserver === "undefined"
@@ -834,7 +838,7 @@ const Item = React.forwardRef<HTMLLIElement, NavigationMenuItemProps>((props, re
         render={render}
         data-slot="navigation-menu-item"
         data-current={current ? "" : undefined}
-        className={cn("relative", className)}
+        className={mergeClassName(cn("relative"), className)}
         {...rest}
       >
         {children}
@@ -892,11 +896,13 @@ const DesktopTrigger = React.forwardRef<HTMLButtonElement, NavigationMenuTrigger
         ref={ref}
         data-slot="navigation-menu-trigger"
         aria-current={item.current ? "true" : undefined}
-        className={cn(
-          topLevelItem,
-          triggerSize[root.size],
-          vertical && "w-full justify-between",
-          !root.indicator && fillHighlight,
+        className={mergeClassName(
+          cn(
+            topLevelItem,
+            triggerSize[root.size],
+            vertical && "w-full justify-between",
+            !root.indicator && fillHighlight,
+          ),
           className,
         )}
         {...rest}
@@ -1177,7 +1183,7 @@ const Group = React.forwardRef<HTMLDivElement, NavigationMenuGroupProps>((props,
     <div
       ref={ref}
       data-slot="navigation-menu-group"
-      className={cn("flex min-w-0 flex-col", className)}
+      className={mergeClassName(cn("flex min-w-0 flex-col"), className)}
       {...rest}
     >
       {label !== undefined && (
@@ -1213,10 +1219,12 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
       <div
         ref={ref}
         data-slot="navigation-menu-footer"
-        className={cn(
-          stacked
-            ? "bg-surface-sunken text-fg-default mt-2 flex flex-col items-start gap-1 rounded-[var(--radius-DEFAULT)] px-3 py-3 text-sm"
-            : "border-border-default bg-surface-sunken text-fg-default -mx-2 -mb-2 mt-2 flex items-center justify-between gap-3 rounded-b-[calc(var(--radius-DEFAULT)-1px)] border-t px-5 py-3 text-sm",
+        className={mergeClassName(
+          cn(
+            stacked
+              ? "bg-surface-sunken text-fg-default mt-2 flex flex-col items-start gap-1 rounded-[var(--radius-DEFAULT)] px-3 py-3 text-sm"
+              : "border-border-default bg-surface-sunken text-fg-default -mx-2 -mb-2 mt-2 flex items-center justify-between gap-3 rounded-b-[calc(var(--radius-DEFAULT)-1px)] border-t px-5 py-3 text-sm",
+          ),
           className,
         )}
         {...props}

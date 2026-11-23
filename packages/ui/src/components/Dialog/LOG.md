@@ -35,3 +35,24 @@
 - **Draggable**: 0/9 competitors. Skip.
 - **Dividers between sections**: Not a widespread pattern. Consumers can use Separator component inside Body if needed.
 - **Destructive variant**: Belongs on AlertDialog (GEO-916), not Dialog. Dialog is for general-purpose modals.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Phone inset survives the size classes (GEO-970 Part A, George)
+
+- **Bug:** the popup had `w-full` plus `max-w-[calc(100vw-2rem)]` (the phone inset), followed by the size's `max-w-sm|md|lg`. tailwind-merge treats both as the same `max-w` utility and kept only the size, so on phones **every size touched both screen edges**.
+- **Fix:** the inset moves to width, `w-[calc(100%-2rem)]` (the popup is fixed, so % is the viewport). The size's `max-w-*` still caps it on larger screens. `size="full"` keeps `w-full` / `w-screen`, edge to edge.
+- **Measured in Chromium:**
+
+  | Viewport           | sm                        | md                        | lg                        |
+  | ------------------ | ------------------------- | ------------------------- | ------------------------- |
+  | 375px, before      | 0px gaps, 375px wide      | 0px gaps, 375px wide      | 0px gaps, 375px wide      |
+  | 375px, after       | **16px gaps, 343px wide** | **16px gaps, 343px wide** | **16px gaps, 343px wide** |
+  | 1024px (unchanged) | 384px                     | 448px                     | 512px                     |
+
+- **AlertDialog** was checked too and isn't affected: it uses `max-w-[calc(100vw-2rem)] sm:max-w-sm`, and the `sm:` modifier keeps the two separate. It's already 343px with 16px gaps at 375px, and 384px at 1024px.
+- **Tests:** each size keeps both `w-[calc(100%-2rem)]` and `max-w-{size}`; `full` has `w-screen` and no inset.

@@ -28,3 +28,9 @@
 - **Dot variant** (MUI, Ant — 2/8): Similar to count badge — it's an overlay indicator, not a standalone badge. Better suited to Avatar or a separate Indicator component.
 - **Pulse animation** (Ant — 1/8): Only one competitor. Not worth adding complexity for a niche feature.
 - **Raw `<button>` for dismiss**: The dismiss button uses a native `<button>` instead of our Button component. Button would be overkill inside a tiny badge — it would bring its own padding, sizing, and styles that conflict with the badge layout. Documented exception, similar to Input.Phone's native approach.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

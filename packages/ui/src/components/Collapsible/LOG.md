@@ -105,3 +105,10 @@ I redid the research across all 9 libraries (see RESEARCH.md). George approved t
 - **Using Base UI Panel for show-more**: impossible without fighting the preflight `[hidden]` `!important` rule (see above).
 - **Divider on the panel (`border-t`)**: leaves a visible 1px line under a closed bordered trigger, because the panel collapses to its border width.
 - **React `<Activity>` hide mode** (Chakra/Mantine `hideMode="activity"`): `hiddenUntilFound` (always mounted) or `hiddenUntilFound={false}` (unmounted) covers both needs, and Base UI owns mounting.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- `Collapsible.ShowMorePanel` is a plain `<div>`, not a Base UI part, so its `className` is resolved with `resolveClassName(className, { open, disabled, transitionStatus })`.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

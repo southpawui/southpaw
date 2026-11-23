@@ -2,6 +2,7 @@ import * as React from "react";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { X } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root (pass-through)
@@ -17,7 +18,12 @@ const Trigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof BaseDialog.Trigger>
 >(({ className, ...props }, ref) => (
-  <BaseDialog.Trigger ref={ref} data-slot="dialog-trigger" className={cn(className)} {...props} />
+  <BaseDialog.Trigger
+    ref={ref}
+    data-slot="dialog-trigger"
+    className={mergeClassName(cn(""), className)}
+    {...props}
+  />
 ));
 Trigger.displayName = "Dialog.Trigger";
 
@@ -36,10 +42,12 @@ const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Ba
     <BaseDialog.Backdrop
       ref={ref}
       data-slot="dialog-backdrop"
-      className={cn(
-        "fixed inset-0 bg-black/50",
-        "transition-opacity duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
-        "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          "fixed inset-0 bg-black/50",
+          "transition-opacity duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
+          "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -70,23 +78,28 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(
       ref={ref}
       data-slot="dialog-popup"
       data-size={size}
-      className={cn(
-        // Position
-        "fixed left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2",
-        // Mobile: slight inset so it doesn't touch edges (except full)
-        size !== "full" && "max-w-[calc(100vw-2rem)]",
-        // Size
-        size !== "full" && sizeClasses[size],
-        size === "full" && sizeClasses.full,
-        // Surface
-        size !== "full" && "bg-surface-overlay rounded-[var(--radius-lg)] shadow-lg",
-        size === "full" && "bg-surface-overlay",
-        // Layout
-        "flex flex-col",
-        // Animation
-        "transition-[opacity,transform] duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
-        "data-[ending-style]:scale-[var(--sp-scale-enter)] data-[ending-style]:opacity-0",
-        "data-[starting-style]:scale-[var(--sp-scale-enter)] data-[starting-style]:opacity-0",
+      className={mergeClassName(
+        cn(
+          // Position
+          "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+          // Phones: a 1rem inset each side so it doesn't touch the screen edges (except full).
+          // On width, not max-width: a `max-w-[calc(100vw-2rem)]` was merged away by
+          // tailwind-merge in favour of the size's `max-w-*`, so phones got edge-to-edge
+          // popups (GEO-970). Width keeps the inset; the size's max-width still caps it.
+          size === "full" ? "w-full" : "w-[calc(100%-2rem)]",
+          // Size
+          size !== "full" && sizeClasses[size],
+          size === "full" && sizeClasses.full,
+          // Surface
+          size !== "full" && "bg-surface-overlay rounded-[var(--radius-lg)] shadow-lg",
+          size === "full" && "bg-surface-overlay",
+          // Layout
+          "flex flex-col",
+          // Animation
+          "transition-[opacity,transform] duration-[var(--sp-duration-entrance)] ease-[var(--sp-easing-default)]",
+          "data-[ending-style]:scale-[var(--sp-scale-enter)] data-[ending-style]:opacity-0",
+          "data-[starting-style]:scale-[var(--sp-scale-enter)] data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -104,7 +117,7 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="dialog-header"
-      className={cn("flex items-start justify-between gap-4 p-6 pb-0", className)}
+      className={mergeClassName(cn("flex items-start justify-between gap-4 p-6 pb-0"), className)}
       {...props}
     />
   ),
@@ -120,7 +133,7 @@ const Body = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">
     <div
       ref={ref}
       data-slot="dialog-body"
-      className={cn("flex-1 overflow-y-auto p-6", className)}
+      className={mergeClassName(cn("flex-1 overflow-y-auto p-6"), className)}
       {...props}
     />
   ),
@@ -136,11 +149,13 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div
     <div
       ref={ref}
       data-slot="dialog-footer"
-      className={cn(
-        "flex flex-col-reverse gap-2 p-6 pt-0",
-        "[&>[data-slot=button]]:w-full [&>[data-slot=dialog-close]>[data-slot=button]]:w-full",
-        "sm:flex-row sm:items-center sm:justify-end sm:gap-3",
-        "sm:[&>[data-slot=button]]:w-auto sm:[&>[data-slot=dialog-close]>[data-slot=button]]:w-auto",
+      className={mergeClassName(
+        cn(
+          "flex flex-col-reverse gap-2 p-6 pt-0",
+          "[&>[data-slot=button]]:w-full [&>[data-slot=dialog-close]>[data-slot=button]]:w-full",
+          "sm:flex-row sm:items-center sm:justify-end sm:gap-3",
+          "sm:[&>[data-slot=button]]:w-auto sm:[&>[data-slot=dialog-close]>[data-slot=button]]:w-auto",
+        ),
         className,
       )}
       {...props}
@@ -158,7 +173,7 @@ const Title = React.forwardRef<HTMLHeadingElement, React.ComponentProps<typeof B
     <BaseDialog.Title
       ref={ref}
       data-slot="dialog-title"
-      className={cn("text-fg-default text-lg font-semibold", className)}
+      className={mergeClassName(cn("text-fg-default text-lg font-semibold"), className)}
       {...props}
     />
   ),
@@ -176,7 +191,7 @@ const Description = React.forwardRef<
   <BaseDialog.Description
     ref={ref}
     data-slot="dialog-description"
-    className={cn("text-fg-muted mt-1 text-sm", className)}
+    className={mergeClassName(cn("text-fg-muted mt-1 text-sm"), className)}
     {...props}
   />
 ));
@@ -188,7 +203,12 @@ Description.displayName = "Dialog.Description";
 
 const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BaseDialog.Close>>(
   ({ className, ...props }, ref) => (
-    <BaseDialog.Close ref={ref} data-slot="dialog-close" className={cn(className)} {...props} />
+    <BaseDialog.Close
+      ref={ref}
+      data-slot="dialog-close"
+      className={mergeClassName(cn(""), className)}
+      {...props}
+    />
   ),
 );
 Close.displayName = "Dialog.Close";
@@ -204,10 +224,12 @@ const CloseButton = React.forwardRef<
   <BaseDialog.Close
     ref={ref}
     data-slot="dialog-close-button"
-    className={cn(
-      "text-fg-muted hover:text-fg-default cursor-pointer rounded-sm p-1",
-      "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-      "focus-visible:sp-focus-ring",
+    className={mergeClassName(
+      cn(
+        "text-fg-muted hover:text-fg-default cursor-pointer rounded-sm p-1",
+        "transition-colors duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+        "focus-visible:sp-focus-ring",
+      ),
       className,
     )}
     aria-label="Close"

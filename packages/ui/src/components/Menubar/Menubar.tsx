@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Menubar as BaseMenubar } from "@base-ui/react/menubar";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import {
   KeyboardOpenContext,
   Menu,
@@ -136,9 +137,11 @@ const MenubarRoot = React.forwardRef<HTMLDivElement, MenubarProps>(
             onKeyDown?.(event);
             if (!event.defaultPrevented) handleTypeahead(event);
           }}
-          className={cn(
-            "bg-surface-raised border-border-default flex w-fit items-center gap-1 rounded-[var(--radius-DEFAULT)] border p-1 [--sp-nested-radius:6px]",
-            "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
+          className={mergeClassName(
+            cn(
+              "bg-surface-raised border-border-default flex w-fit items-center gap-1 rounded-[var(--radius-DEFAULT)] border p-1 [--sp-nested-radius:6px]",
+              "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
+            ),
             className,
           )}
           {...props}
@@ -219,13 +222,15 @@ const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof 
         event.preventDefault();
         openAtLastItem(event.currentTarget);
       }}
-      className={cn(
-        "text-fg-default inline-flex h-[var(--sp-control-height-sm)] shrink-0 cursor-default select-none items-center gap-2 rounded-[var(--sp-nested-radius,6px)] px-3 text-sm font-medium outline-none",
-        "[&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
-        "focus-visible:sp-focus-ring hover:bg-[var(--sp-state-hover)]",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
-        "[[data-orientation=vertical]>&]:justify-start",
-        menuTriggerOpenClasses,
+      className={mergeClassName(
+        cn(
+          "text-fg-default inline-flex h-[var(--sp-control-height-sm)] shrink-0 cursor-default select-none items-center gap-2 rounded-[var(--sp-nested-radius,6px)] px-3 text-sm font-medium outline-none",
+          "[&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
+          "focus-visible:sp-focus-ring hover:bg-[var(--sp-state-hover)]",
+          "data-[disabled]:pointer-events-none data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+          "[[data-orientation=vertical]>&]:justify-start",
+          menuTriggerOpenClasses,
+        ),
         className,
       )}
       {...props}

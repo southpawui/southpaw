@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Spinner
@@ -32,7 +33,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
       ref={ref}
       data-slot="spinner"
       role="status"
-      className={cn("inline-flex items-center gap-2", className)}
+      className={mergeClassName(cn("inline-flex items-center gap-2"), className)}
       {...props}
     >
       {variant === "circle" && (

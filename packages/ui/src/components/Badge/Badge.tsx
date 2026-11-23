@@ -1,6 +1,7 @@
 import * as React from "react";
 import { X } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Badge
@@ -67,14 +68,16 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
       ref={ref}
       data-slot="badge"
       data-variant={variant}
-      className={cn(
-        // Base
-        "inline-flex items-center rounded-full font-medium",
-        // Size
-        sizeClasses[size],
-        // Appearance
-        appearance === "solid" && variantSolid[variant],
-        appearance === "outline" && `border ${variantOutline[variant]}`,
+      className={mergeClassName(
+        cn(
+          // Base
+          "inline-flex items-center rounded-full font-medium",
+          // Size
+          sizeClasses[size],
+          // Appearance
+          appearance === "solid" && variantSolid[variant],
+          appearance === "outline" && `border ${variantOutline[variant]}`,
+        ),
         className,
       )}
       {...props}

@@ -4,7 +4,7 @@
 @import "@southpawui/tokens/css";
 
 /* Tell Tailwind to scan the UI package for class names */
-@source "../../packages/ui/src/**/*.tsx";
+@source "../../packages/ui/src/**/*.{ts,tsx}";
 
 /* ---- Component keyframes ---- */
 @keyframes progress-indeterminate {

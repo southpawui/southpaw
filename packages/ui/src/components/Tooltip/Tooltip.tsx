@@ -2,6 +2,8 @@ import * as React from "react";
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import { CheckCircleIcon, InfoIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { Kbd } from "../Kbd/Kbd";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Defaults
@@ -369,7 +371,10 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(
         delay={delay}
         closeDelay={closeDelay}
         data-slot="tooltip-trigger"
-        className={cn(touchEnabled && "select-none [-webkit-touch-callout:none]", className)}
+        className={mergeClassName(
+          cn(touchEnabled && "select-none [-webkit-touch-callout:none]"),
+          className,
+        )}
         {...ariaProps}
         {...touchHandlers}
         {...props}
@@ -402,10 +407,12 @@ const Positioner = React.forwardRef<
     data-slot="tooltip-positioner"
     sideOffset={sideOffset}
     collisionPadding={collisionPadding}
-    className={cn(
-      "z-50 outline-none",
-      // Mantine hideDetached — hide when the trigger scrolls out of view
-      "data-[anchor-hidden]:invisible",
+    className={mergeClassName(
+      cn(
+        "z-50 outline-none",
+        // Mantine hideDetached — hide when the trigger scrolls out of view
+        "data-[anchor-hidden]:invisible",
+      ),
       className,
     )}
     {...props}
@@ -461,23 +468,25 @@ const Popup = React.forwardRef<HTMLDivElement, PopupProps>(
         data-slot="tooltip-popup"
         data-variant={variant}
         data-density={density}
-        className={cn(
-          variantClasses[variant],
-          "bg-[var(--sp-tooltip-bg)] text-[var(--sp-tooltip-fg)]",
-          "flex max-w-xs items-start rounded-[var(--radius-sm)] shadow-md",
-          // Transparent border becomes visible in Windows forced-colours (bg is overridden there)
-          "border border-transparent forced-colors:border-[CanvasText]",
-          // Density-aware type + spacing
-          "gap-1.5 px-2 py-1 text-sm leading-snug",
-          "data-[density=compact]:gap-1 data-[density=compact]:px-1.5 data-[density=compact]:py-0.5 data-[density=compact]:text-xs",
-          "data-[density=comfortable]:gap-2 data-[density=comfortable]:px-3 data-[density=comfortable]:py-1.5",
-          // Motion (Emil): 125ms, scale 0.97 → 1 from the trigger, strong ease-out
-          "origin-[var(--transform-origin)]",
-          "transition-[opacity,scale] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
-          "data-[starting-style]:scale-[var(--sp-scale-press)] data-[starting-style]:opacity-0",
-          "data-[ending-style]:scale-[var(--sp-scale-press)] data-[ending-style]:opacity-0",
-          // Warm group, keyboard focus, dismiss → no animation
-          "data-[instant]:duration-0",
+        className={mergeClassName(
+          cn(
+            variantClasses[variant],
+            "bg-[var(--sp-tooltip-bg)] text-[var(--sp-tooltip-fg)]",
+            "flex max-w-xs items-start rounded-[var(--radius-sm)] shadow-md",
+            // Transparent border becomes visible in Windows forced-colours (bg is overridden there)
+            "border border-transparent forced-colors:border-[CanvasText]",
+            // Density-aware type + spacing
+            "gap-1.5 px-2 py-1 text-sm leading-snug",
+            "data-[density=compact]:gap-1 data-[density=compact]:px-1.5 data-[density=compact]:py-0.5 data-[density=compact]:text-xs",
+            "data-[density=comfortable]:gap-2 data-[density=comfortable]:px-3 data-[density=comfortable]:py-1.5",
+            // Motion (Emil): 125ms, scale 0.97 → 1 from the trigger, strong ease-out
+            "origin-[var(--transform-origin)]",
+            "transition-[opacity,scale] duration-[var(--sp-duration-press)] ease-[var(--sp-easing-default)]",
+            "data-[starting-style]:scale-[var(--sp-scale-press)] data-[starting-style]:opacity-0",
+            "data-[ending-style]:scale-[var(--sp-scale-press)] data-[ending-style]:opacity-0",
+            // Warm group, keyboard focus, dismiss → no animation
+            "data-[instant]:duration-0",
+          ),
           className,
         )}
         {...props}
@@ -507,11 +516,13 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseT
       ref={ref}
       data-slot="tooltip-arrow"
       aria-hidden="true"
-      className={cn(
-        "size-2 rotate-45 bg-[var(--sp-tooltip-bg)] forced-colors:hidden",
-        "data-[side=bottom]:-top-1 data-[side=top]:-bottom-1",
-        "data-[side=left]:-right-1 data-[side=right]:-left-1",
-        "data-[side=inline-end]:-left-1 data-[side=inline-start]:-right-1",
+      className={mergeClassName(
+        cn(
+          "size-2 rotate-45 bg-[var(--sp-tooltip-bg)] forced-colors:hidden",
+          "data-[side=bottom]:-top-1 data-[side=top]:-bottom-1",
+          "data-[side=left]:-right-1 data-[side=right]:-left-1",
+          "data-[side=inline-end]:-left-1 data-[side=inline-start]:-right-1",
+        ),
         className,
       )}
       {...props}
@@ -543,16 +554,17 @@ const Shortcut = React.forwardRef<HTMLElement, ShortcutProps>(
       return () => setShortcutKeys(undefined);
     }, [keys, setShortcutKeys]);
 
+    // Kbd (GEO-940) instead of a hand-rolled <kbd> (GEO-970). `outline` is `border-current/30`, so it
+    // takes the tooltip's own (inverse) colour. Hidden from AT: `keys` sets aria-keyshortcuts on
+    // the trigger instead.
     return (
-      <kbd
+      <Kbd
         ref={ref}
         aria-hidden="true"
         data-slot="tooltip-shortcut"
-        className={cn(
-          "ms-1 inline-flex items-center rounded-[calc(var(--radius-sm)-2px)] px-1",
-          "border-current/30 border font-sans text-[0.85em] leading-tight opacity-80",
-          className,
-        )}
+        variant="outline"
+        size="sm"
+        className={mergeClassName(cn("ms-1 opacity-80"), className)}
         {...props}
       />
     );

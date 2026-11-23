@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Root
@@ -17,7 +18,7 @@ const Root = React.forwardRef<HTMLDivElement, ProgressRootProps>(
       ref={ref}
       data-slot="progress"
       data-color={color}
-      className={cn("flex w-full flex-col gap-1", className)}
+      className={mergeClassName(cn("flex w-full flex-col gap-1"), className)}
       {...props}
     />
   ),
@@ -44,9 +45,8 @@ const Track = React.forwardRef<HTMLDivElement, ProgressTrackProps>(
     <BaseProgress.Track
       ref={ref}
       data-slot="progress-track"
-      className={cn(
-        "bg-surface-sunken relative w-full overflow-hidden rounded-full",
-        trackSizes[size],
+      className={mergeClassName(
+        cn("bg-surface-sunken relative w-full overflow-hidden rounded-full", trackSizes[size]),
         className,
       )}
       {...props}
@@ -66,18 +66,20 @@ const Indicator = React.forwardRef<
   <BaseProgress.Indicator
     ref={ref}
     data-slot="progress-indicator"
-    className={cn(
-      "h-full rounded-full",
-      "transition-[width] duration-[var(--sp-duration-slow)] ease-[var(--sp-easing-default)]",
-      // Colour from parent Root's data-color
-      "[[data-color=default]_&]:bg-accent",
-      "[[data-color=brand]_&]:bg-brand",
-      "[[data-color=success]_&]:bg-success",
-      "[[data-color=danger]_&]:bg-danger",
-      "[[data-color=warning]_&]:bg-[oklch(0.7_0.15_85)]",
-      // Indeterminate animation
-      "[[data-indeterminate]_&]:animate-[progress-indeterminate_1.5s_ease-in-out_infinite]",
-      "[[data-indeterminate]_&]:w-1/3",
+    className={mergeClassName(
+      cn(
+        "h-full rounded-full",
+        "transition-[width] duration-[var(--sp-duration-slow)] ease-[var(--sp-easing-default)]",
+        // Colour from parent Root's data-color
+        "[[data-color=default]_&]:bg-accent",
+        "[[data-color=brand]_&]:bg-brand",
+        "[[data-color=success]_&]:bg-success",
+        "[[data-color=danger]_&]:bg-danger",
+        "[[data-color=warning]_&]:bg-[oklch(0.7_0.15_85)]",
+        // Indeterminate animation
+        "[[data-indeterminate]_&]:animate-[progress-indeterminate_1.5s_ease-in-out_infinite]",
+        "[[data-indeterminate]_&]:w-1/3",
+      ),
       className,
     )}
     {...props}
@@ -94,7 +96,7 @@ const Label = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
     <BaseProgress.Label
       ref={ref}
       data-slot="progress-label"
-      className={cn("text-fg-default text-sm font-medium", className)}
+      className={mergeClassName(cn("text-fg-default text-sm font-medium"), className)}
       {...props}
     />
   ),
@@ -110,7 +112,7 @@ const Value = React.forwardRef<HTMLSpanElement, React.ComponentProps<typeof Base
     <BaseProgress.Value
       ref={ref}
       data-slot="progress-value"
-      className={cn("text-fg-muted text-sm tabular-nums", className)}
+      className={mergeClassName(cn("text-fg-muted text-sm tabular-nums"), className)}
       {...props}
     />
   ),

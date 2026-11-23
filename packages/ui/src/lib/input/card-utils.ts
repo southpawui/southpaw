@@ -32,7 +32,7 @@ export const cardBrandIcons: Record<
 
 /* ---- Formatting via imask ---- */
 
-function applyMask(value: string, maskOpts: IMask.AnyMaskedOptions): string {
+function applyMask(value: string, maskOpts: Parameters<typeof IMask.createMask>[0]): string {
   const mask = IMask.createMask(maskOpts);
   mask.resolve(value);
   return mask.value;

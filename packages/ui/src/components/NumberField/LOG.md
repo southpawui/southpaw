@@ -112,3 +112,15 @@ Scope approved by George (via the coordinator) on 2026-11-16. The research is in
 - **Regression test:** inside `<fieldset disabled>`, the input and Increase are disabled, there's no `data-disabled`, and the native-disabled classes are present. 36 tests.
 - **Checked in Playwright:** the ButtonGroup DisabledCascade story shows NumberField dimmed. `pnpm verify numberfield` passes all checks.
 - **Approved** by George via the coordinator (2026-11-18).
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- The local `mergeClassName` helper (added in GEO-929) moved to `lib/merge-class-name.ts`, and this file imports it.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Error message shown in stories (GEO-957, GEO-970 Part A)
+
+- Stories: the `Demo` helper's `<Field.Error match>` workaround is removed, so the stories now rely on the GEO-957 fix. The Themes "Split, error" demo gets a message ("Quantity must be 5 or more").
+- `pnpm verify` passes all checks.

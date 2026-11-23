@@ -81,3 +81,15 @@ The plan was an opt-in `selectOnFocus` (Chakra). In the build, Playwright showed
 
 - **GEO-959** (Tooltip on icon-only buttons): OTPField has **no icon-only buttons**. The separator is decorative (`role="separator"`, icon `aria-hidden`), and the GOV.UK story's "Send a new code" is a text Button. Nothing to retrofit.
 - **GEO-957** (Field.Error with `invalid` only): the stories use `<Field.Error match>` until the coordinator's restack fix lands.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- The local `mergeClassName` helper (added in GEO-930) moved to `lib/merge-class-name.ts`, and this file imports it.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Error message shown in stories (GEO-957, GEO-970 Part A)
+
+- Stories: the `Demo` helper's `<Field.Error match>` workaround is removed, so the stories now rely on the GEO-957 fix. The Themes "Attached, error" demo gets a message ("Enter the 6-digit code").
+- `pnpm verify` passes all checks.

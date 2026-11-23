@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 
 /* ============================================================
  * Types
@@ -277,9 +278,11 @@ const Group = React.forwardRef<HTMLElement, KbdGroupProps>(
         {
           "data-slot": "kbd-group",
           dir: "ltr",
-          className: cn(
-            "inline-flex items-center whitespace-nowrap align-middle font-sans",
-            groupGapClasses[resolvedSize],
+          className: mergeClassName(
+            cn(
+              "inline-flex items-center whitespace-nowrap align-middle font-sans",
+              groupGapClasses[resolvedSize],
+            ),
             className,
           ),
           children: items,

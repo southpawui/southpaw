@@ -30,3 +30,9 @@
 - **Dedicated icon slot/prop**: 0/9 competitors have this. Icons are composed into the Header via children — more flexible.
 - **Destructive variant prop**: shadcn and Chakra style destructive confirms differently, but it's the consumer who chooses `<Button color="danger">` — not a prop on AlertDialog. Keeps the component simple.
 - **Focus on cancel button**: The research suggested focusing cancel by default (safer UX). Base UI handles initial focus automatically — it focuses the first focusable element, which is typically the cancel button if it comes first in DOM order. Our Footer uses `flex-col-reverse` on mobile but `flex-row` on desktop, so focus goes to cancel on desktop and confirm on mobile. This is acceptable.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.

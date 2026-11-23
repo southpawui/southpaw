@@ -169,7 +169,7 @@ describe("NavigationMenu", () => {
       const { container } = render(<Nav highlight="fill" />);
       expect(container.querySelector("[data-slot='navigation-menu-indicator']")).toBeNull();
       expect(button("Products").className).toContain("hover:bg-state-hover");
-      expect(button("Products").className).toContain("data-[popup-open]:bg-state-hover");
+      expect(button("Products").className).toContain("aria-expanded:bg-state-hover");
       expect(screen.getByRole("link", { name: "Pricing" }).className).toContain(
         "[&[aria-current]]:bg-state-selected",
       );

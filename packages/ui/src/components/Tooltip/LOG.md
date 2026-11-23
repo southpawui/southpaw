@@ -96,3 +96,19 @@ Research: see RESEARCH.md (all 9 libraries + Base UI source + Emil Kowalski's mo
 - **Reduced motion**: shared motion tokens zero all durations, which also removes the opacity fade. Emil says to keep opacity. This is a library-wide token decision, flagged to George.
 - **Button + `focusableWhenDisabled`**: Button's disabled styles target the `:disabled` attribute, so `focusableWhenDisabled` (which uses `aria-disabled`/`data-disabled`) loses the dimmed look. The States story adds `data-[disabled]:` classes locally. This belongs in Button.
 - **`Tooltip.Shortcut`**: switch to the Kbd component once GEO-940 (Lane 2) lands.
+
+## 2026-11-21 — Type errors found by the new packages/ui typecheck (GEO-951, GEO-970 Part A)
+
+- Test only: a ref callback in `Tooltip.test.tsx` returned `calls.push(node)` (a number), which isn't a valid React ref. It now returns nothing.
+
+## 2026-11-21 — Function `className` is no longer dropped (GEO-958, GEO-970 Part A)
+
+- Base UI types `className` as `string | (state) => string`. `cn()` (clsx) silently ignores functions, so a consumer's state-function `className` was lost.
+- Every `className={cn(…, className)}` here is now `mergeClassName(cn(…), className)` (`lib/merge-class-name.ts`). A string gives exactly the same output as before: the consumer `className` was always the last argument, and tailwind-merge is idempotent. A function now merges per state.
+- Tests: `lib/merge-class-name.test.tsx`, one or more real components per family. The new packages/ui typecheck (GEO-951) found every place a function reached a plain element.
+
+## 2026-11-21 — Tooltip.Shortcut renders Kbd (GEO-970 Part A, from the GEO-940 note)
+
+- `Tooltip.Shortcut` renders `<Kbd variant="outline" size="sm">` instead of a hand-rolled `<kbd>`. `outline` is `border-current/30`, so it keeps the tooltip's light-on-dark colour.
+- The children API, `aria-hidden` and the `keys` → `aria-keyshortcuts` registration are unchanged. The "planned swap to Kbd" noted above is now done.
+- Checked in Chromium (KeyboardShortcut story): the hint renders as ⌘S, ⌘C and ⌘X with a 30% light border, and the trigger keeps `aria-keyshortcuts="Meta+S"`. `pnpm verify tooltip` passes all checks.

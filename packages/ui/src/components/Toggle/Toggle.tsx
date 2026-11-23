@@ -3,6 +3,7 @@ import { Toggle as BaseToggle } from "@base-ui/react/toggle";
 import { CheckIcon } from "@phosphor-icons/react";
 import { Spinner } from "../Spinner/Spinner";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import { ButtonGroupContext } from "../ButtonGroup/context";
 import { ToggleGroupContext } from "../ToggleGroup/context";
 
@@ -251,41 +252,43 @@ export const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
           aria-busy={loading || undefined}
           aria-invalid={toggleGroup?.invalid || undefined}
           aria-label={ariaLabel}
-          className={cn(
-            "group/toggle inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-medium",
-            // Fits its content by default, even in a column flex parent that would stretch it
-            // (George, GEO-932). `className="w-full"` or ButtonGroup `grow` makes it full width.
-            "w-fit",
-            "rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))] border-2",
-            "transition-[color,background-color,border-color,box-shadow,transform]",
-            "duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-            "focus-visible:sp-focus-ring",
-            !disabled && !locked && "active:scale-[var(--sp-scale-press)]",
-            // Unpressed + pressed looks (no hover reaction while read-only / inactive)
-            locked
-              ? withoutHover(
-                  `${offByVariant[variant][inverse]} ${pressedByVariant[variant][color]}`,
-                )
-              : cn(offByVariant[variant][inverse], pressedByVariant[variant][color]),
-            // Forced colours: system colours carry the pressed state.
-            "forced-colors:data-[pressed]:border-[Highlight] forced-colors:data-[pressed]:outline-2 forced-colors:data-[pressed]:-outline-offset-4 forced-colors:data-[pressed]:outline-[Highlight]",
-            // Invalid (shadcn): danger border from aria-invalid
-            "aria-[invalid=true]:!border-danger",
-            // Size
-            isIconOnly ? cn(iconSquare[squareSize], "px-0") : sizeClasses[size],
-            // Disabled / loading
-            "disabled:pointer-events-none disabled:opacity-[var(--sp-state-disabled-opacity)]",
-            loading && "disabled:opacity-80",
-            // Read-only: focusable, state locked. The pressed look stays; unpressed goes sunken
-            // like a read-only Input.
-            readOnly &&
-              !disabled &&
-              "not-data-[pressed]:bg-surface-sunken not-data-[pressed]:border-border-default cursor-default",
-            // Inactive: disabled look, pointer events stay on for a Tooltip
-            inactive &&
-              !disabled &&
-              !readOnly &&
-              "cursor-not-allowed opacity-[var(--sp-state-disabled-opacity)]",
+          className={mergeClassName(
+            cn(
+              "group/toggle inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-medium",
+              // Fits its content by default, even in a column flex parent that would stretch it
+              // (George, GEO-932). `className="w-full"` or ButtonGroup `grow` makes it full width.
+              "w-fit",
+              "rounded-[var(--sp-nested-radius,var(--radius-DEFAULT))] border-2",
+              "transition-[color,background-color,border-color,box-shadow,transform]",
+              "duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+              "focus-visible:sp-focus-ring",
+              !disabled && !locked && "active:scale-[var(--sp-scale-press)]",
+              // Unpressed + pressed looks (no hover reaction while read-only / inactive)
+              locked
+                ? withoutHover(
+                    `${offByVariant[variant][inverse]} ${pressedByVariant[variant][color]}`,
+                  )
+                : cn(offByVariant[variant][inverse], pressedByVariant[variant][color]),
+              // Forced colours: system colours carry the pressed state.
+              "forced-colors:data-[pressed]:border-[Highlight] forced-colors:data-[pressed]:outline-2 forced-colors:data-[pressed]:-outline-offset-4 forced-colors:data-[pressed]:outline-[Highlight]",
+              // Invalid (shadcn): danger border from aria-invalid
+              "aria-[invalid=true]:!border-danger",
+              // Size
+              isIconOnly ? cn(iconSquare[squareSize], "px-0") : sizeClasses[size],
+              // Disabled / loading
+              "disabled:pointer-events-none disabled:opacity-[var(--sp-state-disabled-opacity)]",
+              loading && "disabled:opacity-80",
+              // Read-only: focusable, state locked. The pressed look stays; unpressed goes sunken
+              // like a read-only Input.
+              readOnly &&
+                !disabled &&
+                "not-data-[pressed]:bg-surface-sunken not-data-[pressed]:border-border-default cursor-default",
+              // Inactive: disabled look, pointer events stay on for a Tooltip
+              inactive &&
+                !disabled &&
+                !readOnly &&
+                "cursor-not-allowed opacity-[var(--sp-state-disabled-opacity)]",
+            ),
             className,
           )}
           {...props}

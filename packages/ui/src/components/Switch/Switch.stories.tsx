@@ -187,6 +187,7 @@ export const Themes: Story = {
                 <Switch.Root aria-label="Error" />
                 <Field.Label className="cursor-pointer">Error</Field.Label>
               </Field.Group>
+              <Field.Error>Turn this on to continue</Field.Error>
             </Field.Root>
             <SwitchField label="Disabled" defaultChecked disabled />
           </div>

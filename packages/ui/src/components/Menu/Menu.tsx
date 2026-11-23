@@ -9,6 +9,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import {
   Kbd,
   parseKeys,
@@ -532,9 +533,10 @@ const Viewport = BaseMenu.Viewport;
 
 /**
  * Open state of a menu trigger, shared by every Menu trigger. Keyed to
- * `data-popup-open`, which Base UI sets together with `aria-expanded="true"`,
- * so the trigger only looks pressed when the accessibility tree says it is
- * expanded.
+ * `aria-expanded="true"` (GEO-970): Base UI also sets `data-popup-open` on a
+ * Tooltip trigger while its tooltip shows, so a tooltip on a menu trigger used
+ * to fake the open look. Only a disclosure sets `aria-expanded`, so the trigger
+ * looks pressed exactly when the accessibility tree says it is expanded.
  * - A pressed overlay as a background-image layer, so it darkens any Button
  *   variant (ghost, outline, solid) without replacing its colour.
  * - An inset ring in the trigger's own text colour: a non-colour cue that
@@ -542,9 +544,9 @@ const Viewport = BaseMenu.Viewport;
  * - Forced colours drop backgrounds and box-shadows: a Highlight outline.
  */
 export const menuTriggerOpenClasses = cn(
-  "data-[popup-open]:bg-[linear-gradient(var(--sp-state-pressed),var(--sp-state-pressed))]",
-  "data-[popup-open]:shadow-[inset_0_0_0_1.5px_currentColor]",
-  "forced-colors:data-[popup-open]:outline-2 forced-colors:data-[popup-open]:-outline-offset-2 forced-colors:data-[popup-open]:outline-solid forced-colors:data-[popup-open]:outline-[Highlight]",
+  "aria-expanded:bg-[linear-gradient(var(--sp-state-pressed),var(--sp-state-pressed))]",
+  "aria-expanded:shadow-[inset_0_0_0_1.5px_currentColor]",
+  "forced-colors:aria-expanded:outline-2 forced-colors:aria-expanded:-outline-offset-2 forced-colors:aria-expanded:outline-solid forced-colors:aria-expanded:outline-[Highlight]",
 );
 
 const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BaseMenu.Trigger>>(
@@ -552,7 +554,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof 
     <BaseMenu.Trigger
       ref={ref}
       data-slot="menu-trigger"
-      className={cn(menuTriggerOpenClasses, className)}
+      className={mergeClassName(cn(menuTriggerOpenClasses), className)}
       {...props}
     />
   ),
@@ -568,7 +570,7 @@ const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof Ba
     <BaseMenu.Backdrop
       ref={ref}
       data-slot="menu-backdrop"
-      className={cn("fixed inset-0", className)}
+      className={mergeClassName(cn("fixed inset-0"), className)}
       {...props}
     />
   ),
@@ -587,7 +589,7 @@ const Positioner = React.forwardRef<
     ref={ref}
     data-slot="menu-positioner"
     sideOffset={sideOffset}
-    className={cn("z-50 outline-none", className)}
+    className={mergeClassName(cn("z-50 outline-none"), className)}
     {...props}
   />
 ));
@@ -660,22 +662,24 @@ const Popup = React.forwardRef<HTMLDivElement, MenuPopupProps>(
               ...style,
             } as React.CSSProperties
           }
-          className={cn(
-            "bg-surface-overlay text-fg-default border-border-default flex flex-col rounded-[var(--radius-DEFAULT)] border p-1 shadow-lg outline-none [--sp-nested-radius:6px]",
-            // Width: Carbon's 160–288px guidance
-            "w-max min-w-40 max-w-72",
-            matchTriggerWidth && "min-w-[max(10rem,var(--anchor-width))]",
-            // Height: scrolls within the space available
-            "max-h-[min(var(--available-height),var(--sp-menu-max-height,24rem))] overflow-y-auto overscroll-contain",
-            // Animation
-            "origin-[var(--transform-origin)]",
-            "transition-[transform,scale,opacity] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
-            "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
-            "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
-            "motion-reduce:transition-none",
-            // Opened from the keyboard: appear at once. Only while open, so the
-            // close animation is unchanged.
-            "data-[keyboard-open]:data-[open]:transition-none",
+          className={mergeClassName(
+            cn(
+              "bg-surface-overlay text-fg-default border-border-default flex flex-col rounded-[var(--radius-DEFAULT)] border p-1 shadow-lg outline-none [--sp-nested-radius:6px]",
+              // Width: Carbon's 160–288px guidance
+              "w-max min-w-40 max-w-72",
+              matchTriggerWidth && "min-w-[max(10rem,var(--anchor-width))]",
+              // Height: scrolls within the space available
+              "max-h-[min(var(--available-height),var(--sp-menu-max-height,24rem))] overflow-y-auto overscroll-contain",
+              // Animation
+              "origin-[var(--transform-origin)]",
+              "transition-[transform,scale,opacity] duration-[var(--sp-duration-fast)] ease-[var(--sp-easing-default)]",
+              "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+              "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+              "motion-reduce:transition-none",
+              // Opened from the keyboard: appear at once. Only while open, so the
+              // close animation is unchanged.
+              "data-[keyboard-open]:data-[open]:transition-none",
+            ),
             className,
           )}
           {...props}
@@ -699,8 +703,10 @@ const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseM
     <BaseMenu.Arrow
       ref={ref}
       data-slot="menu-arrow"
-      className={cn(
-        "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
+      className={mergeClassName(
+        cn(
+          "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
+        ),
         className,
       )}
       {...props}
@@ -915,7 +921,7 @@ const RadioGroup = React.forwardRef<
   <BaseMenu.RadioGroup
     ref={ref}
     data-slot="menu-radio-group"
-    className={cn(className)}
+    className={mergeClassName(cn(""), className)}
     {...props}
   />
 ));
@@ -983,7 +989,7 @@ const Group = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseM
           ref={ref}
           data-slot="menu-group"
           aria-describedby={descriptionId}
-          className={cn(className)}
+          className={mergeClassName(cn(""), className)}
           {...props}
         />
       </GroupDescriptionContext.Provider>
@@ -1013,9 +1019,8 @@ const GroupLabel = React.forwardRef<HTMLDivElement, MenuGroupLabelProps>(
         <BaseMenu.GroupLabel
           ref={ref}
           data-slot="menu-group-label"
-          className={cn(
-            "text-fg-muted px-2 pb-1 pt-2 text-xs font-semibold",
-            hasDescription && "pb-0",
+          className={mergeClassName(
+            cn("text-fg-muted px-2 pb-1 pt-2 text-xs font-semibold", hasDescription && "pb-0"),
             className,
           )}
           {...props}
@@ -1050,9 +1055,11 @@ const Separator = React.forwardRef<HTMLDivElement, MenuSeparatorProps>(
       ref={ref}
       data-slot="menu-separator"
       data-variant={variant}
-      className={cn(
-        "border-border-default -mx-1 my-1 h-0 shrink-0 border-t",
-        variant === "dashed" && "border-dashed",
+      className={mergeClassName(
+        cn(
+          "border-border-default -mx-1 my-1 h-0 shrink-0 border-t",
+          variant === "dashed" && "border-dashed",
+        ),
         className,
       )}
       {...props}
@@ -1084,8 +1091,10 @@ const Search = React.forwardRef<HTMLInputElement, MenuSearchProps>(
         data-slot="menu-search-input"
         placeholder={placeholder}
         aria-label={props["aria-label"] ?? placeholder}
-        className={cn(
-          "text-fg-default placeholder:text-fg-muted border-border-default h-[var(--sp-control-height-sm)] w-full border-b bg-transparent pe-9 ps-9 text-sm outline-none",
+        className={mergeClassName(
+          cn(
+            "text-fg-default placeholder:text-fg-muted border-border-default h-[var(--sp-control-height-sm)] w-full border-b bg-transparent pe-9 ps-9 text-sm outline-none",
+          ),
           className,
         )}
         {...props}
@@ -1106,7 +1115,7 @@ const List = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseMe
     <BaseMenu.List
       ref={ref}
       data-slot="menu-list"
-      className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain", className)}
+      className={mergeClassName(cn("min-h-0 flex-1 overflow-y-auto overscroll-contain"), className)}
       {...props}
     />
   ),
@@ -1118,7 +1127,10 @@ const Empty = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseM
     <BaseMenu.Empty
       ref={ref}
       data-slot="menu-empty"
-      className={cn("text-fg-muted px-2 py-4 text-center text-sm empty:hidden", className)}
+      className={mergeClassName(
+        cn("text-fg-muted px-2 py-4 text-center text-sm empty:hidden"),
+        className,
+      )}
       {...props}
     />
   ),
