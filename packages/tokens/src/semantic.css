@@ -58,6 +58,10 @@
   --sp-skeleton-highlight: color-mix(in oklab, var(--sp-neutral-0) 70%, transparent);
   --sp-skeleton-outline: transparent;
 
+  /* ---- Indicator (GEO-964): the ring that separates an overlay from what it sits on.
+     Set it on a container to match a raised or sunken parent. ---- */
+  --sp-indicator-ring: var(--sp-surface-base);
+
   /* ---- Focus (two-tone ring) ---- */
   --sp-focus-outer: var(--sp-neutral-900);
   --sp-focus-inner: var(--sp-neutral-0);
@@ -113,6 +117,10 @@
   --sp-skeleton-highlight: color-mix(in oklab, var(--sp-fg-default) 10%, transparent);
   --sp-skeleton-outline: transparent;
 
+  /* ---- Indicator (GEO-964): the ring that separates an overlay from what it sits on.
+     Set it on a container to match a raised or sunken parent. ---- */
+  --sp-indicator-ring: var(--sp-surface-base);
+
   /* ---- Focus ---- */
   --sp-focus-outer: var(--sp-neutral-25);
   --sp-focus-inner: var(--sp-neutral-950);
@@ -167,6 +175,10 @@
   --sp-skeleton-highlight: color-mix(in oklab, #ffffff 80%, transparent);
   --sp-skeleton-outline: var(--sp-border-control);
 
+  /* ---- Indicator (GEO-964): the ring that separates an overlay from what it sits on.
+     Set it on a container to match a raised or sunken parent. ---- */
+  --sp-indicator-ring: var(--sp-surface-base);
+
   /* ---- Focus ---- */
   --sp-focus-outer: #000000;
   --sp-focus-inner: #ffffff;
@@ -190,6 +202,7 @@
     --sp-skeleton: Canvas;
     --sp-skeleton-highlight: Canvas;
     --sp-skeleton-outline: GrayText;
+    --sp-indicator-ring: Canvas;
     --sp-focus-outer: Highlight;
     --sp-focus-inner: Canvas;
     --sp-border-control: ButtonText;

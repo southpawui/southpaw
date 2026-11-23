@@ -103,3 +103,26 @@
     opacity: 0;
   }
 }
+
+/* ---- Indicator (GEO-964) ---- */
+
+/* Pulse: a ring that grows out of the dot and fades. Reduced motion turns the
+ * animation off and shows a static ring instead (set in the component). */
+@keyframes sp-indicator-pulse {
+  from {
+    scale: 1;
+    opacity: 0.6;
+  }
+  to {
+    scale: 2.4;
+    opacity: 0;
+  }
+}
+
+/* A small pop when the count changes. Runs on --sp-duration-fast, so it's 0ms
+ * under reduced motion. */
+@keyframes sp-indicator-pop {
+  50% {
+    scale: 1.2;
+  }
+}
