@@ -62,6 +62,10 @@
      Set it on a container to match a raised or sunken parent. ---- */
   --sp-indicator-ring: var(--sp-surface-base);
 
+  /* ---- LoadingOverlay (GEO-965): dims a busy region. Surface-based, so it
+     lightens in light themes and darkens in dark ones; Dialog may reuse it. ---- */
+  --sp-backdrop-loading: color-mix(in oklab, var(--sp-surface-base) 75%, transparent);
+
   /* ---- Focus (two-tone ring) ---- */
   --sp-focus-outer: var(--sp-neutral-900);
   --sp-focus-inner: var(--sp-neutral-0);
@@ -120,6 +124,7 @@
   /* ---- Indicator (GEO-964): the ring that separates an overlay from what it sits on.
      Set it on a container to match a raised or sunken parent. ---- */
   --sp-indicator-ring: var(--sp-surface-base);
+  --sp-backdrop-loading: color-mix(in oklab, var(--sp-surface-base) 75%, transparent);
 
   /* ---- Focus ---- */
   --sp-focus-outer: var(--sp-neutral-25);
@@ -178,6 +183,7 @@
   /* ---- Indicator (GEO-964): the ring that separates an overlay from what it sits on.
      Set it on a container to match a raised or sunken parent. ---- */
   --sp-indicator-ring: var(--sp-surface-base);
+  --sp-backdrop-loading: color-mix(in oklab, var(--sp-surface-base) 92%, transparent);
 
   /* ---- Focus ---- */
   --sp-focus-outer: #000000;
@@ -203,6 +209,7 @@
     --sp-skeleton-highlight: Canvas;
     --sp-skeleton-outline: GrayText;
     --sp-indicator-ring: Canvas;
+    --sp-backdrop-loading: Canvas;
     --sp-focus-outer: Highlight;
     --sp-focus-inner: Canvas;
     --sp-border-control: ButtonText;
