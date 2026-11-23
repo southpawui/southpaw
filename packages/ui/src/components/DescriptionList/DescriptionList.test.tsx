@@ -9,6 +9,9 @@ import { copyText } from "../../lib/use-copy-to-clipboard";
 import { destroyAnnouncer } from "../../lib/announce";
 
 const announcer = () => document.querySelector("[data-slot=announcer]");
+// The copy button's tooltip. Not getByText: the shared announcer says "Copied" too, and
+// once its 100ms write lands both match (a race that only shows under load).
+const tooltip = () => document.querySelector<HTMLElement>("[data-slot=tooltip-popup]")!;
 
 const DL = DescriptionList;
 
@@ -412,7 +415,10 @@ describe("Details", () => {
     // Check icon, "Copied" in the tooltip (held open), and a polite announcement
     expect(button).toHaveAttribute("data-status", "copied");
     expect(button.querySelector("svg")).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText("Copied")).toBeVisible());
+    await waitFor(() => {
+      expect(tooltip()).toHaveTextContent("Copied");
+      expect(tooltip()).toBeVisible();
+    });
     await waitFor(() => expect(announcer()).toHaveTextContent("Copied"));
     // Only the shared announcer: no live region of the button's own
     expect(document.querySelectorAll("[role=status]")).toHaveLength(1);
@@ -453,7 +459,10 @@ describe("Details", () => {
     await userEvent.click(screen.getByRole("button"));
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("data-status", "failed");
-    await waitFor(() => expect(screen.getByText("Copy failed")).toBeVisible());
+    await waitFor(() => {
+      expect(tooltip()).toHaveTextContent("Copy failed");
+      expect(tooltip()).toBeVisible();
+    });
     await waitFor(() => expect(announcer()).toHaveTextContent("Copy failed"));
   });
 
@@ -626,9 +635,12 @@ describe("signoff regressions", () => {
     );
     const button = screen.getByRole("button");
     await userEvent.click(button);
-    await waitFor(() => expect(screen.getByText("Copied")).toBeVisible());
+    await waitFor(() => {
+      expect(tooltip()).toHaveTextContent("Copied");
+      expect(tooltip()).toBeVisible();
+    });
     await userEvent.keyboard("{Escape}");
-    await waitFor(() => expect(screen.queryByText("Copied")).not.toBeVisible());
+    await waitFor(() => expect(tooltip()).not.toBeVisible());
     // Still in the copied state; only the tooltip was dismissed
     expect(button).toHaveAttribute("data-status", "copied");
   });
