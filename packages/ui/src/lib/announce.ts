@@ -49,17 +49,28 @@ function getRegion(): HTMLElement {
   return el;
 }
 
+export interface AnnounceOptions {
+  /**
+   * Announce even if it's the same as the message still in the region, e.g. a
+   * second "Copied" after copying another value (GEO-966). The region is
+   * emptied and the message written again after the usual gap, so screen
+   * readers hear a change. Default false: repeats are skipped.
+   */
+  force?: boolean;
+}
+
 /**
  * Announce a message politely. An identical message to the one still in the
- * region is skipped, so ten skeletons starting at once say "Loading" once.
+ * region is skipped, so ten skeletons starting at once say "Loading" once;
+ * pass `{ force: true }` for a repeat the user caused and needs to hear.
  * No-op on the server.
  */
-export function announce(message: string) {
+export function announce(message: string, { force = false }: AnnounceOptions = {}) {
   if (typeof document === "undefined") return;
   // The app removed the region: a new one has heard nothing yet, so don't skip
   if (region && !region.isConnected) lastMessage = "";
   const text = message.trim();
-  if (!text || text === lastMessage) return;
+  if (!text || (text === lastMessage && !force)) return;
   lastMessage = text;
   const el = getRegion();
   clearTimeout(writeTimer);
