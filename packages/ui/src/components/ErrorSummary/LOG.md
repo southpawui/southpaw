@@ -1,5 +1,23 @@
 # Error Summary — Change Log
 
+## 2026-11-21 — Demo form adds NumberField and OTPField (GEO-970)
+
+The Default demo now includes the two form controls that weren't on the branch when ErrorSummary was built:
+
+- **"Confirmation code"**: an OTPField with 6 slots in groups of 3, `required`.
+  - Empty, it shows "Enter the confirmation code".
+  - Partly filled, the hidden input reports `patternMismatch` (its pattern is `\d{6}`), not `tooShort`, so that message matches `patternMismatch`: "Confirmation code must be 6 digits".
+- **"How many books do you want to borrow at a time?"**: a NumberField with `min` 1, `max` 10 and `required`, showing "Enter how many books you want to borrow at a time".
+  - No range messages: NumberField clamps on blur (25 becomes 10), so they could never show.
+
+**Checked with Playwright:**
+
+- An empty submit lists 10 errors in form order, and focus moves to the summary.
+- The code link focuses the first OTP slot, and the books link focuses the number input.
+- A partly filled code shows the right message.
+
+**Found while checking the demo:** OTPField slots got `data-invalid` but not `aria-invalid` when the form was invalid, so they stayed grey while the other controls turned red. This is fixed in OTPField by the next GEO-970 commit; see OTPField/LOG.md.
+
 ## 2026-11-18 — Signed off by George; /improve findings fixed
 
 The read-only audit found 9 issues. All of them checked out against the code, and each is fixed with a regression test (11 new tests).

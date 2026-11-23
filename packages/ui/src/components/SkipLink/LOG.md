@@ -1,5 +1,21 @@
 # SkipLink — Change Log
 
+## 2026-11-21 — Stories use NavigationMenu (GEO-970)
+
+The placeholder header nav, a `<nav>` with a plain list of links, is now a real `NavigationMenu`. It has a "Books" disclosure with three links, plus Events, Your account and Help. This was planned for the restack, once NavigationMenu shared a base with SkipLink.
+
+The header stays on one row: the home link doesn't shrink, and the nav takes the rest of the width. Below `md` it collapses to NavigationMenu's "Menu" button, and there's no horizontal scroll at 390px.
+
+Checked with Playwright:
+
+- **Tab order:** skip link, City Library, Books, Events, Your account.
+- **Skipping:** activating the skip link focuses `main#main-content`, and the next Tab lands on the in-content link, not the nav.
+- **Other stories:** the Books panel opens below the header, and the sticky-header Target story still focuses the target.
+
+## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
+
+`sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the link's `forced-colors:focus:outline-*` fallback is gone. That was the local workaround noted at sign-off. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
+
 ## 2026-11-18 — Signed off by George; /improve findings fixed
 
 The read-only audit found 9 issues. All of them checked out against the code, and each is fixed, with 10 new regression tests.

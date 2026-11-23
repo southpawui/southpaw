@@ -14,10 +14,21 @@
  *
  * Or via the Tailwind utility:
  *   className="focus-visible:ring-sp"
+ *
+ * Forced colours (Windows High Contrast) strips box-shadow, so the ring
+ * alone would leave focus invisible (WCAG 2.4.7, GEO-950). There, a
+ * transparent outline is painted in the system colour, so focus still
+ * shows. It's scoped to forced colours: applied everywhere, the outline
+ * style flips to solid on focus while a component's colour transition fades
+ * `currentColor` out, which flashes a dark outline in normal mode.
  */
 
 @utility sp-focus-ring {
   outline: none;
+  @media (forced-colors: active) {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
   box-shadow:
     0 0 0 2px var(--sp-focus-inner),
     0 0 0 5px var(--sp-focus-outer);

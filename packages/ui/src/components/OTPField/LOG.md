@@ -1,5 +1,25 @@
 # OTPField — Change Log
 
+## 2026-11-21 — Slots get `aria-invalid` when the field fails validation (GEO-970)
+
+- **Bug:** Base UI 1.9 sets each slot's `aria-invalid` only from Field.Root's `invalid` prop (`OTPFieldInput`: `'aria-invalid': !disabled && invalid`). `data-invalid`, though, comes from the field's validity state. So when a field failed validation, for example on a Base UI Form submit, the slots got `data-invalid` but no `aria-invalid`. As a result:
+  - screen readers weren't told the slots were invalid;
+  - the `aria-invalid:!border-danger` border never applied, so the slots stayed grey while every other control turned red.
+
+  The ErrorSummary demo showed this.
+
+- **Fix:** `OTPField.Input` renders through Base UI's `render` prop and sets `aria-invalid` from the field's state (`valid === false`, not disabled). It still uses Base UI's own value when that one is set. A consumer's `render` still takes over.
+- **Tests:** a new test submits an empty required field inside a Form and expects `data-invalid` plus `aria-invalid="true"` on every slot. It fails without the fix.
+- **Checked with Playwright on the ErrorSummary demo:** after a failed submit, every slot has `aria-invalid="true"` and the danger border (`rgb(179, 38, 30)`). Filling the code clears it.
+
+## 2026-11-21 — Warning state now uses the `--sp-warning` token (GEO-970)
+
+The warning border was written as `border-[var(--sp-warning,var(--sp-fg-default))]`, which fell back to a dark border while the token was still on another branch (PR #44). The token is on the base now, so the state uses the `border-warning` utility and the fallback is gone. The test now checks for `border-warning`, and the warning story's "pending the token" note is replaced with real hint text. Checked with Playwright: the border is `#b45309` in light, `#fcd34d` in dark and `#7a4100` in high contrast, the same as the token.
+
+## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
+
+`sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So each slot's `forced-colors:focus-visible:outline-*` fallback is gone. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.
+
 ## 2026-11-16 — Sign-off (GEO-930)
 
 George signed off ("signed off"). I ran `/improve` on this folder myself, since it's a single component. It found three issues, all fixed, each with a regression test:

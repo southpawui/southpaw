@@ -103,4 +103,23 @@ describe("Tabs", () => {
     );
     expect(screen.getByTestId("tabs").className).toContain("test-class");
   });
+
+  it("styles the selected tab via Base UI's data-active attribute", () => {
+    render(
+      <Tabs.Root defaultValue="b">
+        <Tabs.List>
+          <Tabs.Tab value="a">A</Tabs.Tab>
+          <Tabs.Tab value="b">B</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="b">Content</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    const selected = screen.getByRole("tab", { name: "B" });
+    // Base UI 1.9 marks the selected tab with data-active; the styles must key off it
+    expect(selected).toHaveAttribute("aria-selected", "true");
+    expect(selected).toHaveAttribute("data-active");
+    expect(screen.getByRole("tab", { name: "A" })).not.toHaveAttribute("data-active");
+    expect(selected.className).toContain("data-[active]:text-accent");
+    expect(selected.className).not.toContain("data-[selected]");
+  });
 });

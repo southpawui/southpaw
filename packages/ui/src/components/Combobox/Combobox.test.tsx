@@ -158,7 +158,7 @@ describe("Combobox", () => {
     rerender(<Harness valid warning />);
     expect(control()).not.toHaveAttribute("data-valid");
     expect(control()).toHaveAttribute("data-warning");
-    expect(control().className).toContain("--sp-warning");
+    expect(control().className).toContain("border-warning");
   });
 
   it("loading shows a spinner, the loading row and aria-busy", async () => {
