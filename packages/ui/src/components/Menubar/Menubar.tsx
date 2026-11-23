@@ -22,6 +22,7 @@ import {
  * ============================================================ */
 
 const TRIGGER = "[data-slot=menubar-trigger]";
+const SEARCH = "[data-slot=menu-search-input]";
 
 /**
  * Typing a character on a top-level trigger moves focus to the next trigger
@@ -71,20 +72,31 @@ function handleMenuSwitch(
   if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
   const bar = event.currentTarget;
   if (bar.getAttribute("aria-orientation") === "vertical") return;
-  // Only from inside an open menu of this bar (React events bubble through portals)
+  // Only from inside an open menu of this bar (React events bubble through
+  // portals). A searchable menu's popup is role="dialog", so match the slot too.
   const target = event.target as Element;
-  if (bar.contains(target) || !target.closest("[role=menu]")) return;
-  // Leave text fields (custom content in a menu) their own caret movement
-  if (target.closest("input, textarea, [contenteditable=''], [contenteditable=true]")) return;
+  if (bar.contains(target) || !target.closest("[role=menu], [data-slot=menu-popup]")) return;
+  // A text field with text keeps Left/Right for its caret. An empty one
+  // (e.g. a menu's search field before typing) has no caret to move, so the
+  // arrows switch menus like anywhere else; Base UI does the same.
+  const field = target.closest<HTMLElement>(
+    "input, textarea, [contenteditable=''], [contenteditable=true]",
+  );
+  if (field && ("value" in field ? (field as HTMLInputElement).value : field.textContent)) return;
   switchMark.current = true;
   const doc = bar.ownerDocument;
+  const expanded = () => bar.querySelector<HTMLElement>(`${TRIGGER}[aria-expanded="true"]`);
+  // The menu the key was pressed in. The switch is done once another menu's
+  // trigger is expanded; if it stays the same (a submenu opened or closed),
+  // give up waiting after a few frames.
+  const from = expanded();
   let tries = 0;
   const settle = () => {
     // The newly opened menu: its trigger is expanded, its popup has aria-controls' id
-    const trigger = bar.querySelector<HTMLElement>(`${TRIGGER}[aria-expanded="true"]`);
+    const trigger = expanded();
     const popupId = trigger?.getAttribute("aria-controls");
     const popup = popupId ? doc.getElementById(popupId) : null;
-    if (!popup && ++tries < 10) {
+    if ((!popup || trigger === from) && ++tries < 10) {
       requestAnimationFrame(settle);
       return;
     }
@@ -95,9 +107,17 @@ function handleMenuSwitch(
       active.hasAttribute("data-highlighted") &&
       !active.hasAttribute("data-disabled") &&
       !bar.contains(active);
-    // Already on an enabled item (e.g. a submenu opened or closed): leave it
-    if (!popup || onEnabledItem) return;
-    // First enabled item (skips disabled ones, e.g. Undo with nothing to undo)
+    // No switch happened (a submenu opened or closed), or focus is already on
+    // an enabled item: leave it
+    if (!popup || trigger === from || onEnabledItem) return;
+    // A searchable menu starts in its search field, as when opened from the
+    // trigger. Otherwise the first enabled item (skips disabled ones, e.g.
+    // Undo with nothing to undo).
+    const search = popup.querySelector<HTMLElement>(SEARCH);
+    if (search) {
+      if (active !== search) search.focus();
+      return;
+    }
     popup
       .querySelector<HTMLElement>(
         '[role^="menuitem"]:not([data-disabled]):not([aria-disabled="true"])',
@@ -256,4 +276,8 @@ export const Menubar = Object.assign(MenubarRoot, {
   Group: Menu.Group,
   GroupLabel: Menu.GroupLabel,
   Separator: Menu.Separator,
+  FilterProvider: Menu.FilterProvider,
+  Search: Menu.Search,
+  List: Menu.List,
+  Empty: Menu.Empty,
 });

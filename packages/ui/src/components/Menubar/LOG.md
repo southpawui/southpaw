@@ -1,5 +1,52 @@
 # Menubar — Change Log
 
+## 2026-11-23 — Search in a menu (George: "ok do it")
+
+### Decision
+
+George saw the prototype (a Help menu with search, as in macOS) and approved my recommendation:
+
+- **Empty search field:** Left/Right switch menus like everywhere else in the bar. The field has no caret to move, so nothing is lost.
+- **Field with text:** Left/Right move the caret. Escape, then Left/Right, leaves the menu. That's the macOS Help menu's behaviour.
+- **Rejected:** switching at the caret's start or end. One Left too many while fixing a typo would jump menus and lose the search.
+
+This replaces the 2026-11-18 "Considered and rejected" entry on filter parts.
+
+### What changed
+
+- **Menubar exports Menu's filter parts:** `FilterProvider`, `Search`, `List`, `Empty`, the same as ContextMenu.
+- **Switching out of a search field:** a searchable popup is `role="dialog"`, not `menu`, so the bar's Left/Right handling also matches Menu's popup slot. Without that, the switch landed on the bare popup with no item highlighted and the open animated.
+- **Text fields:** the 2026-11-18 guard skipped every text field. It now skips only fields that have text, and an empty field switches. Base UI makes the same call: from an empty search field it switches menus itself, and once there's text it leaves the keys to the caret.
+- **Switching into a searchable menu** focuses its search field, the same as opening it from its trigger.
+- **Timing fix:** the handler now waits until a different menu's trigger is the expanded one. Before, it could act on the menu being left. A submenu opening or closing still gives up after 10 frames, as before.
+- **Story:** Search, with Help as a searchable menu of 10 topics. It replaces the prototype.
+- **Tests:** 2 new.
+  - Switching into a searchable menu focuses the field, with `data-keyboard-open`.
+  - Left in a field with text moves the caret and doesn't switch.
+  - Left/Right from an empty field isn't unit-tested: Base UI's switch from the input doesn't run in jsdom. It's checked in browsers below.
+
+### Checks (real keys, Chromium and WebKit)
+
+| From                            | Key          | Result                                                  |
+| ------------------------------- | ------------ | ------------------------------------------------------- |
+| Help, empty field               | Left         | View opens, Toolbar highlighted, keyboard open          |
+| View                            | Right        | Help opens, focus in the search field                   |
+| Help, empty field               | Right        | Wraps to File, New file highlighted                     |
+| Help, "exp"                     | Left         | Caret moves (3 → 2), Help stays open                    |
+| Help, "exp", result highlighted | Left         | Caret moves, highlight kept                             |
+| Help, typed then cleared        | Left         | View opens                                              |
+| File → Open recent              | Right / Left | Submenu opens (report.pdf) / closes back to Open recent |
+
+- `pnpm test`: 408 pass. `pnpm verify menubar`: passes; the Search story is clean with no inconclusives. eslint is clean.
+
+### Sign-off (George, 2026-11-23), /improve
+
+- **Defensive guard added:** when the handler waits but no other menu opens, it now leaves focus alone instead of falling through to "focus the first item" of the same menu. No reachable case was found.
+  - A test with Right on a disabled submenu trigger showed that Base UI treats it as "go to the next menu" (APG), so it switches.
+  - Submenu open and close already land on an enabled item.
+  - Test dropped, guard kept.
+- No other findings.
+
 ## 2026-11-18 — Sign-off (George), /improve fixes
 
 ### /improve findings, fixed

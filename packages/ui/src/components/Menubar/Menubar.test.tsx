@@ -66,6 +66,8 @@ describe("Menubar", () => {
     expect(Menubar.Popup).toBe(Menu.Popup);
     expect(Menubar.SubmenuTrigger).toBe(Menu.SubmenuTrigger);
     expect(Menubar.Backdrop).toBe(Menu.Backdrop);
+    expect(Menubar.Search).toBe(Menu.Search);
+    expect(Menubar.FilterProvider).toBe(Menu.FilterProvider);
   });
 
   it("supports vertical orientation", () => {
@@ -247,5 +249,77 @@ describe("Menubar", () => {
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     await new Promise((r) => requestAnimationFrame(r));
     expect(input).toHaveFocus();
+  });
+
+  /* ---------- search ---------- */
+
+  function SearchBar() {
+    return (
+      <Menubar aria-label="Application">
+        <Menubar.Menu>
+          <Menubar.Trigger>File</Menubar.Trigger>
+          <Menubar.Portal>
+            <Menubar.Positioner>
+              <Menubar.Popup data-testid="popup-File">
+                <Menubar.Item>New</Menubar.Item>
+              </Menubar.Popup>
+            </Menubar.Positioner>
+          </Menubar.Portal>
+        </Menubar.Menu>
+        <Menubar.FilterProvider>
+          <Menubar.Menu>
+            <Menubar.Trigger>Help</Menubar.Trigger>
+            <Menubar.Portal>
+              <Menubar.Positioner>
+                <Menubar.Popup data-testid="popup-Help">
+                  <Menubar.Search placeholder="Search help" />
+                  <Menubar.List>
+                    <Menubar.Item>Getting started</Menubar.Item>
+                    <Menubar.Item>Export a report</Menubar.Item>
+                  </Menubar.List>
+                  <Menubar.Empty>No help topics match</Menubar.Empty>
+                </Menubar.Popup>
+              </Menubar.Positioner>
+            </Menubar.Portal>
+          </Menubar.Menu>
+        </Menubar.FilterProvider>
+      </Menubar>
+    );
+  }
+
+  const frames = () =>
+    new Promise((r) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))),
+    );
+
+  it("switching into a searchable menu focuses its search field", async () => {
+    const user = userEvent.setup();
+    render(<SearchBar />);
+    screen.getByRole("menuitem", { name: "File" }).focus();
+    await user.keyboard("{ArrowDown}");
+    await screen.findByTestId("popup-File");
+    await user.keyboard("{ArrowRight}");
+    await screen.findByTestId("popup-Help");
+    await waitFor(() => expect(screen.getByPlaceholderText("Search help")).toHaveFocus());
+    expect(screen.getByTestId("popup-Help")).toHaveAttribute("data-keyboard-open");
+  });
+
+  // Left/Right from an empty search field: Base UI switches menus there, but
+  // not in jsdom. Checked with real keys in Chromium and WebKit (LOG.md).
+
+  it("Left/Right in a search field with text move the caret", async () => {
+    const user = userEvent.setup();
+    render(<SearchBar />);
+    screen.getByRole("menuitem", { name: "Help" }).focus();
+    await user.keyboard("{ArrowDown}");
+    await screen.findByTestId("popup-Help");
+    const search = screen.getByPlaceholderText("Search help");
+    await waitFor(() => expect(search).toHaveFocus());
+    await user.keyboard("exp");
+    await user.keyboard("{ArrowLeft}");
+    await frames();
+    expect(search).toHaveFocus();
+    expect(screen.queryByTestId("popup-File")).toBeNull();
+    expect(screen.getByRole("menuitem", { name: "Export a report" })).toBeInTheDocument();
   });
 });

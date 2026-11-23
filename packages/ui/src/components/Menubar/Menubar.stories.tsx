@@ -323,6 +323,61 @@ export const Controlled: Story = {
 };
 
 /* ============================================================
+ * SEARCH — a searchable Help menu, as in macOS
+ * ============================================================ */
+
+const helpTopics = [
+  "Getting started",
+  "Keyboard shortcuts",
+  "Export a report",
+  "Import data",
+  "Share with your team",
+  "Manage permissions",
+  "Billing and plans",
+  "Troubleshooting sync",
+  "Release notes",
+  "Contact support",
+];
+
+export const Search: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Help has a search field at the top, like the macOS Help menu. Opening Help, from its trigger or with Left/Right from a neighbouring menu, puts focus in the field. Type to filter; ArrowDown highlights results and Enter picks one. While the field is empty, Left/Right switch menus like everywhere else in the bar; once it has text, they move the caret (Escape first to leave).",
+      },
+    },
+  },
+  render: () => (
+    <Menubar aria-label="Application">
+      {menus.slice(0, 3).map(({ label, Items }) => (
+        <BarMenu key={label} label={label}>
+          <Items />
+        </BarMenu>
+      ))}
+      <Menubar.FilterProvider>
+        <Menubar.Menu>
+          <Menubar.Trigger>Help</Menubar.Trigger>
+          <Menubar.Portal>
+            <Menubar.Positioner align="start">
+              <Menubar.Popup maxHeight="18rem" className="w-64">
+                <Menubar.Search placeholder="Search help" />
+                <Menubar.List>
+                  {helpTopics.map((t) => (
+                    <Menubar.Item key={t}>{t}</Menubar.Item>
+                  ))}
+                </Menubar.List>
+                <Menubar.Empty>No help topics match</Menubar.Empty>
+              </Menubar.Popup>
+            </Menubar.Positioner>
+          </Menubar.Portal>
+        </Menubar.Menu>
+      </Menubar.FilterProvider>
+    </Menubar>
+  ),
+};
+
+/* ============================================================
  * NARROW SCREENS — the bar collapses into one "Menu" button
  * ============================================================ */
 

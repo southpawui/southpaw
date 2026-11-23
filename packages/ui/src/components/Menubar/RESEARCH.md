@@ -63,6 +63,7 @@ Base UI props: `orientation` (horizontal), `loopFocus` (true), `modal` (true), `
 
 - **Built:** top-level typeahead, and ArrowUp opens at the last item (Base UI lacks both).
 - **Story patterns:** narrow screens (collapse into one "Menu" button), and controlled open through each menu's `open`.
+- **Built (2026-11-23):** search in a menu (Menu's filter parts, as in the macOS Help menu). Left/Right switch menus while the field is empty and move the caret once it has text.
 - **Rejected:** a current-item style on the bar. It belongs to navigation bars, which NavigationMenu covers.
 
 ## Accessibility guidance
