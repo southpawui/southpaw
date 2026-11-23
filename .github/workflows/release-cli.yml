@@ -1,0 +1,36 @@
+# Publishes the southpawui CLI to npm.
+#
+# DISABLED until George explicitly approves the first publish (GEO-973).
+# To enable: remove `"private": true` from packages/cli/package.json, set the
+# version, add an NPM_TOKEN repository secret, and delete the `if: false` line.
+name: Release southpawui
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "southpawui@*"
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+jobs:
+  publish:
+    if: false # Disabled: George approves the first npm publish himself.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter southpawui test
+      - run: pnpm --filter southpawui build
+      - run: npm publish --provenance --access public
+        working-directory: packages/cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

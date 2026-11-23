@@ -1,5 +1,28 @@
 # Docs site — Change Log
 
+## 2026-11-23 — Typecheck workaround removed; southpawui install tabs (GEO-973)
+
+### What changed
+
+- **Removed** `typescript.ignoreBuildErrors` from `next.config.mjs` and the scoped `scripts/typecheck.mjs`. `typecheck` is plain `tsc --noEmit` again. This branch now sits on GEO-970 Part A, which fixed the `packages/ui` type errors.
+  - Verified: `pnpm typecheck` exits 0 with 0 errors, and `next build` type-checks and builds all 12 routes.
+- **Install tabs** are now "southpawui" and "Manual". They open on Manual until `SOUTHPAWUI_PUBLISHED` in `lib/install.ts` is true, with a notice that the CLI is "available with v0.2.0".
+  - The Manual tab lists versioned npm dependencies.
+  - Its registry links are at least 24px tall, to meet the WCAG 2.2 target size.
+- **Installation page** is rewritten around `southpawui`, with one line on installing with the shadcn CLI.
+- **LLM Markdown** expands `<InstallTabs>` to the `southpawui` commands.
+- **Phone overflow** (George's review):
+  - Untitled code blocks now end their scroll area before the floating copy button, so commands never run underneath it.
+  - The Manual tab's `@import` line is now a code block with a copy button.
+  - Long inline code wraps (`overflow-wrap: anywhere`).
+- **Docs verify** runs at 320px too, and checks every page, theme and width for no horizontal page scroll and no code under a copy button. I confirmed the copy-button check catches the old layout: 3 blocks failed with the fix turned off. It's now 235 checks.
+- **Docs verify** also has 2 install checks: `dialog.md` shows the `southpawui` commands, and no page or LLM output says `shadcn@latest`.
+
+### Why
+
+- George's GEO-973 decisions: option E, plus E3 (no shadcn tab) and D4 (the tabs plan).
+- The workaround was always temporary, marked TODO(GEO-970).
+
 ## 2026-11-21 — Sign-off (George), /improve pass (GEO-894)
 
 ### /improve findings and fixes

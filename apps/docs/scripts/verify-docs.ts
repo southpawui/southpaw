@@ -20,6 +20,7 @@ const THEMES = ["light", "dark", "high-contrast"] as const;
 const VIEWPORTS = {
   desktop: { width: 1280, height: 900 },
   phone: { width: 375, height: 812 },
+  small: { width: 320, height: 700 },
 } as const;
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 
@@ -82,6 +83,33 @@ async function domChecks(page: Page, label: string) {
   record(`accessible names · ${label}`, unnamed.length === 0, unnamed.join("\n      "));
 }
 
+/** No horizontal page scroll, and no code running under a floating copy button. */
+async function layoutChecks(page: Page, label: string) {
+  const { scrollW, clientW } = await page.evaluate(() => ({
+    scrollW: document.documentElement.scrollWidth,
+    clientW: document.documentElement.clientWidth,
+  }));
+  record(
+    `no horizontal page scroll · ${label}`,
+    scrollW <= clientW,
+    `scrollWidth ${scrollW} > clientWidth ${clientW}`,
+  );
+  const overlaps = await page.evaluate(() => {
+    const bad: string[] = [];
+    for (const fig of document.querySelectorAll("figure.shiki")) {
+      const button = fig.querySelector(":scope > div[class*='absolute'] button");
+      const viewport = fig.querySelector(":scope > .fd-scroll-container");
+      if (!button || !viewport || (fig as HTMLElement).offsetParent === null) continue;
+      const b = button.getBoundingClientRect();
+      const v = viewport.getBoundingClientRect();
+      if (b.width && v.right > b.left + 1 && v.top < b.bottom && v.bottom > b.top)
+        bad.push((fig.textContent ?? "").slice(0, 40));
+    }
+    return bad;
+  });
+  record(`copy buttons don't cover code · ${label}`, overlaps.length === 0, overlaps.join(" | "));
+}
+
 async function open(page: Page, url: string, theme: string) {
   await page.addInitScript((t) => localStorage.setItem("sp-theme", t), theme);
   await page.goto(BASE + url, { waitUntil: "networkidle" });
@@ -106,6 +134,13 @@ async function main() {
         record(`theme applied · ${label}`, applied === theme, `data-theme=${applied}`);
         await axe(page, label);
         await domChecks(page, label);
+        await layoutChecks(page, label);
+        if (url === "/docs/components/dialog") {
+          // Inactive tab panels aren't rendered: check the southpawui tab's commands too.
+          await page.getByRole("tab", { name: "southpawui" }).first().click();
+          await layoutChecks(page, `${label} · southpawui tab`);
+          await page.getByRole("tab", { name: "Manual" }).first().click();
+        }
         await page.screenshot({
           path: path.join(OUT, `${slug(url)}--${theme}--${vpName}.png`),
           fullPage: true,
@@ -264,6 +299,24 @@ async function main() {
       `endpoint · ${url}`,
       res.ok && body.includes(expect),
       `${res.status}, ${body.length} bytes`,
+    );
+  }
+
+  // Install instructions (GEO-973): southpawui is the documented installer; shadcn isn't.
+  {
+    const md = await (await fetch(`${BASE}/docs/components/dialog.md`)).text();
+    record(
+      "install · dialog.md gives the southpawui commands",
+      md.includes("npx southpawui@latest init") && md.includes("npx southpawui@latest add dialog"),
+    );
+    const outputs = await Promise.all(
+      ["/llms-full.txt", "/docs/components/dialog", "/docs/installation"].map(async (u) =>
+        (await fetch(BASE + u)).text(),
+      ),
+    );
+    record(
+      "install · no page or llms output tells people to run shadcn@latest",
+      outputs.every((t) => !t.includes("shadcn@latest")),
     );
   }
 

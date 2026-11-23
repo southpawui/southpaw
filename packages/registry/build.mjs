@@ -17,7 +17,7 @@
  * unchanged after `shadcn add`.
  */
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,11 +27,20 @@ const uiSrc = path.join(root, "packages/ui/src");
 const tokensSrc = path.join(root, "packages/tokens/src");
 const examplesDir = path.join(here, "examples");
 const docsDir = path.join(root, "apps/docs");
-const outPublic = path.join(docsDir, "public/r");
-const outIndex = path.join(docsDir, "registry");
+// REGISTRY_OUT_DIR redirects all output (tests build into a temp folder, so they
+// never race a docs build writing the same files).
+const outBase = process.env.REGISTRY_OUT_DIR ? path.resolve(process.env.REGISTRY_OUT_DIR) : null;
+const outPublic = outBase ? path.join(outBase, "r") : path.join(docsDir, "public/r");
+const outIndex = outBase ? path.join(outBase, "registry") : path.join(docsDir, "registry");
 
-// TODO(GEO-894): set NEXT_PUBLIC_SITE_URL once the docs have a domain.
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001").replace(/\/$/, "");
+// TODO(domain): set SOUTHPAW_REGISTRY_URL (or NEXT_PUBLIC_SITE_URL) once the docs have a domain.
+const SITE_URL = (
+  process.env.SOUTHPAW_REGISTRY_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "http://localhost:3001"
+).replace(/\/$/, "");
+/** Registry namespace. Dependencies are `@southpaw/<name>`, so they don't depend on the base URL. */
+const NAMESPACE = "@southpaw";
 const TARGET_ROOT = "components/southpaw";
 const SCHEMA_ITEM = "https://ui.shadcn.com/schema/registry-item.json";
 const SCHEMA_REGISTRY = "https://ui.shadcn.com/schema/registry.json";
@@ -42,7 +51,23 @@ const kebab = (s) =>
     .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
     .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
     .toLowerCase();
-const itemUrl = (name) => `${SITE_URL}/r/${name}.json`;
+const itemRef = (name) => `${NAMESPACE}/${name}`;
+
+/** Version ranges for npm dependencies, taken from the packages that own the source. */
+const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
+const versionRanges = Object.assign(
+  {},
+  ...[path.join(root, "packages/ui/package.json"), path.join(here, "package.json")].flatMap((p) => {
+    const pkg = readJson(p);
+    return [pkg.devDependencies ?? {}, pkg.peerDependencies ?? {}, pkg.dependencies ?? {}];
+  }),
+);
+/** `name@range` when the range is known and isn't a workspace link; otherwise the bare name. */
+const versioned = (name) => {
+  const range = versionRanges[name];
+  return range && !range.startsWith("workspace:") ? `${name}@${range}` : name;
+};
+const versionedDeps = (deps) => [...deps].sort().map(versioned);
 const rel = (abs) => path.relative(root, abs).split(path.sep).join("/");
 const isSource = (f) =>
   /\.(tsx?)$/.test(f) && !/\.(test|stories)\.tsx?$/.test(f) && !f.endsWith(".d.ts");
@@ -132,8 +157,8 @@ async function addLibItem(libPath) {
   items.set(name, {
     name,
     type: "registry:lib",
-    dependencies: [...deps].sort(),
-    registryDependencies: [...libDeps, ...[...components].map(kebab)].map(itemUrl).sort(),
+    dependencies: versionedDeps(deps),
+    registryDependencies: [...libDeps, ...[...components].map(kebab)].map(itemRef).sort(),
     files: [
       { path: rel(abs), type: "registry:lib", target: `${TARGET_ROOT}/lib/${subPath}`, content },
     ],
@@ -146,14 +171,14 @@ async function addComponentItem(dir) {
   const absDir = path.join(uiSrc, "components", dir);
   const sources = (await readdir(absDir)).filter(isSource).sort();
   const deps = new Set();
-  const regDeps = new Set([itemUrl("southpaw-tokens")]);
+  const regDeps = new Set([itemRef("southpaw-tokens")]);
   const files = [];
   for (const f of sources) {
     const abs = path.join(absDir, f);
     const a = await analyse(abs);
     a.deps.forEach((d) => deps.add(d));
-    for (const c of a.components) if (c !== dir) regDeps.add(itemUrl(kebab(c)));
-    for (const l of a.libs) regDeps.add(itemUrl(await addLibItem(l)));
+    for (const c of a.components) if (c !== dir) regDeps.add(itemRef(kebab(c)));
+    for (const l of a.libs) regDeps.add(itemRef(await addLibItem(l)));
     files.push({
       path: rel(abs),
       type: "registry:ui",
@@ -165,7 +190,7 @@ async function addComponentItem(dir) {
     name,
     type: "registry:ui",
     title: dir,
-    dependencies: [...deps].sort(),
+    dependencies: versionedDeps(deps),
     registryDependencies: [...regDeps].sort(),
     files,
   });
@@ -196,8 +221,8 @@ async function addExamples() {
     items.set(name, {
       name,
       type: "registry:example",
-      dependencies: [...deps].sort(),
-      registryDependencies: [...new Set(uiDeps)].map(itemUrl).sort(),
+      dependencies: versionedDeps(deps),
+      registryDependencies: [...new Set(uiDeps)].map(itemRef).sort(),
       files: [
         {
           path: rel(abs),

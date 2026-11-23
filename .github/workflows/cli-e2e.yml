@@ -1,0 +1,30 @@
+# Real installs with southpawui into fresh Next.js and Vite apps, then
+# production builds. Runs when the CLI or the registry build changes.
+name: southpawui e2e
+
+on:
+  pull_request:
+    paths:
+      - "packages/cli/**"
+      - "packages/registry/**"
+      - "packages/ui/src/**"
+      - "packages/tokens/src/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter southpawui e2e

@@ -7,7 +7,7 @@ import { RegistryDemo } from "./registry-demo";
 /**
  * A live registry example with Preview / Code tabs (shadcn apps/v4 pattern).
  * `name` is an example in packages/registry/examples; the code shown is the
- * file as `shadcn add` installs it.
+ * file as southpawui installs it.
  */
 export async function ComponentPreview({
   name,

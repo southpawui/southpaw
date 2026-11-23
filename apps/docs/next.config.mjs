@@ -11,10 +11,6 @@ const config = {
   // Next 16 writes an AGENTS.md by default; the repo keeps agent docs in .claude/.
   agentRules: false,
   devIndicators: { position: "bottom-right" },
-  // TODO(GEO-970): packages/ui has pre-existing type errors that `next build` would
-  // fail on. Docs types are still enforced by `pnpm typecheck` (scripts/typecheck.mjs).
-  // Remove this once packages/ui type-checks cleanly.
-  typescript: { ignoreBuildErrors: true },
   transpilePackages: ["@southpawui/ui", "@southpawui/registry"],
   async rewrites() {
     // Every docs page is also served as Markdown at /docs/<slug>.md (BRIEF §8).

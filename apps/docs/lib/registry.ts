@@ -28,10 +28,9 @@ export function registryItemUrl(name: string) {
   return `${SITE_URL}/r/${name}.json`;
 }
 
-/** Registry dependency URLs → item names that this registry serves. */
+/** Registry dependencies (`@southpaw/<name>`) → the item names this registry serves. */
 export function localDependencyNames(entry: RegistryEntry): string[] {
-  const prefix = `${SITE_URL}/r/`;
   return entry.registryDependencies
-    .filter((d) => d.startsWith(prefix))
-    .map((d) => d.slice(prefix.length).replace(/\.json$/, ""));
+    .filter((d) => d.startsWith("@southpaw/"))
+    .map((d) => d.slice("@southpaw/".length));
 }
