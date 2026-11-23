@@ -2,7 +2,7 @@
 
 ## 2026-11-23 — Sign-off (GEO-963)
 
-George signed off Skeleton, choosing "Combobox a": Combobox's skeleton rows are deferred to a separate Combobox follow-up ticket.
+George signed off Skeleton, choosing "Combobox a": Combobox's skeleton rows are deferred to the Combobox follow-up ticket, GEO-975.
 
 **/improve findings**
 
@@ -86,4 +86,4 @@ Built to George's decisions of 2026-11-21: option (a) on all 20, the `--sp-skele
 - States includes loading, loaded, delayed, each animation, and a static reduced-motion preview. Storybook can't force the media query, so the preview is static.
 - Valid, error and disabled don't apply to a skeleton.
 
-**Deferred:** Combobox's optional, always-silent skeleton rows. George chose (a) on 2026-11-23: they go in a separate Combobox follow-up ticket, not this branch.
+**Deferred:** Combobox's optional, always-silent skeleton rows. George chose (a) on 2026-11-23: they go in the Combobox follow-up ticket, GEO-975, not this branch.
