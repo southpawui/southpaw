@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
+import { defaultLinkLabels, getLinkBehaviour } from "../../lib/link";
 import {
   Kbd,
   parseKeys,
@@ -768,8 +769,9 @@ export interface MenuLinkItemProps
 
 const LinkItem = React.forwardRef<Element, MenuLinkItemProps>((props, ref) => {
   const { content, rest } = splitContentProps(props);
-  const { className, children, label, target, ...itemProps } = rest;
-  const newTab = target === "_blank";
+  const { className, children, label, target, rel, ...itemProps } = rest;
+  // Shared with Link: same wording, and the consumer's rel is kept
+  const { newTab, rel: mergedRel } = getLinkBehaviour({ target, rel });
   const {
     body,
     ariaProps,
@@ -783,7 +785,7 @@ const LinkItem = React.forwardRef<Element, MenuLinkItemProps>((props, ref) => {
         className="text-fg-muted [[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)_&]:text-current"
       />
     ) : undefined,
-    srSuffix: newTab ? "Opens in a new tab" : undefined,
+    srSuffix: newTab ? defaultLinkLabels.newTab : undefined,
     // Links mark the current page, not just the current item
     current: "page",
   });
@@ -794,7 +796,7 @@ const LinkItem = React.forwardRef<Element, MenuLinkItemProps>((props, ref) => {
       data-slot="menu-link-item"
       label={textLabel(children, label)}
       target={target}
-      rel={newTab ? "noopener noreferrer" : undefined}
+      rel={mergedRel}
       {...ariaProps}
       {...dataProps}
       className={cn(rowClasses, className as string)}

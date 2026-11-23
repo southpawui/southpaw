@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
+import { Link } from "../Link/Link";
 
 // Bundlers statically replace `process.env.NODE_ENV`; declared locally so the
 // library doesn't need Node types.
@@ -38,7 +39,8 @@ export interface SkipLinkProps extends React.ComponentPropsWithRef<"a"> {
   render?: useRender.RenderProp;
 }
 
-const linkClasses = cn(
+// Positioning and the chip look. Colour, underline and focus come from Link.
+const skipLinkClasses = cn(
   // Off-screen until focused; never display:none, which would drop it from the tab order.
   // The slide clears the top inset too, and the hidden link never catches taps.
   "fixed z-[9999] opacity-0 pointer-events-none",
@@ -50,13 +52,12 @@ const linkClasses = cn(
   "transition-[translate,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
   "inline-flex h-[var(--sp-control-height)] items-center rounded-md px-4",
   "border-border-default bg-surface-base text-fg-default border text-sm font-semibold shadow-lg",
-  "underline-offset-2 hover:underline",
-  // :focus, not :focus-visible, so it always shows when it has focus
-  "focus:sp-focus-ring outline-none",
+  // :focus as well as Link's :focus-visible, so it always shows when it has focus
+  "focus:sp-focus-ring",
   "print:hidden",
 );
 
-const Link = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
+const SkipLinkRoot = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
   (
     {
       href = "#main-content",
@@ -69,17 +70,22 @@ const Link = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
     },
     ref,
   ) => {
-    return useRender({
-      defaultTagName: "a",
-      render,
-      ref,
-      props: {
-        ...props,
-        href,
-        "data-slot": "skip-link",
-        className: mergeClassName(cn(linkClasses), className),
-        children,
-        onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
+    return (
+      <Link
+        {...props}
+        ref={ref}
+        href={href}
+        render={render}
+        // A standalone chip in the text colour: underline on hover, no visited
+        // colour, and no printed URL (it's hidden in print anyway)
+        variant="inherit"
+        standalone
+        underline="hover"
+        visited={false}
+        printUrl={false}
+        data-slot="skip-link"
+        className={mergeClassName(skipLinkClasses, className)}
+        onClick={(event: React.MouseEvent<HTMLAnchorElement>) => {
           onClick?.(event);
           if (event.defaultPrevented) return;
           // The resolved href (honours <base> and an href set on a `render` element)
@@ -97,12 +103,14 @@ const Link = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
           }
           if (!updateHash) target.scrollIntoView?.();
           focusTarget(target);
-        },
-      },
-    });
+        }}
+      >
+        {children}
+      </Link>
+    );
   },
 );
-Link.displayName = "SkipLink";
+SkipLinkRoot.displayName = "SkipLink";
 
 /* ============================================================
  * Target
@@ -202,4 +210,4 @@ function focusTarget(target: HTMLElement) {
   }
 }
 
-export const SkipLink = Object.assign(Link, { Target });
+export const SkipLink = Object.assign(SkipLinkRoot, { Target });

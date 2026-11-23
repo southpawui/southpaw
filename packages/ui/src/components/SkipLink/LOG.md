@@ -1,5 +1,14 @@
 # SkipLink — Change Log
 
+## 2026-11-22 — Built on Link (GEO-967)
+
+SkipLink now renders `Link` with `variant="inherit"`, `standalone`, `underline="hover"`, `visited={false}` and `printUrl={false}`.
+
+- **Styling:** positioning, the slide-in and the chip look stay in SkipLink's own classes. They come last in `cn()`, so they win wherever they overlap with Link's: transition, radius and semibold weight.
+- **Focus:** the `focus:` ring sits alongside Link's `focus-visible:` ring, so a ring shows whenever the link has focus.
+- **Kept as before:** the click handler still reads `event.currentTarget.href` and checks `defaultPrevented`. The ref is forwarded through Link, and `data-slot="skip-link"` is kept.
+- **Checks:** 25 tests pass. The stories match their earlier baselines: Translated within 0.13%, Themes within 0.06%. The hover underline is now GOV.UK's thicker one.
+
 ## 2026-11-21 — Stories use NavigationMenu (GEO-970)
 
 The placeholder header nav, a `<nav>` with a plain list of links, is now a real `NavigationMenu`. It has a "Books" disclosure with three links, plus Events, Your account and Help. This was planned for the restack, once NavigationMenu shared a base with SkipLink.

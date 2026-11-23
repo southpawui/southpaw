@@ -3,6 +3,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { WarningCircle } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
+import { Link } from "../Link/Link";
 import {
   getErrorMessage,
   lowerFirst,
@@ -397,11 +398,6 @@ export interface ErrorSummaryItemProps extends Omit<React.ComponentPropsWithRef<
   children?: React.ReactNode;
 }
 
-const linkClasses = cn(
-  "text-danger rounded-sm font-medium underline underline-offset-2",
-  "hover:decoration-2 focus-visible:sp-focus-ring outline-none",
-);
-
 const Item = React.forwardRef<HTMLLIElement, ErrorSummaryItemProps>(
   ({ target, name, render, className, children, ...props }, ref) => {
     const ctx = useErrorSummary("ErrorSummary.Item");
@@ -414,30 +410,33 @@ const Item = React.forwardRef<HTMLLIElement, ErrorSummaryItemProps>(
     React.useEffect(() => {
       if (linked) setHref(hrefFor({ target, name }));
     }, [linked, target, name, hrefFor, errors]);
-    const link = useRender({
-      defaultTagName: "a",
-      render,
-      props: {
-        href: href ?? "#",
-        "data-slot": "error-summary-link",
-        className: linkClasses,
-        onClick: (event: React.MouseEvent) => {
-          // GOV.UK: scroll the label or legend into view, then focus the field
-          event.preventDefault();
-          ctx.focusError({ target, name });
-        },
-        children,
-      },
-      enabled: linked,
-    });
     return (
       <li
         ref={ref}
         data-slot="error-summary-item"
-        className={mergeClassName(cn(!linked && "text-danger font-medium"), className)}
+        className={mergeClassName("text-danger font-medium", className)}
         {...props}
       >
-        {linked ? link : children}
+        {linked ? (
+          // Link in the danger text colour. Hash links: no visited colour, no print URL.
+          <Link
+            href={href ?? "#"}
+            variant="inherit"
+            visited={false}
+            printUrl={false}
+            render={render}
+            data-slot="error-summary-link"
+            onClick={(event) => {
+              // GOV.UK: scroll the label or legend into view, then focus the field
+              event.preventDefault();
+              ctx.focusError({ target, name });
+            }}
+          >
+            {children}
+          </Link>
+        ) : (
+          children
+        )}
       </li>
     );
   },

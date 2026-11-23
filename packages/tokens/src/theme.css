@@ -37,6 +37,9 @@
   --color-danger-subtle: var(--sp-danger-subtle);
   --color-info: var(--sp-info);
   --color-warning: var(--sp-warning);
+  --color-link: var(--sp-link);
+  --color-link-hover: var(--sp-link-hover);
+  --color-link-visited: var(--sp-link-visited);
 
   /* ---- Borders ---- */
   --color-border-default: var(--sp-border-default);
