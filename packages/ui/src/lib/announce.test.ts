@@ -49,6 +49,37 @@ describe("announce", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it("force announces a repeat: the region empties, then the message is written again", () => {
+    announce("Copied");
+    vi.advanceTimersByTime(ANNOUNCE_WRITE_DELAY_MS);
+    const region = regions()[0]!;
+    expect(region.textContent).toBe("Copied");
+    announce("Copied", { force: true });
+    expect(region.textContent).toBe("");
+    vi.advanceTimersByTime(ANNOUNCE_WRITE_DELAY_MS);
+    expect(region.textContent).toBe("Copied");
+  });
+
+  it("force still ignores empty messages, and the default still skips repeats", () => {
+    announce("Copied");
+    vi.advanceTimersByTime(ANNOUNCE_WRITE_DELAY_MS);
+    const region = regions()[0]!;
+    const spy = vi.spyOn(region, "textContent", "set");
+    announce("  ", { force: true });
+    announce("Copied");
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("a forced repeat restarts the clear timer", () => {
+    announce("Copied");
+    vi.advanceTimersByTime(ANNOUNCE_WRITE_DELAY_MS + ANNOUNCE_CLEAR_MS - 1000);
+    announce("Copied", { force: true });
+    vi.advanceTimersByTime(ANNOUNCE_WRITE_DELAY_MS + 1000);
+    expect(regions()[0]!.textContent).toBe("Copied");
+    vi.advanceTimersByTime(ANNOUNCE_CLEAR_MS);
+    expect(regions()[0]!.textContent).toBe("");
+  });
+
   it("clears the message later, and the same text can then be announced again", () => {
     announce("Loading");
     vi.advanceTimersByTime(ANNOUNCE_WRITE_DELAY_MS + ANNOUNCE_CLEAR_MS);
