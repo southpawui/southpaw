@@ -152,19 +152,41 @@ export function menuItemClasses({
     // Highlight (pointer hover, keyboard focus, open submenu)
     !danger &&
       !solid &&
-      "data-[highlighted]:bg-[var(--sp-state-pressed)] data-[popup-open]:bg-[var(--sp-state-pressed)]",
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-[var(--sp-state-pressed)] data-[popup-open]:bg-[var(--sp-state-pressed)]",
     !danger &&
       solid &&
-      "data-[highlighted]:bg-accent data-[highlighted]:text-fg-on-brand data-[popup-open]:bg-accent data-[popup-open]:text-fg-on-brand",
-    danger && !solid && "data-[highlighted]:bg-danger/10",
-    danger && solid && "data-[highlighted]:bg-danger data-[highlighted]:text-fg-on-danger",
-    // Current item (Primer `active`)
-    active &&
-      "font-medium after:absolute after:inset-y-2 after:start-0.5 after:w-0.5 after:rounded-full after:bg-accent after:content-['']",
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-accent [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:text-fg-on-brand data-[popup-open]:bg-accent data-[popup-open]:text-fg-on-brand",
+    danger &&
+      !solid &&
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-danger/10",
+    // Subtle highlight: the tint alone measures 1.2–1.45:1, under the 3:1 a
+    // focus indicator needs (WCAG 1.4.11), so a 2px bar marks the start of
+    // the highlighted row (matches Combobox/Autocomplete, Lane 5).
+    !solid &&
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:absolute [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:inset-y-1 [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:start-0 [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:w-0.5 [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:rounded-full [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:content-['']",
+    !solid &&
+      (danger
+        ? "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:bg-danger"
+        : "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:after:bg-accent"),
+    // Forced colours drop backgrounds (both highlight styles): outline instead.
+    "forced-colors:[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:outline-solid forced-colors:[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:outline-2 forced-colors:[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:-outline-offset-2 forced-colors:[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:outline-[color:Highlight]",
+    danger &&
+      solid &&
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:bg-danger [&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:text-fg-on-danger",
+    // Current item (Primer `active`): bold text plus the selected tint. No
+    // bar: the bar marks only the highlight (George, 2026-11-16).
+    active && "font-medium",
     active && !solid && "bg-[var(--sp-state-selected)]",
     // Inactive (Primer): still focusable, label muted, reason shown below
     "data-[inactive]:[&_[data-slot=menu-item-label]]:text-fg-muted",
-    // Disabled: Base UI keeps it out of activation; we fade it
+    // Disabled: Base UI keeps it out of activation; we fade the whole row.
+    // Base UI keeps disabled items keyboard-focusable on purpose (useMenuItem:
+    // focusableWhenDisabled: true; MenuRoot: disabledIndices: []; APG: screen
+    // reader users learn they exist). So the highlight styles above apply when
+    // the item is enabled OR the keyboard put it there (Popup's
+    // data-input-modality): pointer hover on a disabled item shows nothing,
+    // keyboard focus keeps the tint and bar at the faded opacity (WCAG 2.4.7).
+    // Same split as Combobox/Autocomplete (Lane 5).
     "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
     // Dividers between items (Primer `showDividers`). The line sits at the top
     // of every item that follows another item, and is hidden on both sides of
@@ -172,8 +194,8 @@ export function menuItemClasses({
     dividers && [
       "before:pointer-events-none before:absolute before:inset-x-2 before:top-0 before:hidden before:h-px before:bg-border-default before:content-['']",
       "[[role^=menuitem]+&]:before:block",
-      "data-[highlighted]:before:opacity-0 data-[popup-open]:before:opacity-0",
-      "[[data-highlighted]+&]:before:opacity-0 [[data-popup-open]+&]:before:opacity-0",
+      "[&[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)]:before:opacity-0 data-[popup-open]:before:opacity-0",
+      "[[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)+&]:before:opacity-0 [[data-popup-open]+&]:before:opacity-0",
       active && "before:opacity-0",
       "[[data-active]+&]:before:opacity-0",
     ],
@@ -323,7 +345,7 @@ function useItemContent(
   const muted = cn(
     danger ? "text-current/80" : "text-fg-muted",
     solid &&
-      "group-data-[highlighted]/menu-item:text-current/85 group-data-[popup-open]/menu-item:text-current/85",
+      "[[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)_&]:text-current/85 group-data-[popup-open]/menu-item:text-current/85",
   );
 
   const inline = descriptionLayout === "inline";
@@ -590,7 +612,18 @@ export interface MenuPopupProps extends React.ComponentProps<typeof BaseMenu.Pop
 
 const Popup = React.forwardRef<HTMLDivElement, MenuPopupProps>(
   (
-    { className, size, highlight, dividers, matchTriggerWidth, maxHeight, style, ...props },
+    {
+      className,
+      size,
+      highlight,
+      dividers,
+      matchTriggerWidth,
+      maxHeight,
+      style,
+      onKeyDownCapture,
+      onPointerMoveCapture,
+      ...props
+    },
     ref,
   ) => {
     const parent = useMenuStyle();
@@ -611,6 +644,16 @@ const Popup = React.forwardRef<HTMLDivElement, MenuPopupProps>(
           data-size={value.size}
           data-highlight={value.highlight}
           data-keyboard-open={keyboardOpen ? "" : undefined}
+          data-input-modality={keyboardOpen ? "keyboard" : "pointer"}
+          onKeyDownCapture={(event) => {
+            event.currentTarget.dataset.inputModality = "keyboard";
+            onKeyDownCapture?.(event);
+          }}
+          onPointerMoveCapture={(event) => {
+            if (event.pointerType !== "touch")
+              event.currentTarget.dataset.inputModality = "pointer";
+            onPointerMoveCapture?.(event);
+          }}
           style={
             {
               ...(maxHeight ? { "--sp-menu-max-height": maxHeight } : null),
@@ -731,7 +774,7 @@ const LinkItem = React.forwardRef<Element, MenuLinkItemProps>((props, ref) => {
       <ArrowSquareOut
         aria-hidden="true"
         data-slot="menu-item-external-icon"
-        className="text-fg-muted group-data-[highlighted]/menu-item:text-current"
+        className="text-fg-muted [[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)_&]:text-current"
       />
     ) : undefined,
     srSuffix: newTab ? "Opens in a new tab" : undefined,
@@ -785,7 +828,7 @@ const SubmenuTrigger = React.forwardRef<HTMLElement, MenuSubmenuTriggerProps>((p
         aria-hidden="true"
         className={cn(
           "flex items-center rtl:-scale-x-100",
-          "text-fg-muted group-data-[highlighted]/menu-item:text-current group-data-[popup-open]/menu-item:text-current",
+          "text-fg-muted group-data-[popup-open]/menu-item:text-current [[data-highlighted]:is(:not([data-disabled]),[data-input-modality=keyboard]_*)_&]:text-current",
         )}
       >
         {chevron ?? <CaretRight weight="bold" className="size-3.5" />}
