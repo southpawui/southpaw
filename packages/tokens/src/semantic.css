@@ -53,6 +53,11 @@
   --sp-link-hover: #083f99; /* 9.63:1 */
   --sp-link-visited: #6b2fb3; /* 7.83:1 */
 
+  /* ---- Skeleton (GEO-963). Translucent, so it reads on every surface. ---- */
+  --sp-skeleton: color-mix(in oklab, var(--sp-fg-default) 10%, transparent);
+  --sp-skeleton-highlight: color-mix(in oklab, var(--sp-neutral-0) 70%, transparent);
+  --sp-skeleton-outline: transparent;
+
   /* ---- Focus (two-tone ring) ---- */
   --sp-focus-outer: var(--sp-neutral-900);
   --sp-focus-inner: var(--sp-neutral-0);
@@ -103,6 +108,11 @@
   --sp-link-hover: #d0e0ff;
   --sp-link-visited: #c8a8ff;
 
+  /* ---- Skeleton ---- */
+  --sp-skeleton: color-mix(in oklab, var(--sp-fg-default) 12%, transparent);
+  --sp-skeleton-highlight: color-mix(in oklab, var(--sp-fg-default) 10%, transparent);
+  --sp-skeleton-outline: transparent;
+
   /* ---- Focus ---- */
   --sp-focus-outer: var(--sp-neutral-25);
   --sp-focus-inner: var(--sp-neutral-950);
@@ -152,6 +162,11 @@
   --sp-link-hover: #002f6c;
   --sp-link-visited: #4c2c92;
 
+  /* ---- Skeleton: a control-strength outline, so shapes don't rely on a faint fill ---- */
+  --sp-skeleton: color-mix(in oklab, var(--sp-fg-default) 12%, transparent);
+  --sp-skeleton-highlight: color-mix(in oklab, #ffffff 80%, transparent);
+  --sp-skeleton-outline: var(--sp-border-control);
+
   /* ---- Focus ---- */
   --sp-focus-outer: #000000;
   --sp-focus-inner: #ffffff;
@@ -171,6 +186,10 @@
     --sp-link: LinkText;
     --sp-link-hover: LinkText;
     --sp-link-visited: VisitedText;
+    /* Backgrounds are forced away; the outline (transparent elsewhere) shows the shape */
+    --sp-skeleton: Canvas;
+    --sp-skeleton-highlight: Canvas;
+    --sp-skeleton-outline: GrayText;
     --sp-focus-outer: Highlight;
     --sp-focus-inner: Canvas;
     --sp-border-control: ButtonText;

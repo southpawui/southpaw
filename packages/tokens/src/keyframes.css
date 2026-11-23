@@ -43,3 +43,63 @@
     opacity: 0.4;
   }
 }
+
+/* ---- Skeleton (GEO-963) ---- */
+
+/* Pulse: an opacity fade, cheap and direction-free */
+@keyframes sp-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Reduced motion, for pulse and wave alike: slower and gentler, no movement */
+@keyframes sp-skeleton-pulse-reduced {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+/* Wave: a highlight half the shape's width sweeps across in reading direction.
+ * With background-size 50%, position -100% sits it just before the start edge
+ * and 200% just past the end edge. */
+@keyframes sp-skeleton-wave {
+  from {
+    background-position-x: -100%;
+  }
+  to {
+    background-position-x: 200%;
+  }
+}
+
+@keyframes sp-skeleton-wave-rtl {
+  from {
+    background-position-x: 200%;
+  }
+  to {
+    background-position-x: -100%;
+  }
+}
+
+/* Delay: hidden (space kept) until the delay runs out, then shown. Used with
+ * a zero duration, a delay and `backwards` fill, so it needs no JavaScript. */
+@keyframes sp-skeleton-appear {
+  from {
+    visibility: hidden;
+  }
+}
+
+/* Loaded content fades in. Uses the motion tokens, so it's instant under reduced motion. */
+@keyframes sp-skeleton-fade-in {
+  from {
+    opacity: 0;
+  }
+}
