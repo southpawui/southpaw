@@ -1,5 +1,9 @@
 # Toolbar — Change Log
 
+## 2026-11-23 — Toolbar.Link keeps a function `className` (GEO-958, after the restack)
+
+Resolving the GEO-967 conflict against Part A brought back `cn(…, className)` in Toolbar.Link. That silently drops a Base UI state-function `className`, which is the GEO-958 bug Part A fixed. Toolbar.Link now uses `mergeClassName(cn(…), className)` like the rest of Toolbar. Regression test: a function `className` is applied alongside the shared ring and `rounded-md`.
+
 ## 2026-11-22 — Toolbar.Link uses the shared link behaviour (GEO-967)
 
 Toolbar hasn't been enhanced yet. This entry covers only what Link (GEO-967) needed from Toolbar.Link, as the Link refactor audit set out:

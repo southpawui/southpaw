@@ -60,10 +60,12 @@ const Link = React.forwardRef<HTMLAnchorElement, React.ComponentProps<typeof Bas
         data-slot="toolbar-link"
         target={target}
         rel={mergedRel}
-        className={cn(
-          "inline-flex h-8 items-center justify-center gap-1.5 rounded-md px-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100",
-          // The shared ring, without Link's small radius: the button keeps rounded-md
-          focusRingClasses,
+        className={mergeClassName(
+          cn(
+            "inline-flex h-8 items-center justify-center gap-1.5 rounded-md px-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100",
+            // The shared ring, without Link's small radius: the button keeps rounded-md
+            focusRingClasses,
+          ),
           className,
         )}
         {...props}

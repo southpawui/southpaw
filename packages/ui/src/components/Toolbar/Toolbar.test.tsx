@@ -27,6 +27,18 @@ describe("Toolbar.Link", () => {
     expect(link).not.toHaveClass("rounded-sm");
   });
 
+  it("keeps a function className alongside the shared classes (GEO-958)", () => {
+    render(
+      <Toolbar.Root aria-label="Formatting">
+        <Toolbar.Link href="/help" className={() => "from-state"}>
+          Help
+        </Toolbar.Link>
+      </Toolbar.Root>,
+    );
+    const link = screen.getByRole("link", { name: "Help" });
+    expect(link).toHaveClass("from-state", "focus-visible:sp-focus-ring", "rounded-md");
+  });
+
   it("a new-tab link gets the icon, hidden text and a merged rel", () => {
     render(
       <Toolbar.Root aria-label="Formatting">

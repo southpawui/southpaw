@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
 import { ArrowSquareOutIcon, DownloadSimpleIcon } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
+import { mergeClassName } from "../../lib/merge-class-name";
 import {
   defaultLinkLabels,
   getLinkBehaviour,
@@ -167,7 +168,10 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         "data-variant": variant,
         "data-standalone": standalone ? "" : undefined,
         "data-new-tab": behaviour.newTab ? "" : undefined,
-        className: cn(linkClasses({ variant, underline, standalone, size, visited }), className),
+        className: mergeClassName(
+          linkClasses({ variant, underline, standalone, size, visited }),
+          className,
+        ),
         children: content,
       },
     });

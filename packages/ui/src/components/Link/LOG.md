@@ -1,5 +1,11 @@
 # Link — Change Log
 
+## 2026-11-23 — `mergeClassName` after the restack onto Part A (GEO-967, GEO-958)
+
+- Rebased onto `geo-968-visually-hidden`, which now sits on Part A (GEO-970). Storybook's `@source` widening now comes from Part A, so the local-only `styles.css` edit is gone.
+- Link merges `className` with `mergeClassName(linkClasses(…), className)` instead of `cn`, matching every other wrapper since Part A. Link's `className` is a string, so the output is unchanged.
+- The conflicts in ErrorSummary, SkipLink, NavigationMenu, Menu and Toolbar were resolved by keeping Part A's `mergeClassName` and Link's changes. See Toolbar's LOG for the one real fix.
+
 ## 2026-11-23 — Sign-off (GEO-967)
 
 George signed off Link, asking for a gap around the focus ring.
