@@ -2,9 +2,9 @@
 
 import { Tabs } from "@southpawui/ui/Tabs";
 import type { ReactNode } from "react";
+import { MANAGERS, type Manager } from "@/lib/install";
 
-const MANAGERS = ["pnpm", "npm", "yarn", "bun"] as const;
-export type Manager = (typeof MANAGERS)[number];
+export type { Manager };
 
 /** Package-manager tabs around one command per manager. */
 export function ManagerTabs({
@@ -33,15 +33,25 @@ export function ManagerTabs({
   );
 }
 
-/** CLI / Manual installation tabs (shadcn code-tabs). */
-export function InstallTabsView({ cli, manual }: { cli: ReactNode; manual: ReactNode }) {
+/** southpawui / Manual installation tabs. Opens on Manual until southpawui is published. */
+export function InstallTabsView({
+  cli,
+  manual,
+  defaultTab,
+}: {
+  cli: ReactNode;
+  manual: ReactNode;
+  defaultTab: "cli" | "manual";
+}) {
   return (
-    <Tabs.Root data-slot="docs-install" defaultValue="cli" className="not-prose my-6">
+    <Tabs.Root data-slot="docs-install" defaultValue={defaultTab} className="not-prose my-6">
       <Tabs.List
         aria-label="Installation method"
         className="[[data-orientation=horizontal]_&]:overflow-visible"
       >
-        <Tabs.Tab value="cli">CLI</Tabs.Tab>
+        <Tabs.Tab value="cli" className="font-mono">
+          southpawui
+        </Tabs.Tab>
         <Tabs.Tab value="manual">Manual</Tabs.Tab>
         <Tabs.Indicator />
       </Tabs.List>

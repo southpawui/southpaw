@@ -77,3 +77,18 @@ body {
   outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--sp-focus-inner);
 }
+
+/*
+ * Code blocks without a title bar float the copy button over the code. End the
+ * scroll viewport before the button, so long commands scroll in the free space
+ * instead of running underneath it (phone widths especially).
+ */
+figure.shiki > div[class*="absolute"] + .fd-scroll-container {
+  margin-inline-end: 2.75rem;
+}
+
+/* Long inline code (paths, imports) wraps instead of overflowing on narrow screens. */
+.prose :not(pre) > code,
+[data-slot="docs-install"] :not(pre) > code {
+  overflow-wrap: anywhere;
+}

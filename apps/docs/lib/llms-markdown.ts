@@ -1,6 +1,12 @@
 import "server-only";
 import { typeTableToMarkdown } from "fumadocs-typescript";
 import { apiGenerator } from "@/components/docs/api-table";
+import {
+  SOUTHPAWUI_AVAILABLE_FROM,
+  SOUTHPAWUI_PUBLISHED,
+  southpawuiAdd,
+  southpawuiInit,
+} from "./install";
 import { getRegistryItem, registryItemUrl } from "./registry";
 
 /** Attribute text may contain ">" inside quoted values (e.g. a type expression). */
@@ -34,7 +40,11 @@ export async function expandBlocksForLLMs(markdown: string): Promise<string> {
   );
   md = await replaceAsync(md, /<InstallTabs\s((?:[^>"]|"[^"]*")*?)\/>/g, async (attrs) => {
     const { name } = props(attrs);
-    return name ? `\`\`\`bash\nnpx shadcn@latest add ${registryItemUrl(name)}\n\`\`\`` : "";
+    if (!name) return "";
+    const note = SOUTHPAWUI_PUBLISHED
+      ? ""
+      : `The southpawui CLI is available with ${SOUTHPAWUI_AVAILABLE_FROM}. Until then, install manually: the registry item at ${registryItemUrl(name)} lists every file (with its target path and contents) and the npm dependencies.\n\n`;
+    return `Install with the southpawui CLI:\n\n\`\`\`bash\n${southpawuiInit("npm")}   # once per project\n${southpawuiAdd("npm", [name])}\n\`\`\`\n\n${note}`.trimEnd();
   });
   md = await replaceAsync(md, /<APITable\s((?:[^>"]|"[^"]*")*?)\/>/g, async (attrs) => {
     const { path, name, type } = props(attrs);

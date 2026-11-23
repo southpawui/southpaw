@@ -9,7 +9,7 @@
     "start": "next start --port 3001",
     "registry": "node ../../packages/registry/build.mjs",
     "lint": "eslint .",
-    "typecheck": "pnpm registry && next typegen && node scripts/typecheck.mjs",
+    "typecheck": "pnpm registry && next typegen && tsc --noEmit",
     "verify": "node --experimental-strip-types --no-warnings scripts/verify-docs.ts"
   },
   "dependencies": {

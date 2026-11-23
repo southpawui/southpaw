@@ -3,34 +3,78 @@ title: Installation
 description: Add Southpaw UI components to a React project with Tailwind v4.
 ---
 
+<Callout title="Available with v0.2.0">
+  The `southpawui` CLI isn't published yet. Until then, every component page has a **Manual** tab
+  with the files to copy.
+</Callout>
+
 ## Requirements
 
 - React 19
-- Tailwind CSS v4
-- A [shadcn-compatible project](https://ui.shadcn.com/docs/installation) (a `components.json` file and an `@/` path alias)
+- Tailwind CSS v4, imported in your global stylesheet with `@import "tailwindcss";`
+- TypeScript
+- Next.js, Vite or React Router 7. Other setups work if they meet the requirements above.
 
-## Add a component
+## Set up your project
 
-Each component page has an **Installation** section with the exact command. For example:
+Run this once, from your project's root:
 
 ```bash
-pnpm dlx shadcn@latest add http://localhost:3001/r/dialog.json
+npx southpawui@latest init
 ```
 
-The CLI copies the component into `components/southpaw/`, adds the shared `cn` helper and the design tokens, and installs the npm dependencies.
+`init` works out your framework, package manager, path alias and global stylesheet. Then it:
+
+1. writes `southpaw.json`, which records those settings so `add` doesn't guess again;
+2. adds the design tokens and the `cn` helper to `components/southpaw/` (or `src/components/southpaw/`);
+3. imports the tokens in your global stylesheet, right after Tailwind;
+4. installs `clsx` and `tailwind-merge` with your package manager.
+
+Running `init` again is safe. It keeps your `southpaw.json` settings unless you pass `--force`.
+
+## Add components
+
+```bash
+npx southpawui@latest add dialog button
+```
+
+`add` copies each component and everything it depends on into `components/southpaw/`, and installs the npm packages it needs. Components import each other with relative paths, so they work whatever your path alias is.
+
+If a file already exists and is different, `add` asks before replacing it. In scripts and CI, nobody can answer, so pass a flag:
+
+| Flag          | What it does                                          |
+| ------------- | ----------------------------------------------------- |
+| `--overwrite` | Replace files that differ, without asking             |
+| `--yes`       | Keep your version of files that differ, and don't ask |
+| `--dry-run`   | List what would change without writing anything       |
+
+Without one of those flags, a non-interactive run that finds a changed file leaves it alone and exits with code 1.
+
+## southpaw.json
+
+```json
+{
+  "registry": "http://localhost:3001",
+  "framework": "next-app",
+  "tsx": true,
+  "css": "app/globals.css",
+  "aliases": { "components": "@/components" },
+  "paths": { "components": "components" }
+}
+```
+
+| Key                  | Meaning                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `registry`           | Where components are downloaded from                        |
+| `framework`          | `next-app`, `next-pages`, `vite`, `react-router` or `other` |
+| `css`                | The global stylesheet that imports Tailwind and the tokens  |
+| `aliases.components` | Your import alias for the components folder, or `null`      |
+| `paths.components`   | The components folder, relative to the project root         |
 
 <Callout title="Registry address">
-  The docs don't have a public domain yet, so commands point at a local docs server on port 3001.
+  The docs don't have a public domain yet, so the registry is a local docs server on port 3001. Override it with
+  `--registry <url>` or the `SOUTHPAW_REGISTRY_URL` environment variable.
 </Callout>
-
-## Import the tokens
-
-Import the tokens once, after Tailwind, in your global CSS:
-
-```css
-@import "tailwindcss";
-@import "./components/southpaw/tokens/index.css";
-```
 
 ## Isolate your app root
 
@@ -43,6 +87,10 @@ Dialogs, selects and other popups render in a portal at the end of `<body>`. Giv
 ```
 
 This is [Base UI's recommended setup](https://base-ui.com/react/overview/quick-start).
+
+## Use components from Client Components
+
+For now, render Southpaw components from Client Components: files that start with `"use client"`. Server Component support is on the way.
 
 ## Set a theme and density
 
@@ -58,3 +106,7 @@ Southpaw reads two attributes, normally on `<html>`. Either works on any element
 | `data-density` | `compact`, `default`, `comfortable` |
 
 Windows High Contrast (`forced-colors: active`) is handled automatically.
+
+## Other installers
+
+The registry uses the shadcn registry format, so the shadcn CLI can install from it too. Add `"registries": { "@southpaw": "http://localhost:3001/r/{name}.json" }` to your `components.json`, then run `shadcn add @southpaw/dialog`.
