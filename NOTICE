@@ -12,7 +12,9 @@ Built on:
 
 - shadcn/ui (MIT) — https://ui.shadcn.com
   Copyright shadcn
-  Southpaw uses the shadcn registry format and credits shadcn
+  Southpaw's registry uses the shadcn registry format, so the
+  shadcn CLI can install from it. The southpawui installer is
+  Southpaw's own and doesn't depend on shadcn. shadcn is credited
   as a foundational influence on the project.
 
 - libphonenumber-js (MIT) — https://github.com/catamphetamine/libphonenumber-js
