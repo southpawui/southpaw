@@ -1,5 +1,13 @@
 # DescriptionList — Change Log
 
+## 2026-11-23 — Copy tests: query the tooltip, not the text (GEO-966)
+
+The full suite failed once with "Found multiple elements with the text: Copied" (found during Toolbar's sign-off).
+
+- **Cause:** `getByText("Copied")` matches the copy button's tooltip and, once its 100ms write lands, the shared announcer region too. Under load the announcer wins the race, so the query finds two elements.
+- **Fix:** the copy tests now assert on the tooltip popup itself (`[data-slot=tooltip-popup]`). The announcer keeps its own assertions.
+- Test-only; the component is unchanged.
+
 ## 2026-11-23 — Item `loading` (GEO-966, GEO-963)
 
 This is the follow-up George approved ("sure", decision 2) for after the restack onto Skeleton. The base is `geo-964-indicator` @ d117eda, which contains Skeleton.
