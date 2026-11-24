@@ -1,5 +1,15 @@
 # ToggleGroup — Change Log
 
+## 2026-11-24 — Sliding indicator: a stale first frame brought it back (GEO-974)
+
+The flaky "hides when nothing is pressed" test was a real bug, not only test timing.
+
+- **Cause:** on mount, `measure()` sets `data-indicator=""` and schedules a frame that sets it to `"ready"` (which enables the transition). If the press cleared before that frame ran, `measure()` removed the indicator but left the frame pending. The frame then set `data-indicator="ready"` again with nothing pressed, so the indicator came back at its old position.
+- **Why it was flaky:** run on its own, the test's click lands within the first ~16ms frame, so it failed every time (the lead from Form's sign-off). In a full run, earlier tests usually let the frame fire first, so it failed about 1 run in 3.
+- **Fix:** clearing the indicator also cancels the pending frame, and the frame only marks it "ready" if it's still shown.
+- **Test:** a deterministic regression test controls `requestAnimationFrame`, un-presses before the first frame, then runs the frame. It fails without the fix and passes with it. The original test now passes 5 times out of 5 run alone.
+- **Verify:** passes. It reports color-contrast inconclusives on Default (3 nodes), DisallowEmpty (6) and Orientation (3): axe can't determine the labels' background because of the sliding indicator, which is the root's `::before`. They predate this fix (the indicator is unchanged) and weren't recorded before. They aren't violations.
+
 ## 2026-11-23 — Server Components support (GEO-972)
 
 - The implementation moved to `ToggleGroup.parts.tsx` (`"use client"`, one named export per part). `ToggleGroup.tsx` is now a server-safe entry that rebuilds the `ToggleGroup` namespace and re-exports its types and helpers, so `<ToggleGroup.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.

@@ -157,6 +157,9 @@ const Root = React.forwardRef<HTMLDivElement, ToggleGroupRootProps>(
       const measure = () => {
         const item = root.querySelector<HTMLElement>(":scope > [data-slot=toggle][data-pressed]");
         if (!item) {
+          // Also drop a pending "ready" frame: if the press clears within the first frame,
+          // that frame would otherwise bring the indicator back with nothing pressed (GEO-974).
+          cancelAnimationFrame(frame);
           root.removeAttribute("data-indicator");
           return;
         }
@@ -171,7 +174,10 @@ const Root = React.forwardRef<HTMLDivElement, ToggleGroupRootProps>(
           // First placement: show it without sliding in from 0, then enable the transition.
           root.setAttribute("data-indicator", "");
           cancelAnimationFrame(frame);
-          frame = requestAnimationFrame(() => root.setAttribute("data-indicator", "ready"));
+          frame = requestAnimationFrame(() => {
+            // Only if it's still shown (nothing un-pressed in the meantime)
+            if (root.hasAttribute("data-indicator")) root.setAttribute("data-indicator", "ready");
+          });
         }
       };
       measure();
