@@ -1,5 +1,10 @@
 # Kbd — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Kbd.parts.tsx` (`"use client"`, one named export per part). `Kbd.tsx` is now a server-safe entry that rebuilds the `Kbd` namespace and re-exports its types and helpers, so `<Kbd.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-13 — Default variant is now `outline` (George, at sign-off)
 
 - **What changed:** the default `variant` changed from `raised` to `outline`. `raised` (the key-cap bottom border) is still available. Stories, tests and RESEARCH.md are updated, and `outline` is listed first.

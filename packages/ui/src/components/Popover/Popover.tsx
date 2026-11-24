@@ -1,173 +1,45 @@
-import * as React from "react";
-import { Popover as BasePopover } from "@base-ui/react/popover";
-import { cn } from "../../lib/cn";
-import { mergeClassName } from "../../lib/merge-class-name";
-
 /* ============================================================
- * Root (pass-through)
+ * Popover: server-safe entry (GEO-972)
+ *
+ * The parts live in ./Popover.parts ("use client"). This file has no
+ * directive, so a Server Component gets a plain object of client
+ * references and `<Popover.Root>` works there too (Base UI's pattern).
+ * Keep it free of hooks, context and Base UI imports: the guard in
+ * lib/use-client.test.ts checks.
  * ============================================================ */
 
-const Root = BasePopover.Root;
+import {
+  PopoverArrow,
+  PopoverClose,
+  PopoverDescription,
+  PopoverPopup,
+  PopoverPortal,
+  PopoverPositioner,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+} from "./Popover.parts";
 
-/* ============================================================
- * Trigger (unstyled — consumer wraps with Button)
- * ============================================================ */
+export type * from "./Popover.parts";
 
-const Trigger = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<typeof BasePopover.Trigger>
->(({ className, ...props }, ref) => (
-  <BasePopover.Trigger
-    ref={ref}
-    data-slot="popover-trigger"
-    className={mergeClassName(cn(""), className)}
-    {...props}
-  />
-));
-Trigger.displayName = "Popover.Trigger";
-
-/* ============================================================
- * Portal (pass-through)
- * ============================================================ */
-
-const Portal = BasePopover.Portal;
-
-/* ============================================================
- * Positioner
- * ============================================================ */
-
-const Positioner = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof BasePopover.Positioner>
->(({ className, ...props }, ref) => (
-  <BasePopover.Positioner
-    ref={ref}
-    data-slot="popover-positioner"
-    className={mergeClassName(cn("outline-none"), className)}
-    {...props}
-  />
-));
-Positioner.displayName = "Popover.Positioner";
-
-/* ============================================================
- * Popup
- * ============================================================ */
-
-const Popup = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BasePopover.Popup>>(
-  ({ className, ...props }, ref) => (
-    <BasePopover.Popup
-      ref={ref}
-      data-slot="popover-popup"
-      className={mergeClassName(
-        cn(
-          "bg-surface-overlay border-border-default w-72 rounded-[var(--radius-DEFAULT)] border p-4 shadow-lg outline-none",
-          // Animation — scale from transform origin (set by Base UI positioner)
-          "origin-[var(--transform-origin)]",
-          "transition-[transform,scale,opacity] duration-[var(--sp-duration-normal)] ease-[var(--sp-easing-default)]",
-          "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
-          "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
-        ),
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
-Popup.displayName = "Popover.Popup";
-
-/* ============================================================
- * Arrow
- * ============================================================ */
-
-const Arrow = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BasePopover.Arrow>>(
-  ({ className, ...props }, ref) => (
-    <BasePopover.Arrow
-      ref={ref}
-      data-slot="popover-arrow"
-      className={mergeClassName(
-        cn(
-          "data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:bottom-[-5px]",
-        ),
-        className,
-      )}
-      {...props}
-    >
-      <div
-        className={cn(
-          "bg-surface-overlay border-border-default h-2.5 w-2.5 rotate-45 border",
-          // Hide the edges that overlap the popup — use parent data-side
-          "[[data-side=bottom]>&]:border-b-0 [[data-side=bottom]>&]:border-r-0",
-          "[[data-side=top]>&]:border-l-0 [[data-side=top]>&]:border-t-0",
-          "[[data-side=left]>&]:border-b-0 [[data-side=left]>&]:border-l-0",
-          "[[data-side=right]>&]:border-r-0 [[data-side=right]>&]:border-t-0",
-        )}
-      />
-    </BasePopover.Arrow>
-  ),
-);
-Arrow.displayName = "Popover.Arrow";
-
-/* ============================================================
- * Title
- * ============================================================ */
-
-const Title = React.forwardRef<HTMLHeadingElement, React.ComponentProps<typeof BasePopover.Title>>(
-  ({ className, ...props }, ref) => (
-    <BasePopover.Title
-      ref={ref}
-      data-slot="popover-title"
-      className={mergeClassName(cn("text-fg-default text-base font-semibold"), className)}
-      {...props}
-    />
-  ),
-);
-Title.displayName = "Popover.Title";
-
-/* ============================================================
- * Description
- * ============================================================ */
-
-const Description = React.forwardRef<
-  HTMLParagraphElement,
-  React.ComponentProps<typeof BasePopover.Description>
->(({ className, ...props }, ref) => (
-  <BasePopover.Description
-    ref={ref}
-    data-slot="popover-description"
-    className={mergeClassName(cn("text-fg-muted mt-1 text-sm"), className)}
-    {...props}
-  />
-));
-Description.displayName = "Popover.Description";
-
-/* ============================================================
- * Close (unstyled)
- * ============================================================ */
-
-const Close = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof BasePopover.Close>>(
-  ({ className, ...props }, ref) => (
-    <BasePopover.Close
-      ref={ref}
-      data-slot="popover-close"
-      className={mergeClassName(cn(""), className)}
-      {...props}
-    />
-  ),
-);
-Close.displayName = "Popover.Close";
-
-/* ============================================================
- * Compound export
- * ============================================================ */
-
-export const Popover = {
-  Root,
-  Trigger,
-  Portal,
-  Positioner,
-  Popup,
-  Arrow,
-  Title,
-  Description,
-  Close,
+export const Popover: {
+  Root: typeof PopoverRoot;
+  Trigger: typeof PopoverTrigger;
+  Portal: typeof PopoverPortal;
+  Positioner: typeof PopoverPositioner;
+  Popup: typeof PopoverPopup;
+  Arrow: typeof PopoverArrow;
+  Title: typeof PopoverTitle;
+  Description: typeof PopoverDescription;
+  Close: typeof PopoverClose;
+} = {
+  Root: PopoverRoot,
+  Trigger: PopoverTrigger,
+  Portal: PopoverPortal,
+  Positioner: PopoverPositioner,
+  Popup: PopoverPopup,
+  Arrow: PopoverArrow,
+  Title: PopoverTitle,
+  Description: PopoverDescription,
+  Close: PopoverClose,
 };

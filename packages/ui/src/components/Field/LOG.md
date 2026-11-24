@@ -1,5 +1,10 @@
 # Field — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Field.parts.tsx` (`"use client"`, one named export per part). `Field.tsx` is now a server-safe entry that rebuilds the `Field` namespace and re-exports its types and helpers, so `<Field.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-07
 
 ### Initial styling (Phase 1) — 0e141aa

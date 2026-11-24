@@ -1,5 +1,10 @@
 # NavigationMenu — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `NavigationMenu.parts.tsx` (`"use client"`, one named export per part). `NavigationMenu.tsx` is now a server-safe entry that rebuilds the `NavigationMenu` namespace and re-exports its types and helpers, so `<NavigationMenu.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-22 — Links built on Link (GEO-967)
 
 - **Desktop:** Base UI's `NavigationMenu.Link` now renders our `Link` through its `render`. A consumer's `render` goes into Link's own `render`, so the chain is Base UI → Link → router link. Base UI keeps roving focus, `closeOnClick` and `aria-current`.

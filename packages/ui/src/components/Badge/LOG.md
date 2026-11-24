@@ -1,5 +1,12 @@
 # Badge — Change Log
 
+## 2026-11-23 — Server-safe icon import (GEO-972)
+
+- The dismiss icon now comes from `@phosphor-icons/react/ssr` (`XIcon`) instead of the main entry, which uses React context. Badge has no hooks, so it stays a Server Component with no `"use client"`.
+- The output is the same: `XIcon` is the same icon, and `X` is its deprecated alias.
+- Badge with `onDismiss` still needs a client parent, because a function can't be passed from a Server Component.
+- See `packages/ui/LOG.md`.
+
 ## 2026-11-09 — Full enhancement
 
 ### What changed

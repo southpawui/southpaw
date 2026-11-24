@@ -1,5 +1,11 @@
 # Toolbar — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Toolbar.parts.tsx` (`"use client"`, one named export per part), including the overflow menu, tooltips, Home/End and the toolbar defaults from GEO-928. `Toolbar.tsx` is now a server-safe entry that rebuilds the `Toolbar` namespace and re-exports its types and helpers (`defaultToolbarLabels`, `markLineEdges`, `toAriaKeyShortcut`), so `<Toolbar.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- `lib/use-overflow.ts` (a hook) now has `"use client"` too.
+- See `packages/ui/LOG.md`.
+
 ## 2026-11-23 — Sign-off (GEO-928)
 
 George signed off Toolbar after the coordinator's review fixes (below).

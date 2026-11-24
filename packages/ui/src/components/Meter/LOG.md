@@ -1,5 +1,10 @@
 # Meter — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Meter.parts.tsx` (`"use client"`, one named export per part). `Meter.tsx` is now a server-safe entry that rebuilds the `Meter` namespace and re-exports its types and helpers, so `<Meter.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Warning fill now uses the `--sp-warning` token (GEO-970)
 
 The warning state was hard-coded as `oklch(0.7 0.15 85)`, the same colour in every theme. It now uses `bg-warning` (`--sp-warning`), so it follows the theme. Checked with Playwright: `#b45309` in light, `#fcd34d` in dark and `#7a4100` in high contrast. In light, this is a darker amber than before, 5:1 on white.

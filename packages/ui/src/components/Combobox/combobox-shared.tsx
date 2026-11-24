@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any -- items are consumer-typed; the
    shared layer only passes them through. Public types live in Combobox.tsx / Autocomplete.tsx. */
 import * as React from "react";

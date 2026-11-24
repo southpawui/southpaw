@@ -1,5 +1,10 @@
 # ToggleGroup — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `ToggleGroup.parts.tsx` (`"use client"`, one named export per part). `ToggleGroup.tsx` is now a server-safe entry that rebuilds the `ToggleGroup` namespace and re-exports its types and helpers, so `<ToggleGroup.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Enhancement (GEO-933)
 
 George agreed to all 17 recommendations via the coordinator; the research is in RESEARCH.md. **API change:** `ToggleGroup` is now a compound, `ToggleGroup.Root` plus `ToggleGroup.Separator`. Nothing else in the repo imported the old single component.

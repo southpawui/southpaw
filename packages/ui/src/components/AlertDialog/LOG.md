@@ -1,5 +1,10 @@
 # AlertDialog — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `AlertDialog.parts.tsx` (`"use client"`, one named export per part). `AlertDialog.tsx` is now a server-safe entry that rebuilds the `AlertDialog` namespace and re-exports its types and helpers, so `<AlertDialog.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Warning icon uses the `--sp-warning` tokens (GEO-970)
 
 The `warning` colour for `AlertDialog.Icon` was hard-coded as `oklch(0.92 0.04 85)` behind `oklch(0.5 0.15 85)`. Those are light-theme colours, so they were used unchanged in dark and high contrast. It now uses `bg-warning-subtle text-warning`, the same pattern as `success`, so it follows the theme.

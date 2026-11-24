@@ -1,5 +1,10 @@
 # Error Summary — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `ErrorSummary.parts.tsx` (`"use client"`, one named export per part). `ErrorSummary.tsx` is now a server-safe entry that rebuilds the `ErrorSummary` namespace and re-exports its types and helpers, so `<ErrorSummary.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-22 — Error links are built on Link (GEO-967)
 
 `ErrorSummary.Item` used to render its own `<a>` with its own classes. It now renders `Link`:

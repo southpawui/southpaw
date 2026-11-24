@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Toggle as BaseToggle } from "@base-ui/react/toggle";
 import { CheckIcon } from "@phosphor-icons/react";

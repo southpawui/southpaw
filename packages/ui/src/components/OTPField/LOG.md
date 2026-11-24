@@ -1,5 +1,10 @@
 # OTPField — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `OTPField.parts.tsx` (`"use client"`, one named export per part). `OTPField.tsx` is now a server-safe entry that rebuilds the `OTPField` namespace and re-exports its types and helpers, so `<OTPField.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Slots get `aria-invalid` when the field fails validation (GEO-970)
 
 - **Bug:** Base UI 1.9 sets each slot's `aria-invalid` only from Field.Root's `invalid` prop (`OTPFieldInput`: `'aria-invalid': !disabled && invalid`). `data-invalid`, though, comes from the field's validity state. So when a field failed validation, for example on a Base UI Form submit, the slots got `data-invalid` but no `aria-invalid`. As a result:

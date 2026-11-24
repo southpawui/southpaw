@@ -1,5 +1,10 @@
 # RadioGroup — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `RadioGroup.parts.tsx` (`"use client"`, one named export per part). `RadioGroup.tsx` is now a server-safe entry that rebuilds the `RadioGroup` namespace and re-exports its types and helpers, so `<RadioGroup.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — ChoiceCards class strings fixed (GEO-970)
 
 - **Bug, found in the GEO-939 research:** the ChoiceCards story joined its class strings with `+` and no spaces. Three classes ran together as `ease-[…]hover:border-fg-mutedhas-[[data-checked]]:border-accent`, so the easing, the hover border and the selected border never applied. The earlier LOG entry said this was fixed, but the code was never changed. It now passes separate strings to `cn()`.

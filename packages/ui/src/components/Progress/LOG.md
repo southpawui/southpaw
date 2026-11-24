@@ -1,5 +1,10 @@
 # Progress — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Progress.parts.tsx` (`"use client"`, one named export per part). `Progress.tsx` is now a server-safe entry that rebuilds the `Progress` namespace and re-exports its types and helpers, so `<Progress.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Indeterminate animation ships with the package; RTL and reduced motion (GEO-970)
 
 - **Bug:** `@keyframes progress-indeterminate` was only in `apps/storybook/styles.css`. Apps using the package got a static third-width bar. The keyframes now live in `packages/tokens/src/keyframes.css`, imported by `@southpawui/tokens/css`, and are removed from Storybook's styles. They are prefixed `sp-` (`sp-progress-indeterminate`) so they don't clash with an app's own keyframes.

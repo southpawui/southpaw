@@ -1,5 +1,10 @@
 # DescriptionList — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `DescriptionList.parts.tsx` (`"use client"`, one named export per part). `DescriptionList.tsx` is now a server-safe entry that rebuilds the `DescriptionList` namespace and re-exports its types and helpers, so `<DescriptionList.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-23 — Copy tests: query the tooltip, not the text (GEO-966)
 
 The full suite failed once with "Found multiple elements with the text: Copied" (found during Toolbar's sign-off).
