@@ -2,6 +2,11 @@
 
 Combobox and Autocomplete are built together (GEO-934) and share their styling. Entries here cover both; `Autocomplete/LOG.md` points here.
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Combobox.parts.tsx` (`"use client"`, one named export per part). `Combobox.tsx` is now a server-safe entry that rebuilds the `Combobox` namespace and re-exports its types and helpers, so `<Combobox.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Warning state now uses the `--sp-warning` token (GEO-970)
 
 The warning border was written as `border-[var(--sp-warning,var(--sp-fg-default))]`, which fell back to a dark border while the token was still on another branch (PR #44). The token is on the base now, so the state uses the `border-warning` utility and the fallback is gone. This lives in `combobox-shared.tsx`, so Autocomplete gets it too. The test now checks for `border-warning`, and the "Amber arrives at the restack" notes in the stories are gone. Checked with Playwright: the border is `#b45309` in light, `#fcd34d` in dark and `#7a4100` in high contrast, the same as the token.

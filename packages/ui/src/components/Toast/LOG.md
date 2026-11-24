@@ -1,5 +1,10 @@
 # Toast — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Toast.parts.tsx` (`"use client"`, one named export per part). `Toast.tsx` is now a server-safe entry that rebuilds the `Toast` namespace and re-exports its types and helpers, so `<Toast.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-16 — Sign-off + /improve fixes (GEO-920)
 
 George signed off (relayed by the coordinator). /improve was run on `Toast/` and the token additions. Every valid finding is fixed, each with a regression test.

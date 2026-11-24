@@ -1,5 +1,10 @@
 # Skeleton — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Skeleton.parts.tsx` (`"use client"`, one named export per part). `Skeleton.tsx` is now a server-safe entry that rebuilds the `Skeleton` namespace and re-exports its types and helpers, so `<Skeleton.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-23 — Sign-off (GEO-963)
 
 George signed off Skeleton, choosing "Combobox a": Combobox's skeleton rows are deferred to the Combobox follow-up ticket, GEO-975.

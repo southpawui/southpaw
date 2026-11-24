@@ -1,5 +1,10 @@
 # Fieldset — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Fieldset.parts.tsx` (`"use client"`, one named export per part). `Fieldset.tsx` is now a server-safe entry that rebuilds the `Fieldset` namespace and re-exports its types and helpers, so `<Fieldset.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-09 — Full enhancement
 
 ### What changed

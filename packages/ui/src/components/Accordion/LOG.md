@@ -1,5 +1,10 @@
 # Accordion — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Accordion.parts.tsx` (`"use client"`, one named export per part). `Accordion.tsx` is now a server-safe entry that rebuilds the `Accordion` namespace and re-exports its types and helpers, so `<Accordion.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Forced-colours focus workaround removed (GEO-950, GEO-970)
 
 `sp-focus-ring` now covers forced colours itself. Windows High Contrast strips the box-shadow ring, so the utility now adds a transparent 2px outline there, which the system paints in its own colour. So the trigger's own `forced-colors:focus-visible:outline-*` fallback is gone. It was the first workaround, the one GEO-950 named. The outline only applies in forced colours, so normal mode is unchanged. Checked with Playwright forced-colours emulation: the outline is solid 2px at offset 2px, and normal mode matches what it was before.

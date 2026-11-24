@@ -1,35 +1,19 @@
-import * as React from "react";
-import { CheckboxGroup as BaseCheckboxGroup } from "@base-ui/react/checkbox-group";
-import { cn } from "../../lib/cn";
-import { mergeClassName } from "../../lib/merge-class-name";
-
 /* ============================================================
- * Root
+ * CheckboxGroup: server-safe entry (GEO-972)
+ *
+ * The parts live in ./CheckboxGroup.parts ("use client"). This file has no
+ * directive, so a Server Component gets a plain object of client
+ * references and `<CheckboxGroup.Root>` works there too (Base UI's pattern).
+ * Keep it free of hooks, context and Base UI imports: the guard in
+ * lib/use-client.test.ts checks.
  * ============================================================ */
 
-const Root = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof BaseCheckboxGroup>>(
-  ({ className, render, ...props }, ref) => (
-    <BaseCheckboxGroup
-      ref={ref}
-      data-slot="checkbox-group"
-      className={mergeClassName(cn("flex flex-col gap-[var(--sp-control-gap)]"), className)}
-      // Base UI's CheckboxGroup (unlike RadioGroup) doesn't expose aria-disabled, so a disabled
-      // group — set directly, from Field.Root, or from an ancestor Fieldset — wasn't announced
-      // as disabled, and its (dimmed) group label failed axe contrast.
-      render={
-        render ??
-        ((renderProps, state) => (
-          <div {...renderProps} aria-disabled={state.disabled || undefined} />
-        ))
-      }
-      {...props}
-    />
-  ),
-);
-Root.displayName = "CheckboxGroup.Root";
+import { CheckboxGroupRoot } from "./CheckboxGroup.parts";
 
-/* ============================================================
- * Compound export
- * ============================================================ */
+export type * from "./CheckboxGroup.parts";
 
-export const CheckboxGroup = { Root };
+export const CheckboxGroup: {
+  Root: typeof CheckboxGroupRoot;
+} = {
+  Root: CheckboxGroupRoot,
+};

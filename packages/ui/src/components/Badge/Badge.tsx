@@ -1,5 +1,6 @@
 import * as React from "react";
-import { X } from "@phosphor-icons/react";
+// The /ssr entry has no React context, so Badge stays a Server Component (GEO-972)
+import { XIcon } from "@phosphor-icons/react/ssr";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
 
@@ -103,7 +104,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           }}
           aria-label="Dismiss"
         >
-          <X weight="bold" className={iconSizeClasses[size]} />
+          <XIcon weight="bold" className={iconSizeClasses[size]} />
         </button>
       )}
     </span>

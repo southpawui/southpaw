@@ -1,5 +1,10 @@
 # Tabs — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Tabs.parts.tsx` (`"use client"`, one named export per part). `Tabs.tsx` is now a server-safe entry that rebuilds the `Tabs` namespace and re-exports its types and helpers, so `<Tabs.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-21 — Selected tab style now applies (GEO-970)
 
 - **Bug:** the selected style used `data-[selected]`, but Base UI 1.9 marks the selected tab with `data-active`. The accent colour and semibold weight never applied, so without `<Tabs.Indicator />` nothing showed which tab was selected. The fix is `data-[active]:text-accent data-[active]:font-semibold`.

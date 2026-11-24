@@ -1,5 +1,10 @@
 # Select — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Select.parts.tsx` (`"use client"`, one named export per part). `Select.tsx` is now a server-safe entry that rebuilds the `Select` namespace and re-exports its types and helpers, so `<Select.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-07
 
 ### Initial styling (Phase 1) — 701eb6b

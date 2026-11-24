@@ -1,5 +1,10 @@
 # Slider — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Slider.parts.tsx` (`"use client"`, one named export per part). `Slider.tsx` is now a server-safe entry that rebuilds the `Slider` namespace and re-exports its types and helpers, so `<Slider.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-16 — Sign-off + /improve fixes (GEO-931)
 
 George signed off "as it is" (relayed by the coordinator). /improve was run on `Slider/`. Every valid finding is fixed, each with a regression test that fails without the fix.

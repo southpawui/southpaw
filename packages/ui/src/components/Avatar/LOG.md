@@ -1,5 +1,10 @@
 # Avatar — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Avatar.parts.tsx` (`"use client"`, one named export per part). `Avatar.tsx` is now a server-safe entry that rebuilds the `Avatar` namespace and re-exports its types and helpers, so `<Avatar.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-13 — Name tooltip replaces native `title` (GEO-941)
 
 ### What changed

@@ -1,5 +1,10 @@
 # Collapsible — Change Log
 
+## 2026-11-23 — Server Components support (GEO-972)
+
+- The implementation moved to `Collapsible.parts.tsx` (`"use client"`, one named export per part). `Collapsible.tsx` is now a server-safe entry that rebuilds the `Collapsible` namespace and re-exports its types and helpers, so `<Collapsible.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.
+- See `packages/ui/LOG.md` for the whole change and the guard that enforces it.
+
 ## 2026-11-16 — Export the completion hook for Accordion
 
 - Added `export const useCollapsibleOpenChangeComplete = useOpenChangeComplete;` (one line, no behaviour change). Accordion (GEO-922) uses it for per-item `onOpenChangeComplete`, so both components fire it the same way. It ships in the Accordion commit.
