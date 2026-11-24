@@ -13,6 +13,7 @@ import {
   type ErrorMessageContext,
   type ErrorMessages,
 } from "./error-messages";
+import { FormSummaryRegistryContext } from "../Form/context";
 
 export {
   defaultErrorMessages,
@@ -148,6 +149,10 @@ const Root = React.forwardRef<HTMLDivElement, ErrorSummaryRootProps>(
     const rootRef = React.useRef<HTMLDivElement>(null);
     const ref = useMergedRef(forwardedRef, rootRef);
     const titleId = React.useId();
+
+    // Inside a Form (GEO-935): tell it a summary is placed, so it skips its built-in one
+    const registerWithForm = React.useContext(FormSummaryRegistryContext);
+    React.useEffect(() => registerWithForm?.(), [registerWithForm]);
 
     const [collected, setCollected] = React.useState<ErrorSummaryError[]>([]);
     const collecting = errorsProp === undefined;
@@ -575,7 +580,11 @@ function labelOf(control: HTMLElement): HTMLElement | null {
 
 let generatedId = 0;
 
-function collectErrors(form: HTMLFormElement, messages: ErrorMessages): ErrorSummaryError[] {
+/**
+ * Read a form's invalid fields as summary errors (collect mode). Exported for Form
+ * (GEO-935), which feeds its built-in summary from the same reading.
+ */
+export function collectErrors(form: HTMLFormElement, messages: ErrorMessages): ErrorSummaryError[] {
   // A Field root marks itself invalid; controls outside a Field mark aria-invalid
   const fields = Array.from(
     form.querySelectorAll<HTMLElement>('[data-slot="field"][data-invalid]'),

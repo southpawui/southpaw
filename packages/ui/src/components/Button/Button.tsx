@@ -22,7 +22,10 @@ export interface ButtonProps extends Omit<React.ComponentProps<typeof BaseButton
   iconPosition?: "start" | "end";
   /** Screen reader label — use for icon-only buttons or to override the visible label */
   srOnly?: string;
-  /** Show a loading spinner. Disables the button and replaces the icon. */
+  /**
+   * Show a loading spinner in place of the icon. The button can't be activated, but it stays
+   * focusable (`aria-disabled` + `aria-busy`), so pressing it doesn't drop focus to the page.
+   */
   loading?: boolean;
   /**
    * Looks and acts disabled but stays focusable and hoverable (Primer `inactive`), so a
@@ -96,7 +99,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isInactive = inactive && !disabled && !loading;
     const isIconOnly = size === "icon";
     // When loading, show spinner in place of icon
-    const displayIcon = loading ? <Spinner /> : icon;
+    // The spinner is decorative here: the button itself is aria-busy, and the spinner's own
+    // "Loading" would otherwise join the name ("Loading Saving"), so the name stops matching the
+    // visible label (WCAG 2.5.3, GEO-935).
+    const displayIcon = loading ? <Spinner aria-hidden="true" /> : icon;
     const hasIcon = !!(displayIcon || loading);
     const iconStart = hasIcon && iconPosition === "start";
     const iconEnd = hasIcon && iconPosition === "end";
@@ -115,7 +121,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={loading || disabled || isInactive}
         // Base UI keeps a focusable-when-disabled button in the tab order with aria-disabled
         // and swallows activation (GEO-932: Primer `inactive`).
-        focusableWhenDisabled={isInactive || undefined}
+        // Loading too (GEO-935): a native `disabled` would blur the button the user just
+        // pressed, dropping focus to <body>. An explicitly `disabled` button stays native.
+        focusableWhenDisabled={isInactive || (loading && !disabled) || undefined}
         data-inactive={isInactive ? "" : undefined}
         className={mergeClassName(
           cn(

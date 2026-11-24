@@ -139,6 +139,13 @@ describe("Toggle", () => {
       expect(t).toHaveAttribute("aria-pressed", "false");
     });
 
+    it("the loading spinner doesn't join the name (WCAG 2.5.3)", () => {
+      render(<Toggle label="Pin" loading />);
+      // The name is the visible label; aria-busy says it's busy, not a status inside it
+      expect(toggle("Pin")).toHaveAccessibleName("Pin");
+      expect(screen.queryByRole("status")).toBeNull();
+    });
+
     it("readOnly stays focusable but the state can't change", async () => {
       const user = userEvent.setup();
       const onPressedChange = vi.fn();

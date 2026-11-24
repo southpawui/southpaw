@@ -1,5 +1,20 @@
 # Button — Change Log
 
+## 2026-11-23 — The loading spinner is decorative (GEO-935, WCAG 2.5.3)
+
+- **Before:** a loading Button rendered Spinner as is, with `role="status"` and a hidden "Loading". So the name became "Loading Saving" instead of the visible "Saving".
+- **Now:** the spinner gets `aria-hidden`. The button's own `aria-busy` says it's busy, and the name is the visible label.
+- **Test:** the name is "Saving", with no status role inside.
+- **Not changed:** Toggle renders the same Spinner when loading, so it has the same issue. That's flagged to the coordinator, not changed here.
+
+## 2026-11-23 — Loading keeps focus (GEO-935)
+
+The coordinator found this in Form review. Pressing an async Form.Submit dropped focus to `<body>` while it was busy.
+
+- **Cause:** `loading` set the native `disabled` attribute, and the browser blurs a control when it becomes disabled.
+- **Fix:** a loading Button now uses Base UI's `focusableWhenDisabled`, as `inactive` does. It stays focused, is `aria-disabled` and `aria-busy`, and clicks and Enter/Space do nothing. A Button that's also explicitly `disabled` stays natively disabled.
+- **Tests:** focus stays through `loading`; a busy button ignores clicks; loading plus disabled is native. The GEO-961 opacity test now checks `aria-disabled` instead of `:disabled`. ButtonGroup's loading regression test is updated the same way.
+
 ## 2026-11-07
 
 ### Initial styling (Phase 1) — f5b50d1

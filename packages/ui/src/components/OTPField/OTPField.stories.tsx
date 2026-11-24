@@ -296,7 +296,7 @@ function CompleteDemo() {
 function AutoSubmitDemo() {
   const [submitted, setSubmitted] = React.useState<string | null>(null);
   return (
-    <Form
+    <Form.Root
       aria-label="Verify"
       onSubmit={(e) => {
         e.preventDefault();
@@ -314,7 +314,7 @@ function AutoSubmitDemo() {
             : "The form submits as soon as the last slot is filled."
         }
       />
-    </Form>
+    </Form.Root>
   );
 }
 

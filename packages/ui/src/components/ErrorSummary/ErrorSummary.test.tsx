@@ -249,7 +249,7 @@ describe("ErrorSummary", () => {
 
   function CollectForm({ onErrorsChange }: { onErrorsChange?: (e: ErrorSummaryError[]) => void }) {
     return (
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root updateTitle={false} onErrorsChange={onErrorsChange} />
         <Field.Root name="name">
           <Field.Label>Full name</Field.Label>
@@ -268,7 +268,7 @@ describe("ErrorSummary", () => {
           </RadioGroup.Root>
         </Field.Root>
         <button type="submit">Send</button>
-      </Form>
+      </Form.Root>
     );
   }
 
@@ -324,7 +324,7 @@ describe("ErrorSummary", () => {
       <ErrorMessagesProvider
         messages={{ valueMissing: ({ lowerLabel }) => `Saisissez ${lowerLabel}` }}
       >
-        <Form>
+        <Form.Root>
           <ErrorSummary.Root
             updateTitle={false}
             messages={{ typeMismatch: () => "Format incorrect" }}
@@ -338,7 +338,7 @@ describe("ErrorSummary", () => {
             <Input type="email" defaultValue="x@" />
           </Field.Root>
           <button type="submit">Envoyer</button>
-        </Form>
+        </Form.Root>
       </ErrorMessagesProvider>,
     );
     await user.click(screen.getByRole("button", { name: "Envoyer" }));
@@ -355,7 +355,7 @@ describe("ErrorSummary sign-off regressions", () => {
   it("an error by name focuses the visible radio, not Base UI's hidden input", async () => {
     const user = userEvent.setup();
     render(
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root
           errors={[{ message: "Select a plan", name: "plan" }]}
           focusTarget="none"
@@ -367,7 +367,7 @@ describe("ErrorSummary sign-off regressions", () => {
             <RadioGroup.Item value="pro" aria-label="Pro" />
           </RadioGroup.Root>
         </Field.Root>
-      </Form>,
+      </Form.Root>,
     );
     await user.click(screen.getByRole("link", { name: "Select a plan" }));
     expect(screen.getByRole("radio", { name: "Free" })).toHaveFocus();
@@ -376,7 +376,7 @@ describe("ErrorSummary sign-off regressions", () => {
   it("an error by name focuses a Select's trigger and links to it", async () => {
     const user = userEvent.setup();
     render(
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root
           errors={[{ message: "Select your country", name: "country" }]}
           focusTarget="none"
@@ -389,7 +389,7 @@ describe("ErrorSummary sign-off regressions", () => {
             </Select.Trigger>
           </Select.Root>
         </Field.Root>
-      </Form>,
+      </Form.Root>,
     );
     const link = screen.getByRole("link", { name: "Select your country" });
     const trigger = screen.getByRole("combobox", { name: "Country" });
@@ -401,13 +401,13 @@ describe("ErrorSummary sign-off regressions", () => {
   it("collect mode reports an invalid field with no label", async () => {
     const user = userEvent.setup();
     render(
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root updateTitle={false} focusTarget="none" />
         <Field.Root name="q">
           <Input required placeholder="Search" />
         </Field.Root>
         <button type="submit">Go</button>
-      </Form>,
+      </Form.Root>,
     );
     await user.click(screen.getByRole("button", { name: "Go" }));
     expect(await screen.findByRole("link", { name: "Enter search" })).toBeInTheDocument();
@@ -416,7 +416,7 @@ describe("ErrorSummary sign-off regressions", () => {
   it("leaves VisuallyHidden text (including focusable) out of the label in messages", async () => {
     const user = userEvent.setup();
     render(
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root updateTitle={false} focusTarget="none" />
         <Field.Root name="postcode">
           <Field.Label>
@@ -426,7 +426,7 @@ describe("ErrorSummary sign-off regressions", () => {
           <Input required />
         </Field.Root>
         <button type="submit">Go</button>
-      </Form>,
+      </Form.Root>,
     );
     await user.click(screen.getByRole("button", { name: "Go" }));
     expect(await screen.findByRole("link", { name: "Enter postcode" })).toBeInTheDocument();
@@ -435,7 +435,7 @@ describe("ErrorSummary sign-off regressions", () => {
   it("a Combobox gets Select wording", async () => {
     const user = userEvent.setup();
     render(
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root updateTitle={false} focusTarget="none" />
         <Field.Root name="fruit">
           <Field.Label>Fruit</Field.Label>
@@ -444,7 +444,7 @@ describe("ErrorSummary sign-off regressions", () => {
           </Combobox.Root>
         </Field.Root>
         <button type="submit">Go</button>
-      </Form>,
+      </Form.Root>,
     );
     await user.click(screen.getByRole("button", { name: "Go" }));
     expect(await screen.findByRole("link", { name: "Select fruit" })).toBeInTheDocument();
@@ -522,14 +522,14 @@ describe("ErrorSummary sign-off regressions", () => {
     const user = userEvent.setup();
     const onErrorsChange = vi.fn();
     render(
-      <Form>
+      <Form.Root>
         <ErrorSummary.Root updateTitle={false} onErrorsChange={onErrorsChange} />
         <Field.Root name="name">
           <Field.Label>Name</Field.Label>
           <Input required />
         </Field.Root>
         <button type="submit">Go</button>
-      </Form>,
+      </Form.Root>,
     );
     await user.click(screen.getByRole("button", { name: "Go" }));
     await waitFor(() => expect(onErrorsChange).toHaveBeenCalledTimes(1));

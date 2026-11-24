@@ -1,5 +1,10 @@
 # Error Summary — Change Log
 
+## 2026-11-23 — Used by Form (GEO-935)
+
+- `collectErrors` is exported. Form feeds its built-in summary from the same reading of the invalid fields.
+- An ErrorSummary inside a Form registers with it (`FormSummaryRegistryContext`), so the Form skips its built-in summary and there's never a second one.
+- Tests and stories: `<Form>` is now `<Form.Root>` (Form became a namespace, GEO-935). No behaviour change.
 ## 2026-11-23 — Server Components support (GEO-972)
 
 - The implementation moved to `ErrorSummary.parts.tsx` (`"use client"`, one named export per part). `ErrorSummary.tsx` is now a server-safe entry that rebuilds the `ErrorSummary` namespace and re-exports its types and helpers, so `<ErrorSummary.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.

@@ -191,13 +191,13 @@ describe("OTPField", () => {
     it("marks slots aria-invalid when the field fails validation on submit", async () => {
       const user = userEvent.setup();
       const { container } = render(
-        <Form aria-label="Verify">
+        <Form.Root aria-label="Verify">
           <Field.Root name="code">
             <Field.Label>Code</Field.Label>
             <OTPField.Root length={3} required />
           </Field.Root>
           <button type="submit">Verify</button>
-        </Form>,
+        </Form.Root>,
       );
       expect(slots(container)[0]).not.toHaveAttribute("aria-invalid");
       await user.click(screen.getByRole("button", { name: "Verify" }));

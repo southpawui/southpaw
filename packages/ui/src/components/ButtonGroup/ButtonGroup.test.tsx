@@ -254,8 +254,12 @@ describe("ButtonGroup", () => {
           Saving
         </Button>,
       );
-      // The spinner contributes "Loading" to the name ("LoadingSaving").
-      expect(screen.getByRole("button", { name: /Saving/ })).toBeDisabled();
+      // The spinner contributes "Loading" to the name ("LoadingSaving"). Since GEO-935 a
+      // loading Button stays focusable: it can't be activated (aria-disabled), not natively disabled.
+      expect(screen.getByRole("button", { name: /Saving/ })).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
     });
   });
 

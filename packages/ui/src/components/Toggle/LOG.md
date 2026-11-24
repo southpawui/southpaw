@@ -1,5 +1,13 @@
 # Toggle — Change Log
 
+## 2026-11-23 — The loading spinner is decorative (GEO-935, WCAG 2.5.3)
+
+The same fix as Button, found in Form review.
+
+- **Before:** a loading Toggle rendered Spinner as is, with `role="status"` and a hidden "Loading", so the name became "Loading Pin" instead of the visible "Pin".
+- **Now:** the spinner gets `aria-hidden`, and the toggle's own `aria-busy` says it's busy.
+- **Test:** the name is "Pin", with no status role inside.
+
 ## 2026-11-18 — Enhancement (GEO-932)
 
 George agreed to the scope via the coordinator; the research is in RESEARCH.md. Decisions:

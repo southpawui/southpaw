@@ -154,10 +154,37 @@ describe("Button", () => {
   it("loading keeps a 90% fade, not the disabled fade (GEO-961 regression)", () => {
     render(<Button loading label="Saving" />);
     const btn = screen.getByRole("button", { name: /Saving/ });
-    expect(btn).toBeDisabled();
+    // Can't be activated, but stays focusable (GEO-935)
+    expect(btn).toHaveAttribute("aria-disabled", "true");
     expect(btn.className).toContain("opacity-90");
     // The :disabled rule out-ranked the loading opacity, so loading showed at the disabled fade.
     expect(btn.className).not.toContain("disabled:opacity-");
+  });
+
+  it("loading keeps focus on the button, is busy, and ignores clicks (GEO-935)", async () => {
+    const onClick = vi.fn();
+    const { rerender } = render(<Button label="Save" onClick={onClick} />);
+    const btn = screen.getByRole("button", { name: "Save" });
+    btn.focus();
+    rerender(<Button label="Save" onClick={onClick} loading />);
+    expect(btn).toHaveFocus();
+    expect(btn).not.toHaveAttribute("disabled");
+    expect(btn).toHaveAttribute("aria-busy", "true");
+    expect(btn).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(btn);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("the loading spinner doesn't join the name (WCAG 2.5.3)", () => {
+    render(<Button loading label="Saving" />);
+    expect(screen.getByRole("button")).toHaveAccessibleName("Saving");
+    // No role=status inside the button: aria-busy on the button says it's busy
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("loading and disabled together stay natively disabled", () => {
+    render(<Button label="Off" loading disabled />);
+    expect(screen.getByRole("button", { name: /Off/ })).toBeDisabled();
   });
 
   it("a plain disabled Button still gets the disabled fade", () => {
