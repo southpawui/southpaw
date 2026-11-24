@@ -124,7 +124,7 @@ function ApplicationForm({
 }) {
   const [sent, setSent] = React.useState(false);
   return (
-    <Form
+    <Form.Root
       className="flex flex-col gap-6 sm:max-w-lg"
       onSubmit={(event) => {
         event.preventDefault();
@@ -246,7 +246,7 @@ function ApplicationForm({
           </p>
         )}
       </div>
-    </Form>
+    </Form.Root>
   );
 }
 
@@ -311,7 +311,7 @@ function ServerErrorsDemo() {
       message,
     }));
     return (
-      <Form
+      <Form.Root
         className="flex flex-col gap-6 sm:max-w-md"
         errors={serverErrors}
         onSubmit={(event) => {
@@ -340,7 +340,7 @@ function ServerErrorsDemo() {
         <Button type="submit" loading={pending}>
           Create account
         </Button>
-      </Form>
+      </Form.Root>
     );
   }
 }
@@ -393,7 +393,7 @@ function TemplateForm({
 }) {
   const t = fieldLabels[lang];
   return (
-    <Form className="flex flex-col gap-5 sm:max-w-md" onSubmit={(e) => e.preventDefault()}>
+    <Form.Root className="flex flex-col gap-5 sm:max-w-md" onSubmit={(e) => e.preventDefault()}>
       <ErrorSummary.Root updateTitle={false} {...summary} />
       <Field.Root name="name">
         <Field.Label>{t.name}</Field.Label>
@@ -419,7 +419,7 @@ function TemplateForm({
         </RadioGroup.Root>
       </Field.Root>
       <Button type="submit">{t.submit}</Button>
-    </Form>
+    </Form.Root>
   );
 }
 

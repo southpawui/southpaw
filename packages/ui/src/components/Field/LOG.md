@@ -1,5 +1,24 @@
 # Field — Change Log
 
+## 2026-11-23 — Side labels align with a leading description (GEO-935 review)
+
+In a horizontal Field whose Field.Content starts with a description, the label now aligns with the description's first line (`mt-0`) instead of centring on the input (`mt-2.5`). GOV.UK, Carbon and Spectrum align side labels to the top of the control column.
+
+## 2026-11-23 — Form defaults and a bare Field.Error message (GEO-935)
+
+Small, separate changes for Form. Since the GEO-972 restack they live in `Field.parts.tsx` (`Field.tsx` is the server-safe entry and is unchanged here).
+
+- **`Field.Label` inside a Form follows the Form's `necessity`** (the approved shared change, decision 8):
+  - `optional` (default): "(optional)" for labels with `optional`, and no asterisk.
+  - `required`: "(required)" for labels with `required`.
+  - `none`: no marking.
+  - The text is part of the label, so screen readers hear it (GOV.UK), with a real space before it.
+  - Outside a Form, the asterisk and "(Optional)" are unchanged (tested).
+- **`Field.Root` takes the Form's orientation as its default.** Its own prop wins.
+- **Fixed: a bare `<Field.Error />` showed no message.**
+  - Our wrapper always passed its own children (icon plus text), which replaced Base UI's default children: the field's `validate` message, or a Form `errors` message.
+  - With no `children` and no `errors`, it now uses Base UI's `render` function and wraps the default message in the same icon and "Error:" layout. Several messages become a list.
+  - Covered by Form's tests: the server error shows inline, and the schema issue shows inline.
 ## 2026-11-23 — Server Components support (GEO-972)
 
 - The implementation moved to `Field.parts.tsx` (`"use client"`, one named export per part). `Field.tsx` is now a server-safe entry that rebuilds the `Field` namespace and re-exports its types and helpers, so `<Field.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.

@@ -421,7 +421,7 @@ function DisabledCascadeDemo() {
       <div className="flex flex-col gap-2">
         <Heading>Spaced: Toggle, NumberField, Checkbox, Switch, Button</Heading>
         <ButtonGroup.Root disabled={disabled} stackBelow={false} aria-label="Mixed controls">
-          <Toggle aria-label="Bold">B</Toggle>
+          <Toggle>Bold</Toggle>
           <NumberField.Root defaultValue={2} min={0} className="w-32">
             <NumberField.Group inputProps={{ "aria-label": "Quantity" }} />
           </NumberField.Root>

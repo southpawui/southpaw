@@ -1,5 +1,8 @@
 # OTPField — Change Log
 
+## 2026-11-23 — `<Form.Root>` in tests and stories (GEO-935)
+
+Form became a namespace (`Form.Root`), so OTPField's test and story use `<Form.Root>`. No behaviour change.
 ## 2026-11-23 — Server Components support (GEO-972)
 
 - The implementation moved to `OTPField.parts.tsx` (`"use client"`, one named export per part). `OTPField.tsx` is now a server-safe entry that rebuilds the `OTPField` namespace and re-exports its types and helpers, so `<OTPField.…>` works from a Next.js Server Component (Base UI's pattern). Public API and import paths are unchanged.

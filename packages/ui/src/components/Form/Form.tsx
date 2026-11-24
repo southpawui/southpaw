@@ -1,21 +1,23 @@
-"use client";
+/* ============================================================
+ * Form: server-safe entry (GEO-935, GEO-972 pattern)
+ *
+ * The parts live in ./Form.parts ("use client"). This file has no directive,
+ * so a Server Component gets a plain object of client references and can
+ * render <Form.Root action={serverAction}> directly. Keep it free of hooks,
+ * context and Base UI imports: the guard in lib/use-client.test.ts checks.
+ * ============================================================ */
 
-import * as React from "react";
-import { Form as BaseForm } from "@base-ui/react/form";
-import { cn } from "../../lib/cn";
-import { mergeClassName } from "../../lib/merge-class-name";
+import { FormErrorSummary, FormRoot, FormSubmit } from "./Form.parts";
 
-export type FormProps = React.ComponentProps<typeof BaseForm>;
+export type * from "./Form.parts";
+export type { FormNecessity, FormNecessityLabels } from "./context";
 
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ className, ...props }, ref) => {
-  return (
-    <BaseForm
-      ref={ref}
-      data-slot="form"
-      className={mergeClassName(cn("space-y-4"), className)}
-      {...props}
-    />
-  );
-});
-
-Form.displayName = "Form";
+export const Form: {
+  Root: typeof FormRoot;
+  ErrorSummary: typeof FormErrorSummary;
+  Submit: typeof FormSubmit;
+} = {
+  Root: FormRoot,
+  ErrorSummary: FormErrorSummary,
+  Submit: FormSubmit,
+};

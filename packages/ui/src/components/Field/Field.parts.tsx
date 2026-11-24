@@ -5,6 +5,7 @@ import { Field as BaseField } from "@base-ui/react/field";
 import { WarningCircle } from "@phosphor-icons/react";
 import { cn } from "../../lib/cn";
 import { mergeClassName } from "../../lib/merge-class-name";
+import { FormFieldContext } from "../Form/context";
 
 /**
  * Whether the nearest Field.Root was given `invalid` (e.g. app or server validation). Base UI's
@@ -20,24 +21,29 @@ interface FieldRootProps extends React.ComponentProps<typeof BaseField.Root> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(
-  ({ className, orientation = "vertical", ...props }, ref) => (
-    <FieldInvalidContext.Provider value={Boolean(props.invalid)}>
-      <BaseField.Root
-        ref={ref}
-        data-slot="field"
-        data-orientation={orientation}
-        className={mergeClassName(
-          cn(
-            "flex gap-1.5",
-            orientation === "vertical" && "w-full flex-col",
-            orientation === "horizontal" && "flex-col sm:flex-row sm:items-start sm:gap-4",
-          ),
-          className,
-        )}
-        {...props}
-      />
-    </FieldInvalidContext.Provider>
-  ),
+  ({ className, orientation: orientationProp, ...props }, ref) => {
+    // GEO-935: inside a Form, the Form's layout is the default; the Field's own prop wins
+    const formDefaults = React.useContext(FormFieldContext);
+    const orientation = orientationProp ?? formDefaults?.orientation ?? "vertical";
+    return (
+      <FieldInvalidContext.Provider value={Boolean(props.invalid)}>
+        <BaseField.Root
+          ref={ref}
+          data-slot="field"
+          data-orientation={orientation}
+          className={mergeClassName(
+            cn(
+              "flex gap-1.5",
+              orientation === "vertical" && "w-full flex-col",
+              orientation === "horizontal" && "flex-col sm:flex-row sm:items-start sm:gap-4",
+            ),
+            className,
+          )}
+          {...props}
+        />
+      </FieldInvalidContext.Provider>
+    );
+  },
 );
 Root.displayName = "Field.Root";
 
@@ -63,36 +69,69 @@ interface FieldLabelProps extends React.ComponentProps<typeof BaseField.Label> {
 }
 
 const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
-  ({ className, required, optional, children, ...props }, ref) => (
-    <BaseField.Label
-      ref={ref}
-      data-slot="field-label"
-      className={mergeClassName(
-        cn(
-          "text-fg-default text-sm font-medium",
-          // Dim with its control when the field is disabled (Base UI sets data-disabled from
-          // Field.Root, Field.Item, or an ancestor Fieldset / disabled ButtonGroup).
-          "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
-          // In horizontal layout, align with control height on sm+
-          "[[data-orientation=horizontal]>&]:sm:mt-2.5 [[data-orientation=horizontal]>&]:sm:w-[var(--sp-field-label-width,8rem)] [[data-orientation=horizontal]>&]:sm:shrink-0",
-        ),
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      {required && (
+  ({ className, required, optional, children, ...props }, ref) => {
+    // GEO-935 (approved shared change): inside a Form, the Form's `necessity` decides the
+    // marking. "optional": "(optional)" text and no asterisk (GOV.UK); "required": "(required)"
+    // text; "none": nothing. Outside a Form, the asterisk and "(Optional)" stay as before.
+    const form = React.useContext(FormFieldContext);
+    const formText = !form
+      ? null
+      : form.necessity === "optional" && optional
+        ? form.labels.optional
+        : form.necessity === "required" && required
+          ? form.labels.required
+          : null;
+
+    let marking: React.ReactNode = null;
+    if (form) {
+      // Part of the label, so screen readers hear it too (GOV.UK). A real space, so the name
+      // reads "Nickname (optional)", not "Nickname(optional)".
+      marking = formText ? (
+        <>
+          {" "}
+          <span data-slot="field-necessity" className="text-fg-muted font-normal">
+            {formText}
+          </span>
+        </>
+      ) : null;
+    } else if (required) {
+      marking = (
         <span className="text-danger ml-0.5" aria-hidden="true">
           *
         </span>
-      )}
-      {optional && !required && (
+      );
+    } else if (optional) {
+      marking = (
         <span className="text-fg-muted ml-1 text-xs font-normal" aria-hidden="true">
           (Optional)
         </span>
-      )}
-    </BaseField.Label>
-  ),
+      );
+    }
+
+    return (
+      <BaseField.Label
+        ref={ref}
+        data-slot="field-label"
+        data-necessity={form?.necessity}
+        className={mergeClassName(
+          cn(
+            "text-fg-default text-sm font-medium",
+            // Dim with its control when the field is disabled (Base UI sets data-disabled from
+            // Field.Root, Field.Item, or an ancestor Fieldset / disabled ButtonGroup).
+            "data-[disabled]:opacity-[var(--sp-state-disabled-opacity)]",
+            // In horizontal layout on sm+: centred on the control, or level with a leading
+            // description (GEO-935)
+            "[[data-orientation=horizontal]:has(>[data-slot=field-content]>[data-slot=field-description]:first-child)>&]:sm:mt-0 [[data-orientation=horizontal]>&]:sm:mt-2.5 [[data-orientation=horizontal]>&]:sm:w-[var(--sp-field-label-width,8rem)] [[data-orientation=horizontal]>&]:sm:shrink-0",
+          ),
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        {marking}
+      </BaseField.Label>
+    );
+  },
 );
 Label.displayName = "Field.Label";
 
@@ -146,27 +185,57 @@ const Error = React.forwardRef<HTMLDivElement, FieldErrorProps>(
     const hasContent = Boolean(errors?.length) || (children != null && children !== false);
     const match = matchProp ?? (rootInvalid && hasContent ? true : undefined);
 
+    const classes = mergeClassName(cn("text-danger flex gap-1.5 text-sm"), className);
+    const body = (message: React.ReactNode) => (
+      <>
+        {!hideIcon && <ErrorIcon />}
+        <span>
+          <span className="sr-only">Error: </span>
+          {message}
+        </span>
+      </>
+    );
+    const list = (items: React.ReactNode[]) => (
+      <ul className="list-inside list-disc">
+        {items.map((error, i) => (
+          <li key={i}>{error}</li>
+        ))}
+      </ul>
+    );
+
+    // GEO-935: no message given, so show the field's own. Base UI puts it in the default
+    // children (a Form `errors` message first, then the field's `validate` or validity
+    // message); the render function wraps it in the same icon and "Error:" layout. Before,
+    // a bare <Field.Error /> rendered with no message at all.
+    if (!hasContent) {
+      return (
+        <BaseField.Error
+          ref={ref}
+          data-slot="field-error"
+          className={classes}
+          match={match}
+          {...props}
+          render={(renderProps) => {
+            const { children: message, ...rest } = renderProps as React.ComponentProps<"div">;
+            return (
+              <div {...rest}>
+                {body(Array.isArray(message) && message.length > 1 ? list(message) : message)}
+              </div>
+            );
+          }}
+        />
+      );
+    }
+
     return (
       <BaseField.Error
         ref={ref}
         data-slot="field-error"
-        className={mergeClassName(cn("text-danger flex gap-1.5 text-sm"), className)}
+        className={classes}
         match={match}
         {...props}
       >
-        {!hideIcon && <ErrorIcon />}
-        <span>
-          <span className="sr-only">Error: </span>
-          {hasMultiple ? (
-            <ul className="list-inside list-disc">
-              {errors.map((error, i) => (
-                <li key={i}>{error}</li>
-              ))}
-            </ul>
-          ) : (
-            singleError
-          )}
-        </span>
+        {body(hasMultiple ? list(errors) : singleError)}
       </BaseField.Error>
     );
   },

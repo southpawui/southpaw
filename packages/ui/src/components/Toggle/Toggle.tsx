@@ -200,7 +200,9 @@ export const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
 
     const iconNode = loading ? (
       <span data-slot="toggle-icon" className={iconSlot}>
-        <Spinner />
+        {/* Decorative: the toggle is aria-busy, and the spinner's own "Loading" would join
+            the name ("Loading Pin"), so it stops matching the visible label (WCAG 2.5.3). */}
+        <Spinner aria-hidden="true" />
       </span>
     ) : icon || pressedIcon ? (
       <>

@@ -269,6 +269,28 @@ describe("ToggleGroup", () => {
       await waitFor(() => expect(group()).not.toHaveAttribute("data-indicator"));
     });
 
+    it("stays hidden when the press clears before the first frame (GEO-974 regression)", () => {
+      // The flake: mount schedules a frame that marks the indicator "ready". Un-pressing before
+      // it ran removed the indicator, then the frame put it back with nothing pressed. Control
+      // the frames so the order is deterministic.
+      const frames: FrameRequestCallback[] = [];
+      vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+        frames.push(cb);
+        return frames.length;
+      });
+      vi.spyOn(window, "cancelAnimationFrame").mockImplementation((id) => {
+        frames[id - 1] = () => {};
+      });
+      const { rerender } = render(<Align value={["left"]} />);
+      expect(group()).toHaveAttribute("data-indicator", "");
+      // Un-press, then run the pending frame
+      rerender(<Align value={[]} />);
+      return waitFor(() => expect(group()).not.toHaveAttribute("data-indicator")).then(() => {
+        frames.forEach((cb) => cb(0));
+        expect(group()).not.toHaveAttribute("data-indicator");
+      });
+    });
+
     it("slidingIndicator={false} turns it off", () => {
       render(<Align slidingIndicator={false} defaultValue={["left"]} />);
       expect(group().className).not.toContain("before:translate-x-");
